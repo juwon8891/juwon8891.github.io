@@ -1,0 +1,16 @@
+---
+layout: default
+---
+<article class="post">
+  <h1>{{ page.title }}</h1>
+  <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %m월 %d일" }}</time>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+</article>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>

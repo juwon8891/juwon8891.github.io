@@ -50,7 +50,7 @@ categories: [학습정리, GitOps, Container]
 
 **GitOps**라는 용어는 2017년 Weaveworks의 CEO인 Alexis Richardson이 처음 소개했습니다. 클라우드 네이티브 애플리케이션의 복잡성이 증가하면서, 전통적인 배포 방식의 한계가 드러나기 시작했고, 이를 해결하기 위한 새로운 패러다임이 필요했습니다.
 
-```mermaid
+<div class="mermaid">
 timeline
     title GitOps 발전 과정
     2014 : Kubernetes 1.0 출시
@@ -65,7 +65,7 @@ timeline
          : 엔터프라이즈 환경 적용 증가
     2023 : OpenGitOps v1.0.0 표준 발표
          : GitOps 원칙 공식 정의
-```
+</div>
 
 **전통적인 배포 방식의 문제점:**
 

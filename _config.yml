@@ -1,0 +1,15 @@
+title: 학습 정리
+description: 주차별 학습 내용 정리
+theme: minima
+baseurl: ""
+url: "https://juwon8891.github.io"
+
+markdown: kramdown
+permalink: /:year/:month/:day/:title/
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"

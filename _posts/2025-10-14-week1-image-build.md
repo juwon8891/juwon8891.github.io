@@ -570,35 +570,6 @@ git tag -a prod-2024-01-15 -m "Production snapshot"
 
 **Pull vs Push 모델 비교:**
 
-```mermaid
-graph TB
-    subgraph "Push 모델 (전통적 CI/CD)"
-        CI_PUSH[CI 파이프라인]
-        CLUSTER_PUSH[Kubernetes Cluster]
-
-        CI_PUSH -->|kubectl apply<br/>직접 배포| CLUSTER_PUSH
-
-        NOTE_PUSH[⚠️ CI가 클러스터 접근 권한 필요<br/>⚠️ 보안 위험 증가<br/>⚠️ 클러스터 상태 동기화 어려움]
-
-        style CI_PUSH fill:#FFB6C1
-        style NOTE_PUSH fill:#FFE5B4
-    end
-
-    subgraph "Pull 모델 (GitOps)"
-        GIT[Git Repository]
-        AGENT[GitOps Agent<br/>(in Cluster)]
-        CLUSTER_PULL[Kubernetes Cluster]
-
-        GIT -.->|주기적 확인| AGENT
-        AGENT -->|변경 감지 시<br/>자동 적용| CLUSTER_PULL
-
-        NOTE_PULL[✅ 클러스터 내부에서 동작<br/>✅ 보안 강화<br/>✅ 자동 동기화]
-
-        style AGENT fill:#98FB98
-        style NOTE_PULL fill:#D4EDDA
-    end
-```
-
 **Pull 모델의 작동 원리:**
 
 1. **GitOps 에이전트 설치**: 클러스터 내부에 ArgoCD나 Flux 설치
@@ -1609,26 +1580,6 @@ graph TB
   - 비공개 저장소는 유료
   - 커뮤니티가 Docker Hub보다 작음
   - 설정이 다소 복잡
-
-**선택 가이드:**
-
-```mermaid
-flowchart TB
-    START{저장소 선택}
-
-    START -->|개인 학습| DOCKER[Docker Hub<br/>✅ 간편함<br/>✅ 무료 시작]
-
-    START -->|오픈소스 프로젝트| DECISION{보안 중요?}
-    DECISION -->|예| QUAY[Quay.io<br/>✅ 무료 보안 스캔<br/>✅ 공개 무제한]
-    DECISION -->|아니오| DOCKER
-
-    START -->|기업 환경| ENTERPRISE[Private Registry<br/>Harbor, Nexus,<br/>ECR, GCR, ACR]
-
-    style DOCKER fill:#2496ED
-    style QUAY fill:#E8" style='color: #000000'>
-59866
-    style ENTERPRISE fill:#95E1D3
-```
 
 #### 1.3 상세 비교표
 

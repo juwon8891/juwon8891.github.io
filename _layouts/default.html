@@ -13,6 +13,15 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
+        // language-mermaid 클래스를 가진 코드 블록을 mermaid div로 변환
+        document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+          var pre = block.parentElement;
+          var div = document.createElement('div');
+          div.className = 'mermaid';
+          div.textContent = block.textContent;
+          pre.replaceWith(div);
+        });
+
         mermaid.initialize({
           startOnLoad: true,
           theme: 'default'

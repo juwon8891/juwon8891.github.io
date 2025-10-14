@@ -4,8 +4,21 @@ theme: minima
 baseurl: ""
 url: "https://juwon8891.github.io"
 
+# RSS 비활성화
+plugins:
+  - jekyll-feed
+
+# Feed 비활성화
+feed:
+  disable: true
+
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
+
+# Mermaid 지원
+kramdown:
+  syntax_highlighter_opts:
+    disable: false
 
 defaults:
   - scope:

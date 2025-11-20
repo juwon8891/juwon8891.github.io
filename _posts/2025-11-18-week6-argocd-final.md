@@ -34,17 +34,22 @@ categories: [학습정리, GitOps, ArgoCD, Kubernetes, Production, Best-Practice
    - [Cluster Credentials 관리](#2-cluster-credentials-관리)
    - [App of Apps 패턴](#3-app-of-apps-패턴)
 
-6. [🔐 시크릿 관리 전략](#-시크릿-관리-전략)
+6. [🔑 LDAP/Active Directory 통합](#-ldapactive-directory-통합)
+   - [Keycloak LDAP Federation](#1-keycloak-ldap-federation)
+   - [ArgoCD RBAC with LDAP Groups](#2-argocd-rbac-with-ldap-groups)
+   - [LDAP 동기화 및 캐싱](#3-ldap-동기화-및-캐싱)
+
+7. [🔐 시크릿 관리 전략](#-시크릿-관리-전략)
    - [Sealed Secrets](#1-sealed-secrets)
    - [External Secrets Operator](#2-external-secrets-operator)
    - [HashiCorp Vault 통합](#3-hashicorp-vault-통합)
 
-7. [📈 모니터링 및 관찰성](#-모니터링-및-관찰성)
+8. [📈 모니터링 및 관찰성](#-모니터링-및-관찰성)
    - [Prometheus Metrics](#1-prometheus-metrics)
    - [Notification 설정](#2-notification-설정)
    - [Audit Logging](#3-audit-logging)
 
-8. [🎓 6주차 학습 정리](#-6주차-학습-정리)
+9. [🎓 6주차 학습 정리](#-6주차-학습-정리)
    - [핵심 성취 목표](#1-핵심-성취-목표)
    - [프로덕션 체크리스트](#2-프로덕션-체크리스트)
    - [마무리 및 다음 단계](#3-마무리-및-다음-단계)
@@ -59,7 +64,7 @@ categories: [학습정리, GitOps, ArgoCD, Kubernetes, Production, Best-Practice
 
 **프로덕션 ArgoCD는 다음과 같은 고가용성 요구사항을 만족해야 합니다**:
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "High Availability Architecture"
         subgraph "API/UI Layer"
@@ -114,7 +119,7 @@ graph TB
 
     style LB fill:#4ECDC4
     style RH fill:#F7DC6F
-</div>
+```
 
 **컴포넌트별 역할**:
 
@@ -187,7 +192,7 @@ helm upgrade --install argocd argo/argo-cd \
 
 **Redis HA**는 **Sentinel**을 사용하여 자동 failover를 제공합니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Redis HA Cluster"
         S1[Sentinel 1] --> M[Redis Master]
@@ -216,7 +221,7 @@ graph TB
 
     style M fill:#E74C3C
     style NEW fill:#2ECC71
-</div>
+```
 
 **Sentinel 동작 방식**:
 1. **정족수(Quorum)**: 최소 2개의 Sentinel이 Master 장애 합의
@@ -255,7 +260,7 @@ kubectl exec -n argocd argocd-redis-ha-server-0 -c sentinel -- \
 
 **ApplicationSet Controller**는 **Leader Election**을 사용하여 Active-Standby 고가용성을 제공합니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant L as Leader Pod
     participant S as Standby Pod
@@ -279,7 +284,7 @@ sequenceDiagram
 
     style L fill:#2ECC71
     style S fill:#F39C12
-</div>
+```
 
 **Leader Election 설정**:
 
@@ -371,7 +376,7 @@ argocd app get myapp | grep "Sync Windows"
 
 **Argo Rollouts**는 Blue-Green, Canary 배포 전략을 제공합니다.
 
-<div class="mermaid">
+```mermaid
 graph LR
     subgraph "Canary Deployment"
         V1[Version 1<br/>100% Traffic]
@@ -388,7 +393,7 @@ graph LR
 
     style V2C fill:#2ECC71
     style ROLLBACK fill:#E74C3C
-</div>
+```
 
 #### Rollout 예시
 
@@ -630,7 +635,7 @@ data:
 
 **Matrix Generator**는 **2개의 Generator를 조합**하여 애플리케이션을 생성합니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Matrix Generator"
         G1[Git Generator<br/>Folders: app1, app2]
@@ -648,7 +653,7 @@ graph TB
     end
 
     style M fill:#F39C12
-</div>
+```
 
 #### Matrix Generator 예시
 
@@ -777,7 +782,7 @@ spec:
 
 **Pull Request Generator**는 **Git Pull Request**를 기반으로 preview 환경을 자동 생성합니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant D as Developer
     participant G as GitHub/GitLab
@@ -798,7 +803,7 @@ sequenceDiagram
 
     style AS fill:#F39C12
     style K fill:#2ECC71
-</div>
+```
 
 #### Pull Request Generator 예시
 
@@ -866,7 +871,7 @@ kubectl create secret generic github-token \
 
 **새 Kubernetes 클러스터를 ArgoCD에 추가하는 전체 과정**:
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Bootstrap Process"
         C1[1. 클러스터 생성]
@@ -895,7 +900,7 @@ graph TB
 
     style C3 fill:#F39C12
     style C4 fill:#2ECC71
-</div>
+```
 
 #### 클러스터 등록
 
@@ -973,7 +978,7 @@ kubectl get secret -n argocd argocd-manager-token -o jsonpath='{.data.token}' | 
 
 **App of Apps**는 **하나의 Application이 다른 Application들을 관리**하는 패턴입니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "App of Apps Pattern"
         ROOT[Root App<br/>apps/root.yaml]
@@ -1009,7 +1014,7 @@ graph TB
     style C1 fill:#4ECDC4
     style P1 fill:#F7DC6F
     style T1 fill:#2ECC71
-</div>
+```
 
 #### App of Apps 구현
 
@@ -1094,6 +1099,182 @@ spec:
 
 ---
 
+## 🔑 LDAP/Active Directory 통합
+
+### 1. Keycloak LDAP Federation
+
+#### LDAP 연동 아키텍처
+
+**Keycloak을 사용하여 기업 LDAP/AD를 ArgoCD SSO에 통합**할 수 있습니다.
+
+```mermaid
+graph TB
+    subgraph "Enterprise Identity"
+        LDAP[LDAP/Active Directory]
+        subgraph "User Groups"
+            G1[DevOps Team]
+            G2[Platform Team]
+            G3[App Team A]
+        end
+    end
+
+    subgraph "Keycloak"
+        KC[Keycloak Server]
+        LDAPF[LDAP Federation]
+        MAPPER[Group Mapper]
+    end
+
+    subgraph "ArgoCD"
+        OIDC[OIDC Config]
+        RBAC[RBAC Policy]
+        APP[Applications]
+    end
+
+    LDAP --> G1
+    LDAP --> G2
+    LDAP --> G3
+
+    G1 --> LDAPF
+    G2 --> LDAPF
+    G3 --> LDAPF
+
+    LDAPF --> KC
+    KC --> MAPPER
+    MAPPER --> OIDC
+    OIDC --> RBAC
+    RBAC --> APP
+
+    style LDAP fill:#E74C3C
+    style KC fill:#F39C12
+    style RBAC fill:#2ECC71
+```
+
+#### Keycloak LDAP 설정
+
+```bash
+# Keycloak Admin Console 접속
+# http://keycloak.example.com/admin
+
+# 1. User Federation → Add provider → ldap 선택
+
+# LDAP 기본 설정:
+# Edit Mode: READ_ONLY (LDAP 수정 불가)
+# Vendor: Active Directory 또는 Other
+# Connection URL: ldap://ldap.example.com:389
+# Users DN: ou=users,dc=example,dc=com
+# Bind DN: cn=admin,dc=example,dc=com
+# Bind Credential: <LDAP_ADMIN_PASSWORD>
+
+# 2. LDAP Group Mapper 생성
+# Mappers → Create
+
+# Name: group-mapper
+# Mapper Type: group-ldap-mapper
+# LDAP Groups DN: ou=groups,dc=example,dc=com
+# Group Name LDAP Attribute: cn
+# Group Object Classes: groupOfNames
+# Membership LDAP Attribute: member
+# Membership Attribute Type: DN
+# Mode: READ_ONLY
+```
+
+### 2. ArgoCD RBAC with LDAP Groups
+
+#### LDAP 그룹 기반 RBAC 정책
+
+```yaml
+# argocd-rbac-cm ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  policy.csv: |
+    # Platform Team (Full Admin)
+    g, /Platform Team, role:admin
+
+    # DevOps Team (Read-only Admin)
+    g, /DevOps Team, role:readonly
+
+    # App Team A (특정 프로젝트만)
+    g, /App Team A, role:app-team-a
+    p, role:app-team-a, applications, *, team-a/*, allow
+    p, role:app-team-a, applications, get, */*, allow
+    p, role:app-team-a, repositories, get, *, allow
+
+    # App Team B (특정 프로젝트만)
+    g, /App Team B, role:app-team-b
+    p, role:app-team-b, applications, *, team-b/*, allow
+    p, role:app-team-b, applications, get, */*, allow
+
+  policy.default: role:readonly
+
+  # LDAP 그룹 클레임 매핑
+  scopes: '[groups, email]'
+```
+
+**그룹 클레임 설정**:
+```yaml
+# argocd-cm ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  oidc.config: |
+    name: Keycloak
+    issuer: https://keycloak.example.com/realms/master
+    clientID: argocd
+    clientSecret: $oidc.keycloak.clientSecret
+    requestedScopes:
+    - openid
+    - profile
+    - email
+    - groups
+    # LDAP 그룹 클레임
+    claimMapping:
+      groups: groups
+```
+
+### 3. LDAP 동기화 및 캐싱
+
+#### Keycloak User Storage SPI 최적화
+
+```bash
+# Keycloak Admin Console
+# User Federation → ldap → Settings
+
+# Cache Settings:
+# Cache Policy: DEFAULT
+# Eviction Day: 1
+# Eviction Hour: 0
+# Eviction Minute: 0
+# Max Lifespan: 86400000 (24시간)
+
+# Sync Settings:
+# Periodic Full Sync: Enabled
+# Full Sync Period: 604800 (7일)
+# Periodic Changed Users Sync: Enabled
+# Changed Users Sync Period: 86400 (1일)
+```
+
+#### LDAP 연결 풀 최적화
+
+```yaml
+# Keycloak StatefulSet 환경 변수
+env:
+- name: LDAP_CONNECTION_POOL_SIZE
+  value: "20"
+- name: LDAP_CONNECTION_POOL_TIMEOUT
+  value: "5000"
+- name: LDAP_READ_TIMEOUT
+  value: "60000"
+```
+
+---
+
 ## 🔐 시크릿 관리 전략
 
 ### 1. Sealed Secrets
@@ -1102,7 +1283,7 @@ spec:
 
 **Sealed Secrets**는 암호화된 Secret을 **안전하게 Git에 저장**할 수 있게 합니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant D as Developer
     participant K as kubeseal CLI
@@ -1119,7 +1300,7 @@ sequenceDiagram
 
     style SS fill:#F39C12
     style KS fill:#2ECC71
-</div>
+```
 
 #### Sealed Secrets 설치 및 사용
 
@@ -1172,7 +1353,7 @@ kubectl get secret mysecret -o jsonpath='{.data.password}' | base64 -d
 - HashiCorp Vault
 - 1Password
 
-<div class="mermaid">
+```mermaid
 graph LR
     subgraph "External Secret Store"
         V[Vault]
@@ -1196,7 +1377,7 @@ graph LR
 
     style ESO fill:#F39C12
     style KS fill:#2ECC71
-</div>
+```
 
 #### External Secrets Operator 사용
 
@@ -1363,7 +1544,7 @@ spec:
 
 #### Notification 아키텍처
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "ArgoCD Notification"
         AC[Application Controller]
@@ -1404,7 +1585,7 @@ graph TB
 
     style NC fill:#F39C12
     style C1 fill:#2ECC71
-</div>
+```
 
 #### Slack Notification 설정
 
@@ -1574,6 +1755,9 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 - ✅ Pull Request Generator (Preview 환경)
 
 **보안 및 시크릿 관리**
+- ✅ LDAP/Active Directory 통합
+- ✅ Keycloak LDAP Federation
+- ✅ LDAP 그룹 기반 RBAC
 - ✅ Sealed Secrets
 - ✅ External Secrets Operator
 - ✅ Vault 통합
@@ -1599,6 +1783,7 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 **보안**
 - [ ] RBAC 정책 구성 완료
 - [ ] SSO (Keycloak/OIDC) 연동
+- [ ] LDAP/Active Directory 통합
 - [ ] Service Account API Key 관리
 - [ ] TLS/SSL 인증서 적용
 - [ ] Network Policy 구성
@@ -1664,7 +1849,8 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 **Phase 2: Expansion (2-3개월)**
 - [ ] Staging/Production 클러스터 추가
 - [ ] 전사 팀 온보딩
-- [ ] SSO 통합 (LDAP/AD)
+- [ ] SSO 통합 (Keycloak + LDAP/AD)
+- [ ] 그룹 기반 RBAC 정책 적용
 - [ ] Self-Service 플랫폼 구축
 
 **Phase 3: Optimization (3-6개월)**

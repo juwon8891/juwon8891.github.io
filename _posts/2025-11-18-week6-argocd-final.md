@@ -35,9 +35,10 @@ categories: [학습정리, GitOps, ArgoCD, Kubernetes, Production, Best-Practice
    - [App of Apps 패턴](#3-app-of-apps-패턴)
 
 6. [🔑 LDAP/Active Directory 통합](#-ldapactive-directory-통합)
-   - [Keycloak LDAP Federation](#1-keycloak-ldap-federation)
-   - [ArgoCD RBAC with LDAP Groups](#2-argocd-rbac-with-ldap-groups)
-   - [LDAP 동기화 및 캐싱](#3-ldap-동기화-및-캐싱)
+   - [OpenLDAP 서버 구축](#1-openldap-서버-구축)
+   - [Keycloak LDAP Federation](#2-keycloak-ldap-federation)
+   - [ArgoCD RBAC with LDAP Groups](#3-argocd-rbac-with-ldap-groups)
+   - [LDAP 동기화 및 캐싱](#4-ldap-동기화-및-캐싱)
 
 7. [🔐 시크릿 관리 전략](#-시크릿-관리-전략)
    - [Sealed Secrets](#1-sealed-secrets)
@@ -1101,11 +1102,238 @@ spec:
 
 ## 🔑 LDAP/Active Directory 통합
 
-### 1. Keycloak LDAP Federation
+### 1. OpenLDAP 서버 구축
+
+#### LDAP란?
+
+**LDAP (Lightweight Directory Access Protocol)**는 사용자, 그룹, 권한 정보를 계층적으로 관리하는 디렉터리 서비스입니다.
+
+**쉬운 비유**:
+- **LDAP 서버** = 회사의 인사/보안부 (모든 직원 정보 중앙 관리)
+- **디렉터리 구조** = 회사 조직도 (본사-부서-팀-직원)
+- **인증(Authentication)** = 신분증 검사
+- **권한 부여(Authorization)** = 출입증/권한 확인
+
+#### LDAP 디렉터리 구조 (DIT)
+
+```
+dc=example,dc=org          # Base DN (Root DN)
+├── ou=people              # Organizational Unit: 사용자
+│   ├── uid=alice
+│   │   ├── cn: Alice
+│   │   ├── sn: Kim
+│   │   └── mail: alice@example.org
+│   └── uid=bob
+│       ├── cn: Bob
+│       ├── sn: Lee
+│       └── mail: bob@example.org
+└── ou=groups              # Organizational Unit: 그룹
+    ├── cn=devs
+    │   └── member: uid=bob,ou=people,dc=example,dc=org
+    └── cn=admins
+        └── member: uid=alice,ou=people,dc=example,dc=org
+```
+
+**주요 용어**:
+- **DN (Distinguished Name)**: `uid=alice,ou=people,dc=example,dc=org`
+- **RDN (Relative Distinguished Name)**: `uid=alice`
+- **Base DN**: `dc=example,dc=org`
+- **Entry**: 디렉터리의 기본 단위 (다수의 Attribute로 구성)
+- **Attribute**: Entry의 각 속성 (cn, sn, uid, mail 등)
+
+#### OpenLDAP 서버 배포
+
+```bash
+# OpenLDAP + phpLDAPadmin 배포
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openldap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openldap
+  namespace: openldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openldap
+  template:
+    metadata:
+      labels:
+        app: openldap
+    spec:
+      containers:
+      # OpenLDAP Server
+      - name: openldap
+        image: osixia/openldap:1.5.0
+        ports:
+        - containerPort: 389
+          name: ldap
+        - containerPort: 636
+          name: ldaps
+        env:
+        - name: LDAP_ORGANISATION
+          value: "Example Org"
+        - name: LDAP_DOMAIN
+          value: "example.org"
+        - name: LDAP_ADMIN_PASSWORD
+          value: "admin"
+        - name: LDAP_CONFIG_PASSWORD
+          value: "admin"
+
+      # phpLDAPadmin (Web UI)
+      - name: phpldapadmin
+        image: osixia/phpldapadmin:0.9.0
+        ports:
+        - containerPort: 80
+          name: phpldapadmin
+        env:
+        - name: PHPLDAPADMIN_HTTPS
+          value: "false"
+        - name: PHPLDAPADMIN_LDAP_HOSTS
+          value: "localhost"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap
+  namespace: openldap
+spec:
+  selector:
+    app: openldap
+  ports:
+  - name: phpldapadmin
+    port: 80
+    targetPort: 80
+    nodePort: 30000
+  - name: ldap
+    port: 389
+    targetPort: 389
+  - name: ldaps
+    port: 636
+    targetPort: 636
+  type: NodePort
+EOF
+
+# 배포 확인
+kubectl get deploy,pod,svc,ep -n openldap
+```
+
+#### OpenLDAP 초기 설정
+
+**1. phpLDAPadmin 웹 UI 접속**:
+```bash
+# 브라우저에서 접속
+open http://127.0.0.1:30000
+
+# 로그인 정보:
+# - Login DN: cn=admin,dc=example,dc=org
+# - Password: admin
+```
+
+**2. OU (Organizational Unit) 생성**:
+```bash
+kubectl -n openldap exec -it deploy/openldap -c openldap -- bash
+
+# ou=people, ou=groups 생성
+cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
+dn: ou=people,dc=example,dc=org
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+ou: groups
+EOF
+```
+
+**3. 사용자 추가**:
+```bash
+# alice 사용자 추가
+cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
+dn: uid=alice,ou=people,dc=example,dc=org
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: alice
+cn: Alice
+sn: Kim
+mail: alice@example.org
+userPassword: password123
+uidNumber: 10001
+gidNumber: 10001
+homeDirectory: /home/alice
+EOF
+
+# bob 사용자 추가
+cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
+dn: uid=bob,ou=people,dc=example,dc=org
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bob
+cn: Bob
+sn: Lee
+mail: bob@example.org
+userPassword: password456
+uidNumber: 10002
+gidNumber: 10002
+homeDirectory: /home/bob
+EOF
+```
+
+**4. 그룹 생성 및 멤버 할당**:
+```bash
+# devs 그룹 생성
+cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
+dn: cn=devs,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: devs
+member: uid=bob,ou=people,dc=example,dc=org
+EOF
+
+# admins 그룹 생성
+cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
+dn: cn=admins,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: admins
+member: uid=alice,ou=people,dc=example,dc=org
+EOF
+```
+
+**5. LDAP 검색 테스트**:
+```bash
+# 모든 사용자 조회
+ldapsearch -x -H ldap://localhost:389 \
+  -b "ou=people,dc=example,dc=org" \
+  -D "cn=admin,dc=example,dc=org" \
+  -w admin
+
+# 특정 사용자 조회
+ldapsearch -x -H ldap://localhost:389 \
+  -b "dc=example,dc=org" \
+  -D "cn=admin,dc=example,dc=org" \
+  -w admin \
+  "(uid=alice)"
+
+# 모든 그룹 조회
+ldapsearch -x -H ldap://localhost:389 \
+  -b "ou=groups,dc=example,dc=org" \
+  -D "cn=admin,dc=example,dc=org" \
+  -w admin
+```
+
+---
+
+### 2. Keycloak LDAP Federation
 
 #### LDAP 연동 아키텍처
 
-**Keycloak을 사용하여 기업 LDAP/AD를 ArgoCD SSO에 통합**할 수 있습니다.
+**Keycloak을 사용하여 OpenLDAP를 ArgoCD SSO에 통합**할 수 있습니다.
 
 ```mermaid
 graph TB
@@ -1178,7 +1406,7 @@ graph TB
 # Mode: READ_ONLY
 ```
 
-### 2. ArgoCD RBAC with LDAP Groups
+### 3. ArgoCD RBAC with LDAP Groups
 
 #### LDAP 그룹 기반 RBAC 정책
 
@@ -1238,7 +1466,7 @@ data:
       groups: groups
 ```
 
-### 3. LDAP 동기화 및 캐싱
+### 4. LDAP 동기화 및 캐싱
 
 #### Keycloak User Storage SPI 최적화
 
@@ -1755,9 +1983,10 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 - ✅ Pull Request Generator (Preview 환경)
 
 **보안 및 시크릿 관리**
-- ✅ LDAP/Active Directory 통합
-- ✅ Keycloak LDAP Federation
-- ✅ LDAP 그룹 기반 RBAC
+- ✅ OpenLDAP 서버 구축 및 DIT 설계
+- ✅ LDAP 사용자/그룹 관리 (ldapadd, ldapsearch)
+- ✅ Keycloak LDAP Federation 연동
+- ✅ LDAP 그룹 기반 RBAC 정책
 - ✅ Sealed Secrets
 - ✅ External Secrets Operator
 - ✅ Vault 통합
@@ -1784,6 +2013,10 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 - [ ] RBAC 정책 구성 완료
 - [ ] SSO (Keycloak/OIDC) 연동
 - [ ] LDAP/Active Directory 통합
+  - [ ] OpenLDAP 서버 또는 AD 설정
+  - [ ] DIT (Directory Information Tree) 설계
+  - [ ] Keycloak LDAP Federation 연동
+  - [ ] LDAP 그룹 매핑 및 동기화
 - [ ] Service Account API Key 관리
 - [ ] TLS/SSL 인증서 적용
 - [ ] Network Policy 구성

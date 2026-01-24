@@ -192,7 +192,7 @@ flowchart TD
     C --> C1[cluster-info ConfigMap 조회]
     D --> D1[CA 인증서 해시 검증]
     E --> E1[CSR 생성 및 자동 승인]
-    F --> F1[kubelet.conf 생성<br/>노드 등록]
+    F --> F1[kubelet.conf 생성<br>노드 등록]
 
     style A fill:#e1f5ff
     style G fill:#c3e6cb
@@ -439,10 +439,10 @@ kubectl get nodes
 ```mermaid
 graph TB
     subgraph "OverlayFS 구조"
-        A[Merged View<br/>컨테이너에서 보이는 통합 파일시스템] --> B[Upper Layer<br/>쓰기 가능 레이어<br/>컨테이너의 변경사항]
-        A --> C[Lower Layer 3<br/>읽기 전용 이미지 레이어]
-        A --> D[Lower Layer 2<br/>읽기 전용 이미지 레이어]
-        A --> E[Lower Layer 1<br/>읽기 전용 이미지 레이어<br/>Base Image]
+        A[Merged View<br>컨테이너에서 보이는 통합 파일시스템] --> B[Upper Layer<br>쓰기 가능 레이어<br>컨테이너의 변경사항]
+        A --> C[Lower Layer 3<br>읽기 전용 이미지 레이어]
+        A --> D[Lower Layer 2<br>읽기 전용 이미지 레이어]
+        A --> E[Lower Layer 1<br>읽기 전용 이미지 레이어<br>Base Image]
     end
 
     F[Container Write] -.-> B
@@ -597,24 +597,24 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```mermaid
 graph TD
     subgraph "Kubernetes CA"
-        CA[CA<br/>kubernetes<br/>10년] --> API[apiserver.crt<br/>kube-apiserver<br/>1년]
-        CA --> APIKUBE[apiserver-kubelet-client.crt<br/>kube-apiserver-kubelet-client<br/>O: kubeadm:cluster-admins<br/>1년]
-        CA --> ADMIN[admin.crt<br/>kubernetes-admin<br/>O: kubeadm:cluster-admins<br/>1년]
-        CA --> KUBELET[kubelet-client.crt<br/>system:node:k8s-ctr<br/>O: system:nodes<br/>자동 갱신]
+        CA[CA<br>kubernetes<br>10년] --> API[apiserver.crt<br>kube-apiserver<br>1년]
+        CA --> APIKUBE[apiserver-kubelet-client.crt<br>kube-apiserver-kubelet-client<br>O: kubeadm:cluster-admins<br>1년]
+        CA --> ADMIN[admin.crt<br>kubernetes-admin<br>O: kubeadm:cluster-admins<br>1년]
+        CA --> KUBELET[kubelet-client.crt<br>system:node:k8s-ctr<br>O: system:nodes<br>자동 갱신]
     end
 
     subgraph "etcd CA"
-        ETCDCA[etcd/ca.crt<br/>etcd-ca<br/>10년] --> ETCD[etcd/server.crt<br/>k8s-ctr<br/>1년]
-        ETCDCA --> ETCDPEER[etcd/peer.crt<br/>k8s-ctr<br/>1년]
-        ETCDCA --> APIETCD[apiserver-etcd-client.crt<br/>kube-apiserver-etcd-client<br/>O: system:masters<br/>1년]
+        ETCDCA[etcd/ca.crt<br>etcd-ca<br>10년] --> ETCD[etcd/server.crt<br>k8s-ctr<br>1년]
+        ETCDCA --> ETCDPEER[etcd/peer.crt<br>k8s-ctr<br>1년]
+        ETCDCA --> APIETCD[apiserver-etcd-client.crt<br>kube-apiserver-etcd-client<br>O: system:masters<br>1년]
     end
 
     subgraph "Front Proxy CA"
-        FRONTCA[front-proxy-ca.crt<br/>front-proxy-ca<br/>10년] --> FRONT[front-proxy-client.crt<br/>front-proxy-client<br/>1년]
+        FRONTCA[front-proxy-ca.crt<br>front-proxy-ca<br>10년] --> FRONT[front-proxy-client.crt<br>front-proxy-client<br>1년]
     end
 
     subgraph "SA Token"
-        SA[sa.key / sa.pub<br/>service-accounts<br/>Private/Public Key Pair]
+        SA[sa.key / sa.pub<br>service-accounts<br>Private/Public Key Pair]
     end
 
     style CA fill:#ff9999
@@ -787,19 +787,19 @@ Kubernetes는 **1년에 3개의 마이너 버전**을 출시하며, **최근 3�
 ```mermaid
 graph TB
     subgraph "Version Skew Policy"
-        API[kube-apiserver<br/>1.32] --> KCM[kube-controller-manager<br/>1.32 ~ 1.31<br/>-1 마이너 버전]
-        API --> SCHED[kube-scheduler<br/>1.32 ~ 1.31<br/>-1 마이너 버전]
-        API --> KUBELET[kubelet<br/>1.32 ~ 1.29<br/>-3 마이너 버전]
-        API --> PROXY[kube-proxy<br/>1.32 ~ 1.29<br/>-3 마이너 버전]
+        API[kube-apiserver<br>1.32] --> KCM[kube-controller-manager<br>1.32 ~ 1.31<br>-1 마이너 버전]
+        API --> SCHED[kube-scheduler<br>1.32 ~ 1.31<br>-1 마이너 버전]
+        API --> KUBELET[kubelet<br>1.32 ~ 1.29<br>-3 마이너 버전]
+        API --> PROXY[kube-proxy<br>1.32 ~ 1.29<br>-3 마이너 버전]
 
-        KUBECTL[kubectl<br/>1.33 ~ 1.31<br/>±1 마이너 버전] -.-> API
+        KUBECTL[kubectl<br>1.33 ~ 1.31<br>±1 마이너 버전] -.-> API
 
-        KUBELET -.-> PROXY2[kube-proxy와<br/>최대 ±3 마이너 버전 차이]
+        KUBELET -.-> PROXY2[kube-proxy와<br>최대 ±3 마이너 버전 차이]
     end
 
     subgraph "HA Control Plane"
-        API2[kube-apiserver<br/>1.32 NEW]
-        API3[kube-apiserver<br/>1.31 OLD]
+        API2[kube-apiserver<br>1.32 NEW]
+        API3[kube-apiserver<br>1.31 OLD]
         API2 -.-> API3
     end
 
@@ -878,13 +878,13 @@ graph TB
 ```mermaid
 graph LR
     subgraph "In-Place Upgrade"
-        A1[v1.32 Cluster] --> A2[v1.33 Cluster<br/>순차 업그레이드]
+        A1[v1.32 Cluster] --> A2[v1.33 Cluster<br>순차 업그레이드]
         A2 --> A3[v1.34 Cluster]
     end
 
     subgraph "Blue-Green Upgrade"
-        B1[Blue: v1.32 Cluster<br/>현재 운영] --> B2[Green: v1.34 Cluster<br/>신규 생성]
-        B2 --> B3[트래픽 전환<br/>Blue → Green]
+        B1[Blue: v1.32 Cluster<br>현재 운영] --> B2[Green: v1.34 Cluster<br>신규 생성]
+        B2 --> B3[트래픽 전환<br>Blue → Green]
         B3 --> B4[Blue 클러스터 제거]
     end
 
@@ -1061,18 +1061,18 @@ flowchart TD
     B --> C[CNI 업그레이드]
     C --> D[업그레이드 계획 확인]
 
-    D --> E1[Control Plane 1<br/>1.32 → 1.33 → 1.34]
+    D --> E1[Control Plane 1<br>1.32 → 1.33 → 1.34]
     E1 --> E2{HA 구성?}
-    E2 -->|Yes| E3[Control Plane 2<br/>1.32 → 1.33 → 1.34]
+    E2 -->|Yes| E3[Control Plane 2<br>1.32 → 1.33 → 1.34]
     E2 -->|No| F1
-    E3 --> E4[Control Plane 3<br/>1.32 → 1.33 → 1.34]
+    E3 --> E4[Control Plane 3<br>1.32 → 1.33 → 1.34]
     E4 --> F1
 
-    F1[Worker 1 Drain] --> F2[Worker 1<br/>1.32 → 1.33 → 1.34]
+    F1[Worker 1 Drain] --> F2[Worker 1<br>1.32 → 1.33 → 1.34]
     F2 --> F3[Worker 1 Uncordon]
 
     F3 --> G1[Worker 2 Drain]
-    G1 --> G2[Worker 2<br/>1.32 → 1.33 → 1.34]
+    G1 --> G2[Worker 2<br>1.32 → 1.33 → 1.34]
     G2 --> G3[Worker 2 Uncordon]
 
     G3 --> H[업그레이드 완료]

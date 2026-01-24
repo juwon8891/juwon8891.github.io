@@ -103,9 +103,9 @@ flowchart TD
     D --> D1[/etc/kubernetes/*.conf]
     E --> E1[/etc/kubernetes/manifests/]
     G --> G1[ConfigMap: kubeadm-config]
-    H --> H1[control-plane 라벨<br/>NoSchedule 태인트]
+    H --> H1[control-plane 라벨<br>NoSchedule 태인트]
     I --> I1[TLS Bootstrap 설정]
-    J --> J1[CoreDNS<br/>kube-proxy]
+    J --> J1[CoreDNS<br>kube-proxy]
 
     style A fill:#e1f5ff
     style K fill:#c3e6cb

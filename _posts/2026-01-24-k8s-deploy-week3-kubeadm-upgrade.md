@@ -1169,53 +1169,6 @@ net.netfilter.nf_conntrack_tcp_timeout_established = 432000 → 86400
 
 ---
 
-## 프로덕션 체크리스트
-
-클러스터를 프로덕션 환경에 배포하기 전 다음 사항들을 확인하세요:
-
-### 보안
-
-- [ ] **인증서 자동 갱신 설정** (cert-manager)
-- [ ] **인증서 만료 모니터링** (x509-certificate-exporter)
-- [ ] **etcd TLS 통신** 설정 (HTTP → HTTPS)
-- [ ] **Secret 암호화** (KMS v2)
-- [ ] **Audit Log** 활성화
-- [ ] **RBAC 최소 권한** 원칙 적용
-- [ ] **NetworkPolicy** 활성화
-- [ ] **Pod Security Standards** 적용
-
-### 고가용성
-
-- [ ] **HA Control Plane** 구성 (최소 3대)
-- [ ] **etcd 클러스터** 구성 (3 또는 5대)
-- [ ] **LoadBalancer** for API Server
-- [ ] **Leader Election** (kcm, scheduler)
-
-### 데이터 백업
-
-- [ ] **ETCD 정기 백업** 자동화
-- [ ] **PersistentVolume 백업** 전략
-- [ ] **재해 복구 계획** (DR)
-- [ ] **백업 복원 테스트**
-
-### 모니터링 및 로깅
-
-- [ ] **Prometheus/Grafana** 설치
-- [ ] **Logging 스택** (EFK/Loki)
-- [ ] **Alerting** 설정
-- [ ] **메트릭 수집** (Control Plane, Node, Pod)
-
-### 운영
-
-- [ ] **업그레이드 전략** 수립
-- [ ] **CI/CD 파이프라인** 구축
-- [ ] **GitOps** 도입 (ArgoCD, Flux)
-- [ ] **리소스 쿼터** 설정
-- [ ] **LimitRange** 설정
-- [ ] **HPA/VPA** 설정
-
----
-
 ## 참고 자료
 
 ### 공식 문서
@@ -1257,6 +1210,5 @@ Week 3에서는 kubeadm을 사용하여 Kubernetes 클러스터를 구축하고,
 3. **모니터링**: Prometheus, Grafana, x509 Exporter 설정
 4. **Version Skew Policy**: 컴포넌트별 버전 호환성
 5. **업그레이드 전략**: In-Place vs Blue-Green
-6. **프로덕션 체크리스트**: 보안, HA, 백업, 모니터링
 
-Week 1에서 "The Hard Way"로 K8s의 내부를 깊이 이해했고, Week 3에서 kubeadm을 통해 실무에서 사용하는 효율적인 클러스터 운영 방법을 익혔습니다. 이제 프로덕션 환경에서 안정적으로 Kubernetes 클러스터를 운영할 수 있는 기반을 갖추었습니다! 🚀
+Week 1에서 "The Hard Way"로 K8s의 내부를 깊이 이해했고, Week 3에서 kubeadm을 통해 실무에서 사용하는 효율적인 클러스터 운영 방법을 익혔습니다! 🚀

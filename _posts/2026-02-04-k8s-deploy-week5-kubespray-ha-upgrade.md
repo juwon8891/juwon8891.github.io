@@ -1956,6 +1956,4 @@ open "http://192.168.10.10:9000/haproxy_stats"
 
 ---
 
-**최종 업데이트**: 2026-02-04
-**작성자**: Claude (Sonnet 4.5)
 **스터디**: CloudNet@ 가시다님 주관 - Kubernetes Deploy 스터디

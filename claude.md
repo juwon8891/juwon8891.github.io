@@ -1,5 +1,28 @@
 # Claude 작업 기록
 
+## 2026-02-04 작업 내역
+
+### 1. PDF 분석 및 정리 (Week 5)
+- 파일: `(1) Kubespary HA & Upgrade.pdf`
+- PDF 내용 추출 및 분석 완료 (Task 도구 사용)
+- Kubespray HA 구성 및 노드 관리 실습 가이드 내용 정리
+
+### 2. K8s-Deploy Week 5 학습정리 파일 생성
+- 파일명: `_posts/2026-02-04-k8s-deploy-week5-kubespray-ha-upgrade.md`
+- Kubespray HA & Upgrade 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 8가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (Week 5)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **Client-Side LoadBalancing 구조** - Nginx Static Pod를 통한 HA 구성
+2. **External LB + Client-Side LB 구조** - HAProxy와 Nginx의 이중 장애 보호
+3. **External LB Only 구조** - 모든 노드가 HAProxy 사용
+4. **scale.yml 실행 흐름** - 노드 추가 프로세스
+5. **remove-node.yml 실행 흐름** - 노드 제거 프로세스 (PDB 고려)
+6. **Client-Side LoadBalancing 동작 원리** - kubelet → Nginx → API Server 흐름
+7. **HAProxy LoadBalancing 구조** - Frontend, Backend, 통계 페이지
+8. **Kubespray 변수 우선순위** - 6단계 Override Flow
+
 ## 2026-01-28 작업 내역
 
 ### 1. PDF 분석 및 정리 (Week 4)
@@ -328,6 +351,69 @@
 - API Server 장애 시 자동 failover
 - 외부 LoadBalancer 불필요
 
+### Week 5: Kubespray HA & Upgrade
+
+**핵심 목표**: Kubespray를 활용한 고가용성(HA) Kubernetes 클러스터 구성 및 운영
+
+**주요 학습 포인트**:
+1. **실습 환경 구성**
+   - Vagrant를 이용한 멀티 노드 클러스터 구성
+   - admin-lb (HAProxy), 3 Control Plane, 2 Worker 노드
+   - 초기화 스크립트 분석 (admin-lb.sh, init-cfg.sh)
+
+2. **K8S API 엔드포인트 전략**
+   - Case 1: Client-Side LoadBalancing (Nginx Static Pod)
+   - Case 2: External LB + Client-Side LB (HAProxy + Nginx)
+   - Case 3: External LB Only (HAProxy 단일 엔드포인트)
+
+3. **노드 라이프사이클 관리**
+   - scale.yml: 노드 추가 (약 3분)
+   - remove-node.yml: 노드 제거 (약 2분)
+   - reset.yml: 클러스터 완전 삭제
+
+4. **장애 시나리오**
+   - Control Plane 노드 장애 시 동작 확인
+   - Client-Side LB 자동 failover 테스트
+   - HAProxy Health Check 동작
+
+5. **모니터링 설정**
+   - kube-ops-view 설치 및 활용
+   - HAProxy 통계 페이지 (http://192.168.10.10:9000/haproxy_stats)
+   - Prometheus 메트릭 수집
+
+6. **트러블슈팅**
+   - 인증서 SAN 추가 (supplementary_addresses_in_ssl_keys)
+   - Containerd rlimits 이슈 해결
+   - PodDisruptionBudget으로 인한 Drain 실패
+
+### 핵심 개념 상세
+
+**Client-Side vs External LoadBalancing**:
+- Client-Side LB: 각 노드에 Nginx Static Pod 배포, 외부 LB 불필요
+- External LB: HAProxy 중앙 집중식 관리, 단일 엔드포인트
+- 이중 장애 보호: External LB + Client-Side LB 조합
+
+**Kubespray 변수 우선순위 (6단계)**:
+1. roles/*/defaults/main.yml (기본값)
+2. roles/*/vars/main.yml (내부 강제 변수)
+3. inventory/mycluster/group_vars/*.yml (99% 여기서 조절)
+4. inventory/mycluster/host_vars/<node>.yml (특정 노드만)
+5. playbook vars (플레이북 로컬 변수)
+6. --extra-vars (-e) (최우선)
+
+**etcd Deployment Type**:
+- host (systemd unit): 독립 관리, 업그레이드 용이 (프로덕션 권장)
+- kubeadm (Static Pod): kubeadm 통합 관리
+
+**PodDisruptionBudget과 Drain**:
+- maxUnavailable: 0 설정 시 Drain 타임아웃 발생
+- 해결: PDB 삭제, 설정 변경, 강제 Drain (--force)
+
+**비정상 노드 강제 삭제**:
+- reset_nodes=false: SSH 접속 안 함
+- allow_ungraceful_removal=true: Drain 실패해도 계속 진행
+- skip_confirmation=true: 확인 프롬프트 스킵
+
 ## 실습 환경
 
 ### Week 1: Kubernetes The Hard Way
@@ -472,6 +558,50 @@ metrics_server_enabled: true
 node_feature_discovery_enabled: true
 ```
 
+### Week 5: Kubespray HA & Upgrade
+
+### 가상머신 구성
+| 호스트명 | 역할 | CPU | RAM | IP 주소 | 초기화 스크립트 |
+|----------|------|-----|-----|----------|-----------------|
+| admin-lb | Kubespray 실행, API LB | 2 | 1GB | 192.168.10.10 | admin-lb.sh |
+| k8s-node1 | Control Plane | 4 | 2GB | 192.168.10.11 | init-cfg.sh |
+| k8s-node2 | Control Plane | 4 | 2GB | 192.168.10.12 | init-cfg.sh |
+| k8s-node3 | Control Plane | 4 | 2GB | 192.168.10.13 | init-cfg.sh |
+| k8s-node4 | Worker | 4 | 2GB | 192.168.10.14 | init-cfg.sh |
+| k8s-node5 | Worker | 4 | 2GB | 192.168.10.15 | init-cfg.sh |
+
+**특징**: HA Control Plane (3 Nodes) + 2 Worker Nodes + External LB (HAProxy)
+
+### 네트워크 설정
+- Pod CIDR: 10.233.64.0/18
+- Service CIDR: 10.233.0.0/18
+- CNI: Flannel
+- Kube Proxy Mode: iptables
+- CoreDNS ClusterIP: 10.233.0.3
+
+### 컴포넌트 버전
+- OS: Rocky Linux 10.0 (Kernel 6.12)
+- Kubernetes: v1.32.9
+- Kubespray: v2.29.1
+- Containerd: v2.1.5
+- etcd: v3.5.25
+- Python: 3.12.9
+- Helm: v3.18.6
+
+### HAProxy 설정
+- API Server LB: 192.168.10.10:6443
+- 통계 페이지: http://192.168.10.10:9000/haproxy_stats
+- Prometheus 메트릭: http://192.168.10.10:8405/metrics
+- Backend: k8s-node1~3 (roundrobin)
+
+### Kubespray 실행 정보
+- 배포 소요 시간: 약 8분
+- 노드 추가 (scale.yml): 약 3분
+- 노드 제거 (remove-node.yml): 약 2분 (PDB 없을 시 20초)
+
+### 모니터링
+- kube-ops-view: http://192.168.10.14:30000/#scale=1.5
+
 ## 생성된 인증서 목록
 
 | 컴포넌트 | CN | O | 용도 |
@@ -571,7 +701,22 @@ node_feature_discovery_enabled: true
 - [Containerd Registry 설정](https://github.com/containerd/containerd/blob/main/docs/hosts.md)
 - [Kubeadm Certificate Management](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
 
+### Week 5: Kubespray HA & Upgrade
+- [Kubespray 공식 문서](https://kubespray.io/)
+- [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)
+- [Kubespray HA Mode 문서](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/operations/ha-mode.md)
+- [Kubespray Node Management](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/operations/nodes.md)
+- [Kubeadm Reset Workflow](https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-reset/)
+- [PodDisruptionBudget 공식 문서](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+- [HAProxy 공식 문서](http://www.haproxy.org/)
+- [Nginx TCP/UDP LoadBalancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/)
+- [kube-ops-view GitHub](https://github.com/hjacobs/kube-ops-view)
+- [Vagrant 공식 문서](https://www.vagrantup.com/docs)
+- [송이레님 - Kubespray 엔드포인트 구성](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-05-00/)
+- [송이레님 - Kubespray 노드 추가](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-06-00-01/)
+- [송이레님 - Kubespray 노드 제거](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-06-00-02/)
+
 ---
 
-**최종 업데이트**: 2026-01-28
+**최종 업데이트**: 2026-02-04
 **작업자**: Claude (Sonnet 4.5)

@@ -41,3 +41,7 @@ vendor/
 
 # PDF files
 *.pdf
+
+# Claude work history (local only)
+CLAUDE.md
+claude.md

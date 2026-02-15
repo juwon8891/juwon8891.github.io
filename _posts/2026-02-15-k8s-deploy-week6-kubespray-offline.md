@@ -1193,62 +1193,6 @@ server = "https://192.168.10.10:35000"
 
 ---
 
-## 도전과제
-
-### 1. Bastion 서버 분리 환경 구성
-
-**현재**: `admin(인터넷O) - k8s-node(인터넷X)`
-
-**목표**: `bastion(인터넷O) - admin(인터넷X) - k8s-node(인터넷X)`
-
-**구성 방법**:
-- bastion: 외부 인터넷에서 필요한 파일 다운로드
-- bastion → admin: rsync, scp로 파일 복사
-- admin: 관련 서비스 기동 (registry, nginx, etc.)
-
-### 2. nftables로 NAT Gateway 구현 및 kube-proxy nftables 모드 적용
-
-**nftables NATGW**:
-
-```bash
-# nftables MASQUERADE 설정
-nft add table ip nat
-nft add chain ip nat postrouting { type nat hook postrouting priority srcnat \; }
-nft add rule ip nat postrouting oifname "enp0s8" masquerade
-
-# 재부팅 후에도 정책 유지
-nft list ruleset > /etc/sysconfig/nftables.conf
-systemctl enable --now nftables.service
-```
-
-**kube-proxy nftables 모드**:
-
-```bash
-# inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
-sed -i 's|kube_proxy_mode: iptables|kube_proxy_mode: nftables|g' inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
-```
-
-### 3. DNS 서버(bind)에 /etc/hosts 설정 대신 도메인 질의
-
-**현재**: k8s 노드들에 `/etc/hosts` 설정
-
-**목표**: admin DNS 서버(bind)에 설정 후 nameserver를 통해 도메인 질의
-
-**구성 방법**:
-1. admin DNS 서버에 zone 파일 생성
-2. k8s-node nameserver 설정: `192.168.10.10`
-3. 도메인 질의 테스트
-
-### 4. kubespray 다운로드 최적화 분석
-
-**분석 대상**:
-- `download_run_once`: 한 번만 다운로드
-- `download_localhost`: localhost에서 다운로드 (docker 필요)
-- `download_force_cache`: 로컬 캐시 강제 업로드
-- `download_keep_remote_cache`: 원격 캐시 파일 유지
-
----
-
 ## 참고 자료
 
 ### Week 6: Kubespray Offline 설치
@@ -1272,4 +1216,3 @@ sed -i 's|kube_proxy_mode: iptables|kube_proxy_mode: nftables|g' inventory/myclu
 ---
 
 **최종 업데이트**: 2026-02-15
-**작성자**: Claude (Sonnet 4.5)

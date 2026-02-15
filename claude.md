@@ -1,5 +1,27 @@
 # Claude 작업 기록
 
+## 2026-02-15 작업 내역
+
+### 1. PDF 분석 및 정리 (Week 6)
+- 파일: `(1) Kubespray offline 설치 _ Notion.pdf`
+- PDF 내용 추출 및 분석 완료 (3,234 라인)
+- Kubespray 폐쇄망(Air-Gap) 환경 offline 설치 실습 가이드 내용 정리
+
+### 2. K8s-Deploy Week 6 학습정리 파일 생성
+- 파일명: `_posts/2026-02-15-k8s-deploy-week6-kubespray-offline.md`
+- Kubespray Offline 설치 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 5가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (Week 6)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **폐쇄망 환경 아키텍처** - Internet → DMZ → 내부망 (Air-Gap) 구조
+2. **NTP 동기화 흐름** - Internet NTP → admin → k8s-nodes
+3. **NAT Gateway 동작 원리** - SNAT/DNAT 흐름
+4. **Registry 이미지 해석 흐름** - FQDN 체크 → shortnames.conf → unqualified-search-registries
+5. **kubespray-offline 전체 흐름** - Download → Setup → Deploy 단계
+6. **이미지 Registry push 흐름** - Tag → Push → Storage
+7. **Offline 배포 핵심 구성요소** - Nginx, Registry, YUM Repo, PyPI Mirror
+
 ## 2026-02-04 작업 내역
 
 ### 1. PDF 분석 및 정리 (Week 5)
@@ -414,6 +436,82 @@
 - allow_ungraceful_removal=true: Drain 실패해도 계속 진행
 - skip_confirmation=true: 확인 프롬프트 스킵
 
+### Week 6: Kubespray Offline 설치
+
+**핵심 목표**: 폐쇄망(Air-Gap) 환경에서 Kubespray를 활용한 Kubernetes 클러스터 배포
+
+**주요 학습 포인트**:
+1. **폐쇄망 환경 아키텍처**
+   - Internet → 외부 방화벽 → DMZ (Bastion) → 내부 방화벽 → 내부망 (Air-Gap)
+   - 내부망에서는 외부 인터넷 접속 불가
+   - 필요 시 방화벽 정책 승인 후 Bastion Server를 통해 다운로드
+
+2. **폐쇄망 서비스 구성**
+   - Network Gateway (IGW, NATGW): iptables/nftables NAT Masquerading
+   - NTP Server/Client: chrony를 통한 시간 동기화
+   - DNS Server/Client: bind를 통한 도메인 이름 해석
+   - Local YUM/DNF Repository: reposync + createrepo
+   - Private Container Registry: registry:3.0.0 컨테이너
+   - Private PyPI Mirror: devpi-server
+
+3. **kubespray-offline 도구**
+   - download-all.sh: 바이너리, 이미지, 패키지 다운로드 (17분, 3.3GB)
+   - setup-container.sh: Containerd 설치, Registry/Nginx 이미지 load
+   - start-nginx.sh: files, images, pypi, rpms 웹 서버로 제공
+   - start-registry.sh: 프라이빗 이미지 저장소 기동 (:35000)
+   - load-push-images.sh: 모든 이미지 Registry에 push (2분)
+   - extract-kubespray.sh: Kubespray repo 압축 해제
+
+4. **offline.yml 설정**
+   - http_server: Nginx 웹 서버 주소
+   - registry_host: 프라이빗 Registry 주소
+   - containerd_registries_mirrors: Registry 미러 설정
+   - files_repo, yum_repo, ubuntu_repo: 패키지 저장소 주소
+   - kube_image_repo, gcr_image_repo 등: 이미지 저장소 Override
+
+5. **클러스터 배포**
+   - offline-repo playbook 실행: k8s-node에 offline repo 설정
+   - 기존 repo 제거: rocky-*.repo → *.repo.original
+   - ansible-playbook cluster.yml 실행 (3분)
+   - kubectl, kubeconfig 설정 및 확인
+
+6. **Troubleshooting**
+   - Flannel 파드 정상 기동: 디폴트 라우팅 추가 필요
+   - podman0 forward 허용: nftables rule 추가
+   - etcd CPU arch 변수 수정: amd64 → arm64 (macOS 사용자)
+
+### 핵심 개념 상세
+
+**kubespray-offline vs contrib/offline**:
+- kubespray-offline: Shell Script, download-all.sh, 사용 편의성 ⭐⭐⭐⭐⭐
+- contrib/offline: Ansible Playbook, manage-offline-files.sh, 커스터마이징 용이
+
+**NAT Gateway 동작 원리**:
+- k8s-node → admin: Source IP 192.168.10.11 → 10.0.2.15 (SNAT)
+- admin → Internet: 10.0.2.15로 요청
+- Internet → admin: 10.0.2.15로 응답
+- admin → k8s-node: Destination IP 10.0.2.15 → 192.168.10.11 (DNAT)
+
+**iptables vs nftables**:
+- iptables: Legacy, 여러 테이블(nat, filter, mangle), 개별 룰 추가/삭제
+- nftables: Modern, 통합 인터페이스, 성능 개선, atomic 룰 업데이트
+
+**Registry 이미지 해석 흐름**:
+1. FQDN 있는가? (docker.io/library/nginx) → 해당 레지스트리에서 직접 pull
+2. 000-shortnames.conf에 매핑 있는가? (alpine = docker.io/library/alpine) → 직접 pull
+3. shortname-mode = enforcing → 사용자에게 선택 요구
+4. shortname-mode = permissive → unqualified-search-registries 순서대로 시도
+
+**PyPI Mirror +simple의 의미**:
+- /root/prod: 사람용 웹 UI
+- /root/prod/+simple: pip 전용 API 엔드포인트 (PEP 503 Simple API)
+- pip는 반드시 +simple 붙인 URL 사용해야 정상 동작
+
+**Containerd Registry Mirror 설정**:
+- /etc/containerd/certs.d/192.168.10.10:35000/hosts.toml
+- server, host, capabilities, skip_verify 설정
+- kubelet → containerd → hosts.toml → Registry 연결
+
 ## 실습 환경
 
 ### Week 1: Kubernetes The Hard Way
@@ -602,6 +700,55 @@ node_feature_discovery_enabled: true
 ### 모니터링
 - kube-ops-view: http://192.168.10.14:30000/#scale=1.5
 
+### Week 6: Kubespray Offline 설치
+
+### 가상머신 구성
+| 호스트명 | 역할 | CPU | RAM | IP 주소 | 초기화 스크립트 |
+|----------|------|-----|-----|----------|-----------------|
+| **admin** | Kubespray 실행, 폐쇄망 서비스 제공 | 4 | 2GB | 192.168.10.10 | admin.sh |
+| **k8s-node1** | Control Plane | 4 | 2GB | 192.168.10.11 | init_cfg.sh |
+| **k8s-node2** | Worker | 4 | 2GB | 192.168.10.12 | init_cfg.sh |
+
+**특징**:
+- admin 서버: 120GB 용량 (외부 인터넷 O)
+- k8s-node: 외부 인터넷 X (admin을 통해 패키지 다운로드)
+
+### 네트워크 설정
+- Pod CIDR: 10.233.64.0/18
+- Service CIDR: 10.233.0.0/18
+- CNI: Flannel
+- Kube Proxy Mode: iptables
+
+### 컴포넌트 버전
+| 컴포넌트 | 버전 |
+|----------|------|
+| OS | Rocky Linux 10.0 (Kernel 6.12) |
+| Kubernetes | v1.34.3 |
+| Kubespray | v2.30.0 |
+| Containerd | v2.2.1 |
+| Runc | v1.3.4 |
+| Nerdctl | v2.2.1 |
+| CNI Plugins | v1.8.0 |
+| etcd | v3.5.26 |
+| Python | 3.12.9 |
+| Helm | v3.18.4 |
+| Nginx (웹 서버) | 1.29.4 |
+| Registry (이미지 저장소) | 3.0.0 |
+
+### 폐쇄망 서비스 포트
+| 서비스 | 포트 | 용도 |
+|--------|------|------|
+| Nginx 웹 서버 | 80 | files, images, pypi, rpms 제공 |
+| Registry | 35000 | 프라이빗 이미지 저장소 |
+| Registry Debug | 5001 | debug, metrics |
+| DNS (bind) | 53 | 도메인 이름 해석 |
+| NTP (chronyd) | 123 | 시간 동기화 |
+
+### kubespray-offline 실행 정보
+- download-all.sh 소요 시간: 약 17분 (3.3GB)
+- load-push-images.sh 소요 시간: 약 2분
+- ansible-playbook cluster.yml 소요 시간: 약 3분
+
 ## 생성된 인증서 목록
 
 | 컴포넌트 | CN | O | 용도 |
@@ -716,7 +863,24 @@ node_feature_discovery_enabled: true
 - [송이레님 - Kubespray 노드 추가](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-06-00-01/)
 - [송이레님 - Kubespray 노드 제거](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-06-00-02/)
 
+### Week 6: Kubespray Offline 설치
+- [Kubespray Offline Environment 공식 문서](https://kubespray.io/#/docs/offline-environment)
+- [kubespray-offline GitHub](https://github.com/kubespray-offline/kubespray-offline)
+- [송이레님 - Kubespray Offline Overview](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-00/)
+- [송이레님 - Kubespray Offline 실습 환경 배포](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-00/)
+- [송이레님 - Network Gateway](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-01/)
+- [송이레님 - NTP / DNS](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-02/)
+- [송이레님 - Local Package Repository](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-03/)
+- [송이레님 - Private Container Registry](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-04/)
+- [송이레님 - Private PyPI Mirror](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-05/)
+- [송이레님 - Private Go Module Proxy](https://sirzzang.github.io/kubernetes/Kubernetes-Kubespray-08-01-06/)
+- [박진형님 - kubespray-offline 설치 및 TS](https://sigridjin.medium.com/kubespray-ha-upgrade-a-hands-on-guide-from-v1-32-to-v1-34-43076ef54676)
+- [박진형님 - kubespray-skills GitHub](https://github.com/sigridjineth/kubespray-skills)
+- [Kubespray Download Optimization](https://kubespray.io/#/docs/download)
+- [devpi 공식 문서](https://devpi.net/)
+- [nftables 공식 문서](https://netfilter.org/projects/nftables/)
+
 ---
 
-**최종 업데이트**: 2026-02-04
+**최종 업데이트**: 2026-02-15
 **작업자**: Claude (Sonnet 4.5)

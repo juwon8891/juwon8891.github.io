@@ -1,5 +1,27 @@
 # Claude 작업 기록
 
+## 2026-02-21 작업 내역 (Week 7)
+
+### 1. PDF 분석 및 정리 (Week 7)
+- 파일: `(1) RKE2 & Cluster API _ Notion.pdf`
+- PDF 내용 추출 및 분석 완료 (50 페이지)
+- RKE2 & Cluster API 실습 가이드 내용 정리
+
+### 2. K8s-Deploy Week 7 학습정리 파일 생성
+- 파일명: `_posts/2026-02-21-k8s-deploy-week7-rke2-cluster-api.md`
+- RKE2와 Cluster API 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 7가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (Week 7)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **RKE2 Server 노드 아키텍처** - systemd, Static Pods, Containerd 구조
+2. **RKE2 Agent 노드 아키텍처** - Containerd, Kubelet, Workloads 구조
+3. **RKE2 HA 구성** - Load Balancer, Embedded etcd, Raft 구조
+4. **Cluster API 아키텍처** - Management Cluster, Provider, Infrastructure 관계
+5. **업그레이드 흐름** - Server → Agent 순차 업그레이드
+6. **RKE2 보안 강화** - FIPS 140-2 준수 흐름
+7. **CAPI 멀티 클라우드** - 동일 YAML로 다양한 클라우드 지원
+
 ## 2026-01-17 작업 내역
 
 ### 1. PDF 분석 및 정리 (Week 1)
@@ -157,6 +179,75 @@
 - import: 정적 로딩 (플레이북 파싱 시)
 - include: 동적 로딩 (실행 시)
 
+### Week 7: RKE2 & Cluster API
+
+**핵심 목표**: 프로덕션 환경의 보안 강화 Kubernetes 배포판과 선언적 클러스터 관리 도구 학습
+
+**주요 학습 포인트**:
+
+#### 1. RKE2 (Rancher Kubernetes Engine 2)
+- **보안 강화**
+  - FIPS 140-2 준수 (승인된 암호화 모듈)
+  - CIS Kubernetes Benchmark 기본 준수
+  - SELinux/AppArmor 통합
+  - Profile 기반 설정 (cis-1.23)
+
+- **아키텍처**
+  - Server 노드 (Control Plane): systemd 기반, Static Pods
+  - Agent 노드 (Worker): containerd, kubelet, kube-proxy
+  - Embedded etcd (HA 구성)
+
+- **내장 컴포넌트**
+  - CNI: Canal(기본), Cilium, Calico, Multus
+  - Ingress: nginx-ingress
+  - LoadBalancer: Klipper LB
+  - Metrics Server, CoreDNS
+
+- **업그레이드**
+  - 수동 업그레이드 (스크립트)
+  - 자동 업그레이드 (System Upgrade Controller)
+  - Server → Agent 순차 업그레이드
+
+- **인증서 관리**
+  - 자동 갱신 (만료 90일 전)
+  - /var/lib/rancher/rke2/server/tls/ 위치
+
+#### 2. Cluster API (CAPI)
+- **선언적 클러스터 관리**
+  - Management Cluster: CAPI 컨트롤러 실행
+  - Workload Cluster: 관리 대상 클러스터
+  - Infrastructure as Code (YAML)
+
+- **주요 리소스**
+  - Cluster: 클러스터 전체 정의
+  - Machine: 단일 노드 (VM/인스턴스)
+  - MachineDeployment: 노드 그룹 (ReplicaSet 유사)
+  - KubeadmControlPlane: Control Plane HA 관리
+
+- **Provider 종류**
+  - Infrastructure: AWS(CAPA), Azure(CAPZ), GCP(CAPG), vSphere(CAPV), Docker(CAPD)
+  - Bootstrap: Kubeadm, Talos
+  - Control Plane: Kubeadm, K3s, RKE2
+
+- **주요 기능**
+  - 멀티 클라우드 지원 (동일 API)
+  - GitOps 친화적
+  - Self-Healing (MachineHealthCheck)
+  - 자동 스케일링
+
+### 핵심 개념 비교 (Week 7)
+
+**RKE2 vs K3s vs kubeadm**:
+- RKE2: 보안 준수(FIPS, CIS), Enterprise, 프로덕션
+- K3s: Edge, IoT, 경량화, 빠른 배포
+- kubeadm: 완전한 제어, 커스터마이징, 학습
+
+**CAPI의 장점**:
+- 선언적: Git = Single Source of Truth
+- 재현 가능: 동일 YAML = 동일 클러스터
+- 멀티 클라우드: Vendor Lock-in 회피
+- Self-Service: 개발자 직접 클러스터 관리
+
 ## 실습 환경
 
 ### Week 1: Kubernetes The Hard Way
@@ -205,6 +296,33 @@ fact_caching = jsonfile
 become = true
 become_method = sudo
 ```
+
+### Week 7: RKE2 & Cluster API
+
+#### RKE2 실습 환경
+| 호스트명 | IP | 역할 | vCPU | Memory |
+|---------|-----|------|------|--------|
+| rke2-server1 | 192.168.56.11 | Server (Control Plane) | 2 | 4GB |
+| rke2-server2 | 192.168.56.12 | Server (Control Plane) | 2 | 4GB |
+| rke2-server3 | 192.168.56.13 | Server (Control Plane) | 2 | 4GB |
+| rke2-agent1 | 192.168.56.21 | Agent (Worker) | 2 | 4GB |
+| rke2-agent2 | 192.168.56.22 | Agent (Worker) | 2 | 4GB |
+
+#### 네트워크 대역
+- Cluster CIDR (Pod): 10.42.0.0/16
+- Service CIDR: 10.43.0.0/16
+
+#### Cluster API 실습 환경
+| 호스트명 | IP | 역할 | vCPU | Memory |
+|---------|-----|------|------|--------|
+| capi-mgmt | 192.168.56.100 | Management Cluster | 2 | 4GB |
+
+#### 컴포넌트 버전
+- RKE2: v1.28.x
+- Cluster API: v1.6.x
+- clusterctl: v1.6.x
+- Docker Provider: v1.6.x
+- OS: Ubuntu 22.04
 
 ## 생성된 인증서 목록
 
@@ -282,7 +400,21 @@ become_method = sudo
 - [Ansible Handlers](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html)
 - [Ansible Roles](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html)
 
+### Week 7: RKE2 & Cluster API
+- [RKE2 공식 문서](https://docs.rke2.io/)
+- [RKE2 GitHub](https://github.com/rancher/rke2)
+- [RKE2 Security Hardening Guide](https://docs.rke2.io/security/hardening_guide)
+- [System Upgrade Controller](https://github.com/rancher/system-upgrade-controller)
+- [Cluster API 공식 문서](https://cluster-api.sigs.k8s.io/)
+- [Cluster API Book](https://cluster-api.sigs.k8s.io/introduction.html)
+- [clusterctl Commands](https://cluster-api.sigs.k8s.io/clusterctl/commands/commands.html)
+- [CAPI Providers](https://cluster-api.sigs.k8s.io/reference/providers.html)
+- [CAPI Quick Start](https://cluster-api.sigs.k8s.io/user/quick-start.html)
+- [CAPI Docker Provider](https://github.com/kubernetes-sigs/cluster-api/tree/main/test/infrastructure/docker)
+- [NIST FIPS 140-2](https://csrc.nist.gov/publications/detail/fips/140/2/final)
+- [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
+
 ---
 
-**작업 완료 시각**: 2026-01-17
+**최종 작업 완료 시각**: 2026-02-21
 **작업자**: Claude (Sonnet 4.5)

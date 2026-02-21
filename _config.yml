@@ -20,6 +20,15 @@ kramdown:
   syntax_highlighter_opts:
     disable: false
 
+# Jekyll 빌드에서 제외할 파일들
+exclude:
+  - claude.md
+  - CLAUDE.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
 defaults:
   - scope:
       path: ""

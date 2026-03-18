@@ -1437,16 +1437,6 @@ aws eks list-insights \
    - Control Plane + Data Plane + Add-ons 자동 관리
    - Karpenter, EBS CSI, LB Controller 자동 설치
 
-### 다음 주 예고
-
-**Week 2 Preview**: EKS 워크로드 배포 및 관리
-
-- Deployment, Service, Ingress 실습
-- AWS Load Balancer Controller (ALB Ingress)
-- Amazon ECR 이미지 배포
-- IRSA (IAM Roles for Service Accounts)
-- Pod 보안 및 NetworkPolicy
-
 ### 참고 자료
 
 **공식 문서**:
@@ -1467,4 +1457,3 @@ aws eks list-insights \
 ---
 
 **최종 업데이트**: 2026-03-18
-**작성자**: Claude (Sonnet 4.5)

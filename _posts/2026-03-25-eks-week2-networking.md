@@ -2,7 +2,7 @@
 layout: post
 title: "[EKS] Week 2 - EKS Networking"
 date: 2026-03-25
-categories: [EKS, Kubernetes, AWS, VPC-CNI, LoadBalancer, Ingress, Service, ExternalDNS]
+categories: [EKS, Kubernetes, AWS, Networking]
 ---
 
 # [EKS] Week 2 - EKS Networking

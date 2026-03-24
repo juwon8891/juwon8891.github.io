@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[EKS] Week 2 - EKS Networking"
-date: 2026-03-25
+date: 2026-03-24
 categories: [EKS, Kubernetes, AWS, Networking]
 ---
 
@@ -1494,4 +1494,4 @@ graph TB
 
 ---
 
-**마지막 업데이트**: 2026-03-25
+**마지막 업데이트**: 2026-03-24

@@ -41,3 +41,11 @@ vendor/
 
 # PDF files
 *.pdf
+
+# 임시 파일
+*.jpeg
+*.jpg
+*.png
+solution_*.py
+solution_*.sql
+test.py

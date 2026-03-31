@@ -1,5 +1,27 @@
 # Claude 작업 기록
 
+## 2026-04-01 작업 내역
+
+### 1. PDF 분석 및 정리 (EKS Week 3)
+- 파일: `(2) 3주차 - EKS Scaling _ Notion.pdf`
+- PDF 내용 추출 및 분석 완료 (76 페이지)
+- EKS Auto Scaling 실습 가이드 내용 정리
+
+### 2. EKS Week 3 학습정리 파일 생성
+- 파일명: `_posts/2026-03-25-eks-week3-scaling.md`
+- EKS Auto Scaling 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 7가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (EKS Week 3)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **HPA 동작 흐름** - Metrics Server → HPA Controller → ReplicaSet 조정
+2. **KEDA 아키텍처** - External Event Source → KEDA Scaler → HPA 생성
+3. **Cluster Autoscaler vs Karpenter** - CAS (ASG 기반, 느림) vs Karpenter (EC2 직접, 빠름)
+4. **Karpenter Provisioning 워크플로우** - Pending Pod → NodePool → EC2 생성 → Pod 바인딩
+5. **Karpenter Disruption 메커니즘** - Consolidation, Drift, Expiration, Interruption
+6. **VPA 컴포넌트 상호작용** - Recommender → Updater → Admission Controller
+7. **EKS Auto Scaling 전체 구조** - Pod/노드/서버리스 계층 구조
+
 ## 2026-02-21 작업 내역 (Week 7)
 
 ### 1. PDF 분석 및 정리 (Week 7)
@@ -162,6 +184,54 @@
 7. **롤 실행 순서** - Pre-tasks, Roles, Tasks, Post-tasks, Handlers 순서
 
 ## 학습 내용 요약
+
+### EKS Week 3: EKS Auto Scaling
+
+**핵심 목표**: Amazon EKS 환경에서 다양한 Auto Scaling 메커니즘 이해 및 실습
+
+**주요 학습 포인트**:
+
+1. **Pod 레벨 스케일링**
+   - HPA (Horizontal Pod Autoscaler): CPU/메모리 메트릭 기반 Pod 수평 확장
+   - VPA (Vertical Pod Autoscaler): CPU/메모리 requests/limits 자동 조정
+   - KEDA (Kubernetes Event-driven Autoscaling): 외부 이벤트 기반, Scale to Zero 지원
+   - CPA (Cluster Proportional Autoscaler): 클러스터 크기 비례 스케일링
+
+2. **노드 레벨 스케일링**
+   - Cluster Autoscaler: Auto Scaling Group 기반, Pending Pod 감지 시 노드 추가 (3-5분)
+   - Karpenter: Just-in-time 노드 프로비저닝, 빠른 스케일링 (1-2분), 비용 최적화
+
+3. **서버리스 컴퓨팅**
+   - AWS Fargate: 노드 관리 불필요, Pod별 격리 실행, Fargate Profile 기반
+
+4. **주요 실습**
+   - Metrics Server 설치 및 HPA 테스트
+   - KEDA + SQS 이벤트 기반 스케일링
+   - VPA Recommender 권장 값 적용
+   - Karpenter NodePool/EC2NodeClass 설정
+   - Fargate Profile을 통한 서버리스 Pod 실행
+
+### 핵심 개념 비교
+
+**HPA vs VPA**:
+- HPA: Pod 개수 조정 (수평 확장), ScaleDown 5분 안정화
+- VPA: Pod 리소스 조정 (수직 확장), Pod 재시작 필요 (Recreate/Auto 모드)
+- 동일 메트릭 대상 시 충돌 → 함께 사용 지양
+
+**Cluster Autoscaler vs Karpenter**:
+- CAS: ASG 기반, 노드 추가 3-5분, 단일 인스턴스 타입 제한적
+- Karpenter: EC2 직접 제어, 노드 추가 1-2분, 다양한 인스턴스 타입 조합, Spot/On-Demand 혼합
+
+**KEDA 차별점**:
+- Scale to Zero 지원 (이벤트 없을 시 Pod 완전 제거)
+- 60+ 외부 Scaler 지원 (SQS, Kafka, Prometheus 등)
+- HPA 자동 생성/관리
+
+**Karpenter Disruption**:
+- Consolidation: 노드 통합으로 비용 절감
+- Drift: NodePool 변경 시 노드 교체
+- Expiration: 노드 수명 만료 시 자동 교체
+- Interruption: Spot Interruption 2분 전 알림 대응
 
 ### Week 1: Bootstrap Kubernetes The Hard Way
 
@@ -604,6 +674,47 @@
 - Self-Service: 개발자 직접 클러스터 관리
 
 ## 실습 환경
+
+### EKS Week 3: EKS Auto Scaling
+
+### 가상머신 및 인프라 구성
+| 리소스 | 사양 | 용도 |
+|--------|------|------|
+| **myeks-bastion-EC2** | t3.medium | 관리 호스트 (kubectl, eksctl, awscli) |
+| **EKS Cluster** | myeks | Kubernetes 클러스터 (v1.31) |
+| **VPC** | 192.168.0.0/16 | 전용 네트워크 환경 |
+| **Public Subnet** | 3개 (각 AZ) | 퍼블릭 리소스 배치 |
+| **Private Subnet** | 3개 (각 AZ) | EKS 노드 배치 |
+| **NAT Gateway** | 3개 (각 AZ) | 프라이빗 서브넷 인터넷 통신 |
+
+### EKS 노드 그룹
+| 노드 그룹 | 인스턴스 타입 | 용량 | 용도 |
+|-----------|---------------|------|------|
+| **myeks-nodegroup** | t3.medium | 3대 (고정) | 초기 워커 노드 |
+| **Karpenter Provisioner** | 다양 (동적) | 필요 시 자동 생성 | Just-in-time 노드 프로비저닝 |
+
+### 네트워크 설정
+- **VPC CIDR**: 192.168.0.0/16
+- **Pod CIDR**: AWS VPC CNI 사용 (VPC 서브넷 IP 직접 할당)
+- **Service CIDR**: 10.100.0.0/16
+- **DNS**: CoreDNS (ClusterIP: 10.100.0.10)
+
+### 주요 애드온
+| 애드온 | 버전 | 용도 |
+|--------|------|------|
+| **VPC CNI** | v1.18.x | Pod 네트워킹 (ENI 기반) |
+| **Metrics Server** | v0.7.x | 리소스 메트릭 수집 (HPA/VPA 필수) |
+| **KEDA** | v2.16.x | 이벤트 기반 스케일링 |
+| **Cluster Autoscaler** | v1.31.x | 노드 자동 확장 |
+| **Karpenter** | v1.1.x | 고급 노드 프로비저닝 |
+| **Vertical Pod Autoscaler** | v1.2.x | Pod 리소스 자동 조정 |
+| **AWS Load Balancer Controller** | v2.x | Ingress/Service LB 관리 |
+
+### 컴포넌트 버전
+- **Kubernetes**: v1.31
+- **eksctl**: v0.x
+- **AWS CLI**: v2.x
+- **Helm**: v3.x
 
 ### Week 1: Kubernetes The Hard Way
 

@@ -836,5 +836,4 @@ kubectl describe pod fargate-pod
 
 ---
 
-**최종 업데이트**: 2026-03-25  
-**작업자**: Claude (Sonnet 4.5)
+**최종 업데이트**: 2026-03-25

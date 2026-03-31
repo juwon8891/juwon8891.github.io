@@ -1126,4 +1126,3 @@ node_feature_discovery_enabled: true
 ---
 
 **최종 업데이트**: 2026-02-21
-**작업자**: Claude (Sonnet 4.5)

@@ -1,5 +1,35 @@
 # Claude 작업 기록
 
+## 작성 지침
+
+**블로그 포스트 작성 시 주의사항**:
+- ❌ **"다음 주차 Preview" 섹션 작성 금지**: 향후 계획이나 예정 내용 언급하지 않음
+- ❌ **"Week X Preview" 섹션 작성 금지**: 미래 주차 내용 미리보기 금지
+- ✅ **현재 주차 내용에만 집중**: 해당 주차에서 학습한 내용만 정리
+- ✅ **"마무리" 섹션**: 핵심 요약만 포함, 다음 주차 언급 없이 종료
+
+## 2026-04-13 작업 내역
+
+### 1. PDF 분석 및 정리 (EKS Week 4)
+- 파일: `(2) 4주차 - EKS AuthN_AuthZ _ Notion.pdf`
+- PDF 내용 추출 및 분석 완료 (47 페이지)
+- EKS Authentication & Authorization 실습 가이드 내용 정리
+
+### 2. EKS Week 4 학습정리 파일 생성
+- 파일명: `_posts/2026-04-01-eks-week4-authn-authz.md`
+- EKS 인증/인가 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 7가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (EKS Week 4)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **K8S API 접근 제어 흐름** - Authentication → Authorization → Admission Control → etcd
+2. **IRSA 전체 흐름** - Pod Identity Webhook → STS → OIDC Provider → AWS IAM → S3
+3. **EKS kubectl 인증 흐름** - aws-iam-authenticator → STS → API Server → Webhook → aws-auth ConfigMap
+4. **Namespace별 ServiceAccount 분리** - dev-team, infra-team RBAC 설정
+5. **Bearer Token (JWT) 동작 원리** - Token Verification → Public Key → Payload 디코딩 → RBAC
+6. **OIDC Authorization Code Flow** - User → App → Keycloak → Token Exchange
+7. **OAuth 2.0 vs OIDC vs IRSA 비교** - 인가 vs 인증 vs Pod→AWS 인증
+
 ## 2026-04-01 작업 내역
 
 ### 1. PDF 분석 및 정리 (EKS Week 3)
@@ -184,6 +214,66 @@
 7. **롤 실행 순서** - Pre-tasks, Roles, Tasks, Post-tasks, Handlers 순서
 
 ## 학습 내용 요약
+
+### EKS Week 4: EKS Authentication & Authorization
+
+**핵심 목표**: Amazon EKS 환경에서 Identity and Access Management 이해 및 실습
+
+**주요 학습 포인트**:
+
+1. **Authentication (인증)**
+   - AWS IAM Authenticator: kubectl → K8S API 인증 (JWT, Presigned STS URL)
+   - OIDC Provider: IRSA 활성화, Web Identity 토큰 교환
+   - ServiceAccount: Pod 내부 애플리케이션 → K8S API 인증 (JWT)
+
+2. **Authorization (인가)**
+   - RBAC: Role-Based Access Control (Role, RoleBinding, ClusterRole, ClusterRoleBinding)
+   - K8S API 구조: Resources, Verbs, API Groups
+
+3. **IRSA (IAM Roles for Service Accounts)**
+   - Pod별 AWS IAM Role 권한 부여
+   - OIDC Provider + Trust Policy + ServiceAccount Annotation
+   - AWS STS AssumeRoleWithWebIdentity → 임시 자격 증명
+
+4. **EKS Pod Identity (차세대)**
+   - IRSA보다 간단한 Trust Policy
+   - EKS 네이티브 통합, 높은 성능
+
+5. **Admission Control**
+   - MutatingWebhook: 요청 변경 (Pod Identity Webhook)
+   - ValidatingWebhook: 요청 검증 (Policy Validation)
+
+6. **OAuth 2.0 & OIDC**
+   - OAuth 2.0: 위임 인증 프로토콜 (Authorization)
+   - OIDC: OAuth 2.0 + ID Token (Authentication + Authorization)
+   - JWT (JSON Web Token): Header.Payload.Signature
+
+7. **주요 실습**
+   - Namespace별 ServiceAccount 분리 (dev-team, infra-team)
+   - IRSA 설정 (Pod에 S3 ReadOnly 권한 부여)
+   - ConfigMap vs EKS API (aws-auth vs Access Entry)
+   - Bearer Token (JWT) 검증 흐름
+
+### 핵심 개념 비교
+
+**Authentication Methods**:
+- X.509 Client Cert: kubelet 인증 (Node Authorizer)
+- ServiceAccount JWT: Pod 내부 애플리케이션 (1시간 TTL)
+- AWS IAM Authenticator: kubectl (15분 TTL)
+- OIDC Token: 외부 IdP 연동 (Google, Keycloak)
+
+**IRSA vs EKS Pod Identity**:
+- IRSA: OIDC 기반, 높은 호환성, 복잡한 Trust Policy
+- Pod Identity: EKS 전용, 간단한 설정, 높은 성능, 최신 SDK 필요
+
+**OAuth 2.0 vs OIDC**:
+- OAuth 2.0: "권한 위임" (Access Token)
+- OIDC: "사용자 신원 확인" (ID Token JWT + Access Token)
+
+**RBAC Verbs**:
+- get, list, watch: 조회
+- create, update, patch: 생성/수정
+- delete, deletecollection: 삭제
 
 ### EKS Week 3: EKS Auto Scaling
 

@@ -602,13 +602,14 @@ graph LR
 4. `aud` (대상), `iss` (발급자) 확인
 
 **X.509 Certificate vs JWT**:
+
 | 항목 | X.509 | JWT |
 |------|-------|-----|
-| **형식** | binary (DER) / PEM | Base64 URL-safe JSON |
-| **서명** | CA Private Key | HMAC (대칭) / RSA (비대칭) |
-| **검증** | CA Public Key | Secret Key / Public Key |
-| **유효 기간** | 1년~10년 | 수분~수시간 |
-| **용도** | TLS, kubelet 인증 | API 인증, OIDC ID Token |
+| 형식 | binary (DER) / PEM | Base64 URL-safe JSON |
+| 서명 | CA Private Key | HMAC (대칭) / RSA (비대칭) |
+| 검증 | CA Public Key | Secret Key / Public Key |
+| 유효 기간 | 1년~10년 | 수분~수시간 |
+| 용도 | TLS, kubelet 인증 | API 인증, OIDC ID Token |
 
 ---
 
@@ -1004,48 +1005,48 @@ kubectl config set-credentials oidc-user \
 
 | 방법 | 주체 | Token 형식 | 유효 기간 | EKS 사용 | 용도 |
 |------|------|------------|-----------|----------|------|
-| **X.509 Client Cert** | User, Node | PEM/DER | 1년 | ✅ | kubelet 인증 (Node Authorizer) |
-| **ServiceAccount JWT** | Pod | JWT (Projected Volume) | 1시간 (기본) | ✅ | Pod 내 애플리케이션 → K8S API |
-| **AWS IAM Authenticator** | User | JWT (Presigned STS URL) | 15분 | ✅ | kubectl → K8S API (EKS 기본) |
-| **OIDC Token** | User | JWT (ID Token) | IdP 설정 | ✅ | 외부 IdP (Google, Keycloak) 연동 |
-| **Bootstrap Token** | Node | secret.token | 24시간 | ❌ | kubeadm 전용 (TLS Bootstrap) |
-| **Static Token File** | User | Plain Text | 무제한 | ❌ | 비권장 (보안 취약) |
+| X.509 Client Cert | User, Node | PEM/DER | 1년 | ✅ | kubelet 인증 (Node Authorizer) |
+| ServiceAccount JWT | Pod | JWT (Projected Volume) | 1시간 (기본) | ✅ | Pod 내 애플리케이션 → K8S API |
+| AWS IAM Authenticator | User | JWT (Presigned STS URL) | 15분 | ✅ | kubectl → K8S API (EKS 기본) |
+| OIDC Token | User | JWT (ID Token) | IdP 설정 | ✅ | 외부 IdP (Google, Keycloak) 연동 |
+| Bootstrap Token | Node | secret.token | 24시간 | ❌ | kubeadm 전용 (TLS Bootstrap) |
+| Static Token File | User | Plain Text | 무제한 | ❌ | 비권장 (보안 취약) |
 
 ### IRSA vs EKS Pod Identity 비교
 
 | 항목 | IRSA | EKS Pod Identity |
 |------|------|------------------|
-| **출시 시기** | 2019년 | 2023년 |
-| **신뢰 메커니즘** | OIDC Provider (Web Identity) | EKS 전용 Trust Policy |
-| **Trust Policy 복잡도** | 높음 (OIDC Endpoint ID 포함) | 낮음 (깔끔) |
-| **성능** | 중간 (OIDC 검증 오버헤드) | 높음 (EKS 네이티브) |
-| **SDK 요구 사항** | 대부분 SDK 지원 | 최신 SDK 필요 (2023+) |
-| **Annotation** | `eks.amazonaws.com/role-arn` | 불필요 (EKS Console 설정) |
-| **호환성** | 모든 K8S 클러스터 (OIDC 지원 시) | EKS 전용 |
-| **권장 환경** | 기존 클러스터, 멀티 클러스터 | 신규 EKS 클러스터 |
+| 출시 시기 | 2019년 | 2023년 |
+| 신뢰 메커니즘 | OIDC Provider (Web Identity) | EKS 전용 Trust Policy |
+| Trust Policy 복잡도 | 높음 (OIDC Endpoint ID 포함) | 낮음 (깔끔) |
+| 성능 | 중간 (OIDC 검증 오버헤드) | 높음 (EKS 네이티브) |
+| SDK 요구 사항 | 대부분 SDK 지원 | 최신 SDK 필요 (2023+) |
+| Annotation | `eks.amazonaws.com/role-arn` | 불필요 (EKS Console 설정) |
+| 호환성 | 모든 K8S 클러스터 (OIDC 지원 시) | EKS 전용 |
+| 권장 환경 | 기존 클러스터, 멀티 클러스터 | 신규 EKS 클러스터 |
 
 ### OAuth 2.0 Grant Type 비교
 
 | Grant Type | 용도 | Client Secret 필요 | Refresh Token | EKS/OIDC 사용 |
 |------------|------|---------------------|---------------|---------------|
-| **Authorization Code** | Server-side Web App | ✅ | ✅ | ✅ (OIDC 기본) |
-| **Implicit** | SPA (레거시) | ❌ | ❌ | ❌ (보안 취약, 비권장) |
-| **Resource Owner Password** | Trusted First-party App | ✅ | ✅ | ❌ (비권장) |
-| **Client Credentials** | Machine-to-Machine | ✅ | ❌ | ❌ |
-| **Refresh Token** | Token 갱신 | ✅ | - | ✅ |
+| Authorization Code | Server-side Web App | ✅ | ✅ | ✅ (OIDC 기본) |
+| Implicit | SPA (레거시) | ❌ | ❌ | ❌ (보안 취약, 비권장) |
+| Resource Owner Password | Trusted First-party App | ✅ | ✅ | ❌ (비권장) |
+| Client Credentials | Machine-to-Machine | ✅ | ❌ | ❌ |
+| Refresh Token | Token 갱신 | ✅ | - | ✅ |
 
 ### K8S RBAC Verbs 정리
 
 | Verb | HTTP Method | 설명 |
 |------|-------------|------|
-| **get** | GET | 단일 리소스 조회 |
-| **list** | GET | 리소스 목록 조회 |
-| **watch** | GET (Stream) | 리소스 변경 감지 (실시간) |
-| **create** | POST | 리소스 생성 |
-| **update** | PUT | 리소스 전체 업데이트 |
-| **patch** | PATCH | 리소스 부분 업데이트 |
-| **delete** | DELETE | 단일 리소스 삭제 |
-| **deletecollection** | DELETE | 여러 리소스 일괄 삭제 |
+| get | GET | 단일 리소스 조회 |
+| list | GET | 리소스 목록 조회 |
+| watch | GET (Stream) | 리소스 변경 감지 (실시간) |
+| create | POST | 리소스 생성 |
+| update | PUT | 리소스 전체 업데이트 |
+| patch | PATCH | 리소스 부분 업데이트 |
+| delete | DELETE | 단일 리소스 삭제 |
+| deletecollection | DELETE | 여러 리소스 일괄 삭제 |
 
 ---
 

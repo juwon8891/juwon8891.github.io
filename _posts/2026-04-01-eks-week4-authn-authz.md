@@ -796,30 +796,30 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph OAuth 2.0
+    subgraph oauth["OAuth 2.0"]
         OA1[인가<br/>Authorization]
         OA2[Access Token]
         OA3[권한 위임]
     end
     
-    subgraph OIDC
+    subgraph oidc["OIDC"]
         OIDC1[인증 + 인가<br/>Authentication + Authorization]
         OIDC2[ID Token JWT<br/>+ Access Token]
         OIDC3[사용자 신원 확인]
     end
     
-    subgraph IRSA
+    subgraph irsa["IRSA"]
         IRSA1[Pod → AWS 인증<br/>AssumeRoleWithWebIdentity]
         IRSA2[ServiceAccount JWT<br/>→ AWS 임시 자격 증명]
         IRSA3[Pod별 최소 권한]
     end
     
-    OAuth 2.0 -.->|+ ID Token| OIDC
-    OIDC -.->|K8S SA JWT<br/>+ OIDC Provider| IRSA
+    oauth -.->|+ ID Token| oidc
+    oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
     
-    style OAuth 2.0 fill:#e1f5ff
-    style OIDC fill:#fff4e1
-    style IRSA fill:#ffe1f5
+    style oauth fill:#e1f5ff
+    style oidc fill:#fff4e1
+    style irsa fill:#ffe1f5
 ```
 
 ---

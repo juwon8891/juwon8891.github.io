@@ -8,6 +8,28 @@
 - ✅ **현재 주차 내용에만 집중**: 해당 주차에서 학습한 내용만 정리
 - ✅ **"마무리" 섹션**: 핵심 요약만 포함, 다음 주차 언급 없이 종료
 
+## 2026-04-24 작업 내역
+
+### 1. PDF 분석 및 정리 (EKS Week 6)
+- 파일: `(2) 6주차 - CI_CD with Amazon EKS _ Notion.pdf`
+- PDF 내용 추출 및 분석 완료 (68 페이지)
+- EKS CI/CD with GitOps 실습 가이드 내용 정리
+
+### 2. EKS Week 6 학습정리 파일 생성
+- 파일명: `_posts/2026-04-15-eks-week6-cicd.md`
+- GitOps 기반 CI/CD 파이프라인 및 Platform Engineering 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 7가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (EKS Week 6)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+1. **GitOps 4대 원칙** - Declarative, Versioned and Immutable, Pulled Automatically, Continuously Reconciled
+2. **Platform Engineering과 DevOps 진화** - DevOps → GitOps → Platform Engineering (3대 가치: 속도, 거버넌스, 효율성)
+3. **EKS GitOps 전체 아키텍처** - Flux v2, Tofu 컨트롤러, Helm 컨트롤러, Argo Workflows 통합 구조
+4. **SaaS 티어 모델 (Silo, Hybrid, Pool)** - Premium (Silo), Advanced (Hybrid), Basic (Pool) 배포 전략
+5. **Flux v2 Reconciliation 흐름** - GitRepository → HelmRepository → HelmRelease → Kubernetes 리소스 배포
+6. **Tofu 컨트롤러 + Terraform 실행 흐름** - Git Push → Flux → Terraform CRD → tf-runner Pod → AWS 리소스 프로비저닝
+7. **Argo Workflows 온보딩 워크플로우** - SQS 메시지 → Argo Events → Workflow → Git Push → Flux → 배포
+
 ## 2026-04-19 작업 내역
 
 ### 1. EKS Week 5 학습정리 파일 생성 (실무 트러블슈팅)
@@ -77,9 +99,6 @@
   - 각 설정의 "왜?", "어떻게?", "무엇을?" 상세 설명 추가
   - 예: Deployment YAML 55줄 → 핵심 3가지 요소 설명으로 축약
   - 예: Go 코드 40줄 → 핵심 로직 + 동작 원리 설명으로 축약
-
----
-
 ## 2026-04-13 작업 내역
 
 ### 1. PDF 분석 및 정리 (EKS Week 4)
@@ -287,4 +306,4 @@
 
 ---
 
-**최종 업데이트**: 2026-04-19
+**최종 업데이트**: 2026-04-24

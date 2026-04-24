@@ -1336,20 +1336,6 @@ apps (Root Application)
 
 ---
 
-## Mermaid 다이어그램 요약
-
-이번 실습에서 추가한 7개의 Mermaid 다이어그램:
-
-1. **GitOps 4대 원칙**: Declarative, Versioned and Immutable, Pulled Automatically, Continuously Reconciled
-2. **Platform Engineering과 DevOps 진화**: DevOps → GitOps → Platform Engineering (3대 가치: 속도, 거버넌스, 효율성)
-3. **EKS GitOps 전체 아키텍처**: Flux v2, Tofu 컨트롤러, Helm 컨트롤러, Argo Workflows 통합 구조
-4. **SaaS 티어 모델**: Silo (Premium), Hybrid (Advanced), Pool (Basic) 배포 전략
-5. **Flux v2 Reconciliation 흐름**: GitRepository → HelmRepository → HelmRelease → Kubernetes 리소스 배포
-6. **Tofu 컨트롤러 + Terraform 실행 흐름**: Git Push → Flux → Terraform CRD → tf-runner Pod → AWS 리소스 프로비저닝
-7. **Argo Workflows 온보딩 워크플로우**: SQS 메시지 → Argo Events → Workflow → Git Push → Flux → 배포
-
----
-
 ## 핵심 개념 정리
 
 ### GitOps vs Traditional CI/CD

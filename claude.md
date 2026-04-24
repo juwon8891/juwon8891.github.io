@@ -12,16 +12,17 @@
 
 ### 1. PDF 분석 및 정리 (EKS Week 6)
 - 파일: `(2) 6주차 - CI_CD with Amazon EKS _ Notion.pdf`
-- PDF 내용 추출 및 분석 완료 (68 페이지)
+- PDF 전체 68페이지 분석 완료
 - EKS CI/CD with GitOps 실습 가이드 내용 정리
 
-### 2. EKS Week 6 학습정리 파일 생성
+### 2. EKS Week 6 학습정리 파일 생성 및 확장
 - 파일명: `_posts/2026-04-15-eks-week6-cicd.md`
+- 초기 생성: 557줄 (개요 + Mermaid 다이어그램 7개)
+- 최종 확장: 1,450줄 (실습 섹션 상세 추가)
 - GitOps 기반 CI/CD 파이프라인 및 Platform Engineering 내용을 체계적으로 마크다운 문서로 변환
-- 주요 개념 7가지 Mermaid 다이어그램 포함
 
 ### 3. Mermaid 다이어그램 추가 (EKS Week 6)
-학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 추가:
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 7개 추가:
 1. **GitOps 4대 원칙** - Declarative, Versioned and Immutable, Pulled Automatically, Continuously Reconciled
 2. **Platform Engineering과 DevOps 진화** - DevOps → GitOps → Platform Engineering (3대 가치: 속도, 거버넌스, 효율성)
 3. **EKS GitOps 전체 아키텍처** - Flux v2, Tofu 컨트롤러, Helm 컨트롤러, Argo Workflows 통합 구조
@@ -29,6 +30,34 @@
 5. **Flux v2 Reconciliation 흐름** - GitRepository → HelmRepository → HelmRelease → Kubernetes 리소스 배포
 6. **Tofu 컨트롤러 + Terraform 실행 흐름** - Git Push → Flux → Terraform CRD → tf-runner Pod → AWS 리소스 프로비저닝
 7. **Argo Workflows 온보딩 워크플로우** - SQS 메시지 → Argo Events → Workflow → Git Push → Flux → 배포
+
+### 4. 실습 섹션 상세 추가 (557줄 → 1,450줄)
+실습 1부터 4까지 상세 내용 추가:
+
+**실습 1: GitOps로 구현하는 SaaS 플랫폼 엔지니어링**
+- 1.1 시작하기: EKS 클러스터 준비, Namespace 확인, Flux v2 리소스 확인, Gitea Git 저장소 구성
+- 1.2 Terraform 및 OpenTofu 컨트롤러: Terraform 모듈 구조 (main.tf, variables.tf, outputs.tf), Terraform CRD 생성, tf-runner Pod 실행, Terraform State 저장 (Kubernetes Secret)
+- 1.3 Helm 차트: helm-tenant-chart 디렉터리 구조, Chart.yaml/values.yaml 상세, ECR에 Helm 차트 업로드 (OCI 형식)
+- 1.4 Helm 차트의 Flux 통합: HelmRepository 생성, HelmRelease 생성 (Premium Tier 예시), Git Push 및 Flux Reconciliation, 배포된 리소스 확인, kustomization.yaml 활용
+
+**실습 2: SaaS 티어 전략**
+- 티어별 HelmRelease 생성 (Basic/Advanced/Premium)
+- 티어별 배포 확인 (enable_producer/enable_consumer 옵션)
+
+**실습 3: 자동화된 테넌트 온보딩/오프보딩**
+- 온보딩 실행 (SQS 메시지 전송, Argo Workflow 확인, Gitea HelmRelease 커밋 확인)
+- 오프보딩 실행 (SQS 메시지 전송, HelmRelease 삭제 커밋 확인)
+- 전체 자동화 흐름 요약표 (5개 구성 요소)
+
+**실습 4: 리소스 확인 및 테스트**
+- 배포 검증 (Deployment 확인)
+- 환경 변수 확인 (티어별 차이)
+- DynamoDB/SQS 데이터 확인
+
+**참고 자료**
+- Argo Image Updater 패턴 설명
+- Argo CD App-of-apps 패턴 설명
+- 주요 도구 및 참고 링크
 
 ## 2026-04-19 작업 내역
 

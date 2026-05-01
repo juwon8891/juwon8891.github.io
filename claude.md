@@ -335,4 +335,104 @@
 
 ---
 
-**최종 업데이트**: 2026-04-24
+## 2026-04-29 작업 내역
+
+### 1. PDF 분석 및 정리 (EKS Week 7)
+- 파일: `(2) 7주차 워크숍 실습 메모(gasida) _ Notion.pdf`
+- PDF 전체 27페이지 분석 완료
+- EKS Cluster In-place Upgrades (1.30 → 1.31) 실습 가이드 내용 정리
+
+### 2. EKS Week 7 학습정리 파일 생성
+- 파일명: `_posts/2026-04-29-eks-week7-cluster-upgrade.md`
+- EKS 클러스터 업그레이드 내용을 체계적으로 마크다운 문서로 변환
+- 주요 개념 7가지 Mermaid 다이어그램 포함
+
+### 3. Mermaid 다이어그램 추가 (EKS Week 7)
+학습정리 파일에 주요 개념을 시각화한 Mermaid 다이어그램 7개 추가:
+1. **업그레이드 준비 흐름** - Upgrade Insights → 백업 → Add-on 호환성 → Deprecated API → HA 전략 → 업그레이드 시작
+2. **In-place Cluster Upgrades 전체 흐름** - Control Plane (10분) → Add-on (2분) → Nodes (30분) 순차 업그레이드
+3. **Sample Application 아키텍처** - UI → Orders/Checkout/Carts/Catalog/Assets → MySQL/Redis/DynamoDB/RabbitMQ
+4. **ArgoCD GitOps 배포 구조** - Git Repository (CodeCommit) → ArgoCD → EKS Cluster → app-of-apps
+5. **관리형 노드그룹 In-Place 업그레이드** - 기존 노드 → 사용자 지정 AMI → 업그레이드 (1.30 → 1.31)
+6. **관리형 노드그룹 Blue-Green 업그레이드** - blue-mng (1.30) → green-mng (1.31) → app 마이그레이션 → blue-mng 삭제
+7. **EKS 업그레이드 전체 흐름** - Insights → 백업 → Control Plane → Add-on → Nodes (관리형/카펜터/셀프/파게이트) → 검증
+
+### 4. 주요 실습 내용
+
+**실습 환경**:
+- EKS 클러스터 버전: 1.30 → 1.31
+- 리전: us-west-2
+- 노드 OS: Amazon Linux 2023, 커널 6.1, containerd 2.2.1
+- 노드 타입: 관리형(blue-mng, initial), 셀프(default-selfmng), 파게이트(fp-profile), 카펜터(default-spot)
+
+**Preparing for Cluster Upgrades**:
+- kube-ops-view 또는 ui-web을 통한 실시간 모니터링
+- 노드그룹별 업그레이드 전략 수립
+- 다양한 방법 비교: eksctl, AWS 콘솔, AWS CLI, Terraform
+
+**In-place Cluster Upgrades (1.30 → 1.31)**:
+1. **Control Plane 업그레이드** (10분 소요)
+   - 방법 1: eksctl (이래 실행하지 않음)
+   - 방법 2: AWS 관리 콘솔 (skip, 이래 실행하지 않음)
+   - 방법 3: AWS CLI (이래 실행하지 않음)
+   - **방법 4: Terraform (권장, 실제 실행!)**
+2. **Add-on 업그레이드** (2분 소요)
+   - CoreDNS
+   - kube-proxy
+   - VPC CNI
+   - EBS CSI Driver
+3. **Nodes 업그레이드**
+   - **관리형 노드그룹** (30분 소요):
+     - In-Place Managed Node group Upgrade
+     - Blue-Green approach for Managed node group update
+   - **카펜터 노드**: 자동 교체 (1.31 AMI 사용)
+   - **셀프 노드그룹**: ASG Launch Template 업데이트
+   - **파게이트 프로파일**: Pod 재시작
+
+**HA 전략 (High Availability Strategies)**:
+- **PodDisruptionBudgets (PDB)**: orders 애플리케이션에 PDB 설정 (minAvailable: 1)
+- **TopologySpreadConstraints**: Pod를 여러 가용 영역(AZ)에 분산 배치
+
+**EKS Upgrade Insights**:
+- 6가지 점검 항목:
+  1. kube-proxy version skew
+  2. Cluster health issues
+  3. EKS add-ons compatibility
+  4. Amazon Linux expiration (2025년 11월 26일 지원 종료)
+  5. kubelet version skew
+  6. Deprecated APIs (v1.32에서 제거 예정)
+
+**Sample Application (ArgoCD GitOps)**:
+- UI → Orders, Checkout, Carts, Catalog, Assets
+- Persistence: MySQL, Redis, DynamoDB
+- Messaging: RabbitMQ
+- ArgoCD를 사용한 GitOps 배포 (AWS CodeCommit 저장소)
+
+### 5. 핵심 개념
+
+**EKS 업그레이드 순서**:
+- Upgrade Insights 사전 점검 → 백업 → Control Plane → Add-on → Nodes → 검증
+
+**업그레이드 Best Practices**:
+1. Upgrade Insights 사전 점검 (kube-proxy, Add-on, Deprecated API 등)
+2. 백업 생성 (etcd 스냅샷, PV 스냅샷)
+3. PDB 설정 (minAvailable로 가용성 보장)
+4. TopologySpreadConstraints 적용 (AZ 분산 배치)
+5. 모니터링 도구 활성화 (kube-ops-view, CloudWatch)
+6. 순차 업그레이드 (Control Plane → Add-on → Nodes)
+7. 한 버전씩 업그레이드 (1.30 → 1.31, 두 버전 점프 불가)
+8. 업그레이드 후 검증 (Pod 상태, 애플리케이션 헬스 체크)
+9. Terraform 사용 권장 (IaC로 재현 가능한 업그레이드)
+
+**주의사항**:
+- ⚠️ 업그레이드는 되돌릴 수 없음 (Rollback 불가)
+- ⚠️ Deprecated API 사전 확인 필수 (v1.32에서 제거되는 API)
+- ⚠️ Amazon Linux 노드는 2025년 11월 26일 지원 종료 (AL2023으로 마이그레이션)
+
+**In-Place vs Blue-Green**:
+- **In-Place**: 기존 노드 교체 (한 번에 1개씩), PDB로 다운타임 최소화, 리소스 비용 낮음, 롤백 어려움
+- **Blue-Green**: 새 노드그룹 생성 후 마이그레이션, 다운타임 없음, 리소스 비용 2배 (일시적), 롤백 쉬움
+
+---
+
+**최종 업데이트**: 2026-04-29

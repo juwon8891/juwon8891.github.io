@@ -888,9 +888,6 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-
----
-
 **🎉 5주차 학습 완료!**
 
 5주차에서는 ArgoCD의 **보안 및 인증**을 학습했습니다:

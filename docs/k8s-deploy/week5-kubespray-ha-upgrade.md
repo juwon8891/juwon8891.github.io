@@ -6,9 +6,6 @@
 
 ---
 
-
----
-
 ## 🏗️ 실습 환경 구성
 
 ### 1. 가상머신 구성
@@ -1714,9 +1711,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e allow_ungraceful_removal=true \
   -e skip_confirmation=true
 ```
-
----
-
 
 ---
 

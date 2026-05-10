@@ -1820,9 +1820,6 @@ kubectl rbac-tool lookup system:masters
 
 ---
 
-
----
-
 **Week 1 학습을 마치며**: Kubernetes를 "처음부터 끝까지 손으로 만들어보는" 이 실습을 통해 Kubernetes의 내부 동작 원리, 보안 메커니즘, 컴포넌트 간 상호작용을 깊이 이해할 수 있었습니다. 자동화 도구(kubeadm, kops, EKS 등)에 가려져 있던 세부 사항들을 직접 다루면서 **진짜 Kubernetes**를 배웠습니다! 🚀
 
 다음 주에는 프로덕션 환경에 더 가까운 고급 네트워킹을 다루며 계속 발전해나가겠습니다. K8s-Deploy 스터디, 화이팅! 💪

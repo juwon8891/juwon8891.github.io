@@ -2213,9 +2213,6 @@ spec:
 
 ---
 
-
----
-
 **🎉 4주차 학습 완료!**
 
 4주차에서는 ArgoCD의 고급 기능인 ApplicationSet, Sync Waves, RBAC, Notifications을 학습하고, Argo Rollouts의 Blue-Green 및 Prometheus 기반 자동 롤백을 실습했습니다. 이제 **엔터프라이즈급 GitOps 파이프라인**을 구축할 수 있는 역량을 갖추게 되었습니다.

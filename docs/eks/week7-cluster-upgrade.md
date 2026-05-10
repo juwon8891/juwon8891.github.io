@@ -6,9 +6,6 @@
 
 ---
 
-
----
-
 ## 📝 실습 메모
 
 ### 1. Preparing for Cluster Upgrades
@@ -1039,9 +1036,6 @@ graph TB
 - ⚠️ **업그레이드는 되돌릴 수 없음** (Rollback 불가)
 - ⚠️ **Deprecated API 사전 확인 필수** (v1.32에서 제거되는 API)
 - ⚠️ **Amazon Linux 노드는 2025년 11월 26일 지원 종료** (AL2023으로 마이그레이션)
-
----
-
 
 ---
 

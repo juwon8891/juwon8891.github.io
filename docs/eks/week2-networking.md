@@ -6,9 +6,6 @@
 
 ---
 
-
----
-
 ## 🌐 AWS VPC CNI 소개
 
 ### 1. VPC CNI란?
@@ -1309,9 +1306,6 @@ graph TB
 - **간단한 외부 접근**: NodePort
 - **프로덕션 외부 접근**: LoadBalancer
 - **외부 서비스 참조**: ExternalName
-
----
-
 
 ---
 

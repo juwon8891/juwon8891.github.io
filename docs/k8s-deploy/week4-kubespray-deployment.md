@@ -1370,9 +1370,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
 
 ---
 
-
----
-
 ## 📚 참고 자료
 
 - [Kubespray 공식 문서](https://kubespray.io/)

@@ -1906,9 +1906,6 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 
 ---
 
-
----
-
 **🎉 6주차 학습 완료!**
 
 6주간의 ArgoCD 학습을 통해 다음과 같은 역량을 갖추게 되었습니다:

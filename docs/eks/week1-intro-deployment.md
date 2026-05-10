@@ -6,9 +6,6 @@
 
 ---
 
-
----
-
 ## ☁️ Amazon EKS 소개
 
 ### 1. Amazon EKS란?
@@ -1240,9 +1237,6 @@ aws eks list-insights \
 | **Public** | ⭐⭐ | ⭐⭐⭐⭐⭐ | 낮음 | 개발/테스트 |
 | **Public + Private** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | 중간 | 프로덕션 (권장) |
 | **Fully Private** | ⭐⭐⭐⭐⭐ | ⭐⭐ | 높음 (VPN/DX) | 금융, 의료, 정부 |
-
----
-
 
 ---
 

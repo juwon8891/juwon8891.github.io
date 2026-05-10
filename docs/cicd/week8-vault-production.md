@@ -1442,9 +1442,6 @@ conn = mysql.connector.connect(
 
 ---
 
-
----
-
 **🎉 8주차 학습 완료!**
 
 8주간의 CI/CD 및 GitOps 학습을 통해 다음과 같은 역량을 갖추게 되었습니다:

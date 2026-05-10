@@ -1,6 +1,8 @@
 
 # 7주차 학습정리 - HashiCorp Vault: 엔터프라이즈급 시크릿 관리와 CI/CD 통합
 
+> HashiCorp Vault를 활용한 시크릿 관리와 CI/CD 파이프라인 보안을 학습합니다.
+
 ---
 
 ## 🔏 Vault 개요와 시크릿 관리의 필요성

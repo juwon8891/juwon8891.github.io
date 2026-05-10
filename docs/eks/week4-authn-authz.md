@@ -165,6 +165,8 @@ data:
 **OIDC Provider 등록**:
 ```bash
 # EKS 클러스터 생성 시 자동 생성
+
+> EKS 인증/인가 (IRSA, OIDC, RBAC, ServiceAccount)를 학습합니다.
 eksctl utils associate-iam-oidc-provider --cluster myeks --approve
 
 # 확인

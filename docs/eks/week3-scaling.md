@@ -476,6 +476,8 @@ graph TB
 
 ```bash
 # CloudFormation Stack 생성
+
+> EKS Auto Scaling (HPA, KEDA, Cluster Autoscaler, Karpenter, VPA)을 학습합니다.
 aws cloudformation deploy \
   --template-file eks-scaling-stack.yaml \
   --stack-name myeks \

@@ -108,6 +108,8 @@ graph TB
 
 ```bash
 # IP Forwarding 활성화
+
+> Kubespray 폐쇄망(Air-Gap) 환경 offline 설치를 학습합니다.
 sysctl -w net.ipv4.ip_forward=1
 cat <<EOF | tee /etc/sysctl.d/99-ipforward.conf
 net.ipv4.ip_forward = 1

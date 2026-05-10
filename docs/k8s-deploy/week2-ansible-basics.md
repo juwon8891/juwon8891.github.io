@@ -116,6 +116,8 @@ Inventory는 Ansible이 관리할 호스트 목록을 정의한 파일입니다.
 ```ini
 # /etc/ansible/hosts 또는 ~/my-ansible/inventory
 
+> Ansible 기초, Playbook, Role, Handler, 변수 우선순위를 학습합니다.
+
 [web]
 tnode1 ansible_host=192.168.10.101
 tnode2 ansible_host=192.168.10.102

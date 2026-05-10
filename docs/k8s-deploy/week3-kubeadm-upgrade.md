@@ -222,6 +222,8 @@ kubelet이 자신의 인증서를 자동으로 발급받는 과정:
 
 ```bash
 # KST 타임존 설정
+
+> kubeadm을 활용한 Kubernetes 클러스터 구축 및 업그레이드를 학습합니다.
 timedatectl set-timezone Asia/Seoul
 
 # Chrony NTP 설정

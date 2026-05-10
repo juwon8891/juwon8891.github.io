@@ -1,6 +1,8 @@
 
 # 5주차 학습정리 - ArgoCD 보안 및 인증: Keycloak SSO 연동과 접근 제어로 완성하는 엔터프라이즈 GitOps
 
+> ArgoCD 보안 설정과 Keycloak SSO 연동을 학습합니다.
+
 ---
 
 ## 🚀 실습 환경 구성

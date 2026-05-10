@@ -163,6 +163,8 @@ graph TB
 
 ```bash
 # EKS 클러스터 정보 확인
+
+> EKS GitOps CI/CD (Flux v2, Tofu Controller, Argo Workflows)를 학습합니다.
 $ kubectl cluster-info
 
 Kubernetes control plane is running at https://XXXXXXXXX.gr7.ap-northeast-2.eks.amazonaws.com

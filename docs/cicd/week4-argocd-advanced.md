@@ -11,7 +11,7 @@
 
 **ApplicationSet**은 ArgoCD의 **Application 생성을 자동화**하는 CRD(Custom Resource Definition)입니다. 하나의 템플릿으로 **여러 환경, 클러스터, 테넌트**에 동일한 애플리케이션을 배포할 수 있습니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "ApplicationSet Controller"
         APPSET[ApplicationSet<br/>템플릿 정의]
@@ -44,7 +44,7 @@ graph TB
     style APP1 fill:#98FB98
     style APP2 fill:#98FB98
     style APP3 fill:#98FB98
-</div>
+```
 
 **ApplicationSet의 이점**:
 - ✅ **자동화**: 새 환경/클러스터 추가 시 자동으로 Application 생성
@@ -187,7 +187,7 @@ kubectl get all -n prod-nginx
 
 Git 저장소의 **디렉토리 구조**를 기반으로 자동으로 Application을 생성합니다.
 
-<div class="mermaid">
+```mermaid
 graph LR
     subgraph "Git Repository"
         ROOT[apps/]
@@ -218,7 +218,7 @@ graph LR
     style APPF fill:#98FB98
     style APPB fill:#98FB98
     style APPD fill:#98FB98
-</div>
+```
 
 #### 모노레포 구조 준비
 
@@ -448,7 +448,7 @@ kubectl get ns | grep -E "(dev|staging|prod)-(frontend|backend|database)"
 
 **Sync Waves**는 ArgoCD가 리소스를 **순서대로 배포**하도록 제어하는 기능입니다. 숫자가 낮은 Wave부터 순차적으로 배포됩니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant ArgoCD
     participant Wave0 as Wave 0<br/>Namespace, ConfigMap
@@ -469,7 +469,7 @@ sequenceDiagram
     Wave3-->>ArgoCD: 준비 완료
 
     Note over ArgoCD,Wave3: 순차적 배포로<br/>의존성 문제 해결
-</div>
+```
 
 **Sync Wave 적용 예시**:
 
@@ -914,7 +914,7 @@ git push
 
 **프로젝트(AppProject)**는 여러 팀이 하나의 ArgoCD를 공유할 때 **격리와 권한 관리**를 제공합니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "ArgoCD Instance"
         subgraph "Project: team-frontend"
@@ -952,7 +952,7 @@ graph TB
     style APP4 fill:#98FB98
     style APP5 fill:#87CEEB
     style APP6 fill:#87CEEB
-</div>
+```
 
 **프로젝트 제약 사항**:
 - 허용된 Git 저장소만 사용 가능
@@ -1273,7 +1273,7 @@ argocd app sync backend-app
 
 **ArgoCD Notifications**는 배포 이벤트를 **Slack, Email, Webhook** 등으로 전송하는 기능입니다.
 
-<div class="mermaid">
+```mermaid
 graph LR
     subgraph "ArgoCD"
         APP[Application]
@@ -1297,7 +1297,7 @@ graph LR
     style SLACK fill:#FFB6C1
     style EMAIL fill:#98FB98
     style WEBHOOK fill:#F7DC6F
-</div>
+```
 
 **주요 구성 요소**:
 - **Trigger**: 언제 알림을 보낼지 (예: on-sync-failed)
@@ -1664,7 +1664,7 @@ curl http://127.0.0.1:30005
 
 **AnalysisTemplate**은 **배포 중 메트릭을 수집하고 분석**하여 자동으로 프로모션/롤백을 결정합니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant Rollout
     participant Analysis
@@ -1687,7 +1687,7 @@ sequenceDiagram
         Decision-->>Rollout: 6. ❌ 롤백 실행
         Rollout->>Rollout: 7. Canary 0%
     end
-</div>
+```
 
 **AnalysisTemplate 구성 요소**:
 - **metrics**: 측정할 메트릭 정의

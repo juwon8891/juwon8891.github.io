@@ -9,7 +9,7 @@
 
 #### 전체 아키텍처
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "로컬 개발 환경"
         DEV[개발자<br/>로컬 머신]
@@ -39,7 +39,7 @@ graph TB
     style JENKINS fill:#4ECDC4
     style GOGS fill:#95E1D3
     style K8S_MASTER fill:#F7DC6F
-</div>
+```
 
 #### Docker Compose로 Jenkins와 Gogs 실행
 
@@ -134,7 +134,7 @@ docker compose exec jenkins docker info
 
 **Kind**(Kubernetes IN Docker)는 Docker 컨테이너를 "노드"로 사용하여 로컬 쿠버네티스 클러스터를 실행하는 도구입니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Host Machine"
         KIND[Kind Tool]
@@ -157,7 +157,7 @@ graph TB
     style CP fill:#F7DC6F
     style W1 fill:#98FB98
     style W2 fill:#98FB98
-</div>
+```
 
 **Kind의 주요 특징**:
 - Docker 컨테이너를 쿠버네티스 노드로 사용
@@ -500,7 +500,7 @@ pipeline {
 
 쿠버네티스는 **선언적 구성(Declarative Configuration)**을 사용합니다. 원하는 상태를 YAML로 선언하면, 쿠버네티스가 해당 상태를 유지합니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant User as 사용자
     participant K8s as Kubernetes API
@@ -518,7 +518,7 @@ sequenceDiagram
     Controller->>Controller: 6. 원하는 상태(2개)와 비교
     Controller->>Pod: 7. 새 Pod 1개 생성
     Pod->>Controller: 8. 상태 보고 (2개)
-</div>
+```
 
 #### 애플리케이션 Deployment 배포
 
@@ -609,7 +609,7 @@ kubectl get deploy,rs,pod -o wide
 
 Pod는 생성/삭제 시마다 IP가 변경됩니다. Service는 Pod에 대한 **안정적인 네트워크 엔드포인트**를 제공합니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Service"
         SVC[Service<br/>ClusterIP: 10.96.236.37<br/>NodePort: 30000]
@@ -634,7 +634,7 @@ graph TB
     style POD2 fill:#98FB98
     style POD3 fill:#98FB98
     style NEW fill:#F7DC6F
-</div>
+```
 
 **Service 주요 기능**:
 - **고정 진입점**: ClusterIP, NodePort, LoadBalancer
@@ -847,7 +847,7 @@ git push
 
 Blue-Green 배포는 두 개의 동일한 프로덕션 환경(Blue, Green)을 유지하여 **무중단 배포**와 **빠른 롤백**을 가능하게 하는 전략입니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "1단계: Blue 환경 운영 중"
         USER1[사용자] -->|트래픽| SERVICE1[Service<br/>selector: blue]
@@ -879,7 +879,7 @@ graph TB
         style GREEN3 fill:#90EE90
         style BLUE3 fill:#87CEEB,stroke-dasharray: 5 5
     end
-</div>
+```
 
 **Blue-Green 배포 장점**:
 - ✅ **무중단 배포**: 서비스 다운타임 없음
@@ -1081,7 +1081,7 @@ watch -d 'kubectl get deploy -o wide; echo; kubectl get svc,ep echo-server-servi
 
 #### ArgoCD 아키텍처
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "GitOps Flow"
         GIT[Git Repository<br/>Desired State]
@@ -1112,7 +1112,7 @@ graph TB
     style API fill:#4ECDC4
     style CTRL fill:#F7DC6F
     style K8S fill:#98FB98
-</div>
+```
 
 **ArgoCD 주요 컴포넌트**:
 
@@ -1128,7 +1128,7 @@ graph TB
 
 #### ArgoCD GitOps 루프
 
-<div class="mermaid">
+```mermaid
 flowchart TB
     START[시작] --> DEPLOY[1. 배포 Deploy<br/>Git Manifest를 클러스터에 배포]
 
@@ -1147,7 +1147,7 @@ flowchart TB
     style MONITOR fill:#98FB98
     style DETECT fill:#87CEEB
     style ACTION fill:#F7DC6F
-</div>
+```
 
 **GitOps 루프 상세 설명**:
 
@@ -1477,7 +1477,7 @@ kubectl get cm argocd-cm -n argocd -o yaml | grep timeout.reconciliation
 
 #### 전체 CI/CD 플로우
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant Dev as 개발자
     participant DevRepo as dev-app Repo
@@ -1497,7 +1497,7 @@ sequenceDiagram
     K8s->>Dev: 8. 배포 완료 확인
 
     Note over Dev,K8s: 개발자는 dev-app만 관리,<br/>나머지는 자동화
-</div>
+```
 
 **Full CI/CD 특징**:
 - **개발팀**: `dev-app` 저장소만 관리 (코드, Dockerfile, VERSION)
@@ -1736,7 +1736,7 @@ curl http://127.0.0.1:30000
 
 #### Argo Rollouts 아키텍처
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Argo Rollouts"
         CTRL[Rollouts Controller]
@@ -1772,7 +1772,7 @@ graph TB
     style CTRL fill:#4ECDC4
     style ROLLOUT fill:#F7DC6F
     style ANALYSIS fill:#FF6B6B
-</div>
+```
 
 ### 2. Canary 배포 전략
 
@@ -1780,7 +1780,7 @@ graph TB
 
 **Canary 배포**는 새 버전을 소수의 사용자에게 먼저 배포하여 테스트한 후, 점진적으로 트래픽을 늘려가는 배포 전략입니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "1단계: 10% Canary"
         USER1[사용자 100%] --> SVC1[Service]
@@ -1806,7 +1806,7 @@ graph TB
 
         style NEW fill:#90EE90
     end
-</div>
+```
 
 **Canary 배포 장점**:
 - ✅ **위험 최소화**: 소수 사용자에게 먼저 배포
@@ -1945,7 +1945,7 @@ kubectl argo rollouts abort rollouts-demo
 
 #### GitOps 저장소 전략
 
-<div class="mermaid">
+```mermaid
 graph LR
     subgraph "개발팀"
         DEV_REPO[dev-app<br/>코드, Dockerfile]
@@ -1970,7 +1970,7 @@ graph LR
     style OPS_REPO fill:#98FB98
     style JENKINS fill:#4ECDC4
     style ARGOCD fill:#F7DC6F
-</div>
+```
 
 **저장소 분리의 이점**:
 - **책임 분리**: 개발팀은 코드, 데브옵스팀은 인프라

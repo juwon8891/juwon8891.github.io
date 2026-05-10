@@ -107,7 +107,7 @@ KUBE_EDITOR="nano" kubectl edit -n ingress-nginx deployments/ingress-nginx-contr
 - ArgoCD Server가 자체 TLS 인증서로 end-to-end HTTPS 유지
 - 설정하지 않으면 "리디렉션 횟수가 너무 많습니다" 오류 발생
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant C as Client Browser
     participant I as Ingress Nginx
@@ -119,7 +119,7 @@ sequenceDiagram
     I->>A: Forward HTTPS (Passthrough)
     A->>S: Load TLS certificate + key
     A->>C: HTTPS Response (Self-Signed Cert)
-</div>
+```
 
 #### IPTABLES 규칙 확인
 
@@ -406,7 +406,7 @@ kubectl rollout restart deployment argocd-server -n argocd
 
 **Keycloak**은 애플리케이션에 초점을 맞춘 오픈 소스 **ID 및 접근(권한) 관리 도구**입니다.
 
-<div class="mermaid">
+```mermaid
 graph TB
     subgraph "Keycloak Features"
         AUTH[강력한 인증]
@@ -441,7 +441,7 @@ graph TB
 
     style AUTH fill:#4ECDC4
     style SSO fill:#F7DC6F
-</div>
+```
 
 ### 2. 주요 기능 및 특징
 
@@ -680,7 +680,7 @@ open http://localhost:8080/realms/myrealm/account
 
 #### OpenID Connect Authorization Code Flow
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant U as User
     participant A as Application(ArgoCD)
@@ -696,7 +696,7 @@ sequenceDiagram
     A->>K: 8. Token 요청 (Code 교환)
     K->>A: 9. ID Token + Access Token
     A->>U: 10. 인증 완료, 세션 생성
-</div>
+```
 
 **흐름 설명**:
 1. 사용자가 ArgoCD에 로그인 요청
@@ -795,7 +795,7 @@ open "https://argocd.example.com"
 
 **OAuth 2.0**은 **권한 부여 프레임워크**입니다.
 
-<div class="mermaid">
+```mermaid
 sequenceDiagram
     participant RO as Resource Owner<br/>(사용자)
     participant C as Client<br/>(애플리케이션)
@@ -812,7 +812,7 @@ sequenceDiagram
     C->>RS: 8. API 요청 (Access Token)
     RS->>C: 9. 게임 목록 반환
     C->>RO: 10. 게임 목록 표시
-</div>
+```
 
 **OAuth 2.0의 핵심**:
 - ✅ **인증은 유저가 직접 수행**

@@ -37,12 +37,12 @@ graph TB
     START[시작: 1.30] --> CP[1. Control Plane<br/>업그레이드<br/>⏱️ 10분]
     CP --> ADDON[2. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>EBS CSI Driver<br/>⏱️ 2분]
     ADDON --> NODES[3. Nodes 업그레이드<br/>⏱️ 30분]
-    
+
     NODES --> MNG[관리형 노드그룹]
     NODES --> KARP[카펜터 노드]
     NODES --> SELF[셀프 노드그룹]
     NODES --> FG[파게이트]
-    
+
     MNG --> END[완료: 1.31]
     KARP --> END
     SELF --> END
@@ -204,7 +204,7 @@ graph TB
     CHECKOUT --> REDIS
     CARTS --> DYNAMODB
     CATALOG --> MYSQL2
-    
+
     ORDERS -.-> RABBITMQ
     CHECKOUT -.-> RABBITMQ
 ```
@@ -991,17 +991,17 @@ graph TB
     BACKUP --> CP[3. Control Plane<br/>업그레이드<br/>⏱️ 10분]
     CP --> ADDON[4. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>VPC CNI, EBS CSI<br/>⏱️ 2분]
     ADDON --> NODES[5. Nodes 업그레이드<br/>⏱️ 30분]
-    
+
     NODES --> MNG[관리형 노드그룹<br/>In-Place or Blue-Green]
     NODES --> KARP[카펜터 노드<br/>자동 교체]
     NODES --> SELF[셀프 노드그룹<br/>ASG Launch Template]
     NODES --> FG[파게이트<br/>Pod 재시작]
-    
+
     MNG --> VERIFY[6. 검증]
     KARP --> VERIFY
     SELF --> VERIFY
     FG --> VERIFY
-    
+
     VERIFY --> END[완료]
 ```
 

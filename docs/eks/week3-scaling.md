@@ -313,7 +313,7 @@ graph TD
     E -->|replicas 증가| H[ReplicaSet]
     F -->|replicas 감소| H
     H -->|Pod 생성/제거| I[Pod]
-    
+
     style B fill:#e1f5ff
     style C fill:#ffe1e1
     style E fill:#d4edda
@@ -329,12 +329,12 @@ graph LR
     C -->|Kubernetes Metrics API| D[HPA]
     D -->|replicas 조정| E[Deployment]
     E -->|Pod 생성/제거| F[Pod]
-    
+
     G[ScaledObject CRD] -.->|정의| B
     B -->|HPA 자동 생성| D
-    
+
     F -->|Scale to Zero<br/>가능| H[0 Replicas]
-    
+
     style A fill:#fff3cd
     style B fill:#e1f5ff
     style D fill:#ffe1e1
@@ -352,7 +352,7 @@ graph TB
         A4 --> A5[노드 등록]
         A5 --> A6[Pod 스케줄링]
     end
-    
+
     subgraph Karpenter["Karpenter"]
         B1[Pending Pod 감지] --> B2[NodePool 평가]
         B2 --> B3[최적 인스턴스 타입 선택<br/>Spot/On-Demand 혼합]
@@ -360,7 +360,7 @@ graph TB
         B4 --> B5[노드 등록]
         B5 --> B6[Pod 스케줄링]
     end
-    
+
     style A4 fill:#ffe1e1
     style B4 fill:#d4edda
 ```
@@ -375,7 +375,7 @@ sequenceDiagram
     participant EC2 as EC2NodeClass
     participant AWS as AWS EC2 API
     participant N as Node
-    
+
     P->>K: Pod 생성 (Pending 상태)
     K->>NP: NodePool 요구사항 확인
     NP->>EC2: EC2NodeClass 참조
@@ -393,22 +393,22 @@ sequenceDiagram
 ```mermaid
 graph TD
     A[Karpenter Disruption Controller] --> B{Disruption 유형}
-    
+
     B -->|Consolidation| C[노드 사용률 모니터링]
     C -->|Underutilized| D[Pod 재배치 가능 여부 확인]
     D -->|가능| E[Pod Drain]
     E --> F[노드 종료<br/>비용 절감]
-    
+
     B -->|Drift| G[NodePool/EC2NodeClass 변경 감지]
     G --> H[새 설정으로 노드 교체]
-    
+
     B -->|Expiration| I[노드 수명 확인<br/>ttlSecondsAfterEmpty]
     I -->|만료| E
-    
+
     B -->|Interruption| J[SQS Queue<br/>Spot Interruption]
     J -->|2분 전 알림| K[신속 Pod 재배치]
     K --> F
-    
+
     style F fill:#d4edda
     style K fill:#ffe1e1
 ```
@@ -421,17 +421,17 @@ graph TD
     B -->|과거 메트릭| C[VPA Recommender]
     C -->|분석| D[권장 값 계산<br/>Target, Lower, Upper]
     D -->|VPA 객체 업데이트| E[VPA Status]
-    
+
     E -->|updateMode: Auto/Recreate| F[VPA Updater]
     F -->|오래된 Pod 식별| G[Pod Eviction]
     G -->|Pod 재생성| H[VPA Admission Controller]
     H -->|권장 값 주입<br/>requests/limits| I[새 Pod]
-    
+
     E -->|updateMode: Initial| J[신규 Pod 생성 시]
     J --> H
-    
+
     E -->|updateMode: Off| K[권장 값만 표시]
-    
+
     style C fill:#e1f5ff
     style F fill:#ffe1e1
     style H fill:#d4edda
@@ -447,21 +447,21 @@ graph TB
         KEDA["KEDA<br/>이벤트 기반<br/>Scale to Zero"]
         CPA["CPA<br/>클러스터 비례"]
     end
-    
+
     subgraph Node_Level["노드 레벨 스케일링"]
         CAS["Cluster Autoscaler<br/>ASG 기반<br/>3-5분 소요"]
         Karpenter["Karpenter<br/>Just-in-time<br/>1-2분 소요<br/>비용 최적화"]
     end
-    
+
     subgraph Serverless["서버리스"]
         Fargate["AWS Fargate<br/>노드 관리 불필요<br/>Pod 격리"]
     end
-    
+
     HPA -.->|Pending Pod 발생| CAS
     KEDA -.->|Pending Pod 발생| Karpenter
-    
+
     Pod_Level -.->|노드 부족 시| Node_Level
-    
+
     style HPA fill:#e1f5ff
     style KEDA fill:#d4edda
     style Karpenter fill:#ffe1e1

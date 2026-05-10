@@ -65,11 +65,11 @@ graph LR
     B --> C[Authorization<br/>인가]
     C --> D[Admission Control<br/>검증/변경]
     D --> E[Persisted to etcd<br/>저장]
-    
+
     B -.-> F[Who are you?]
     C -.-> G[What can you do?]
     D -.-> H[Is this valid?]
-    
+
     style B fill:#e1f5ff
     style C fill:#fff4e1
     style D fill:#ffe1f5
@@ -112,7 +112,7 @@ sequenceDiagram
     participant STS as AWS STS
     participant API as K8S API Server
     participant CM as ConfigMap<br/>aws-auth
-    
+
     User->>Client: kubectl get nodes
     Client->>STS: GetCallerIdentity<br/>(Presigned URL 생성)
     STS-->>Client: JWT Token<br/>(15분 유효)
@@ -272,7 +272,7 @@ sequenceDiagram
     participant STS as AWS STS
     participant OIDC as OIDC Provider
     participant S3 as AWS S3
-    
+
     Pod->>Pod: Pod 생성 시<br/>MutatingWebhook 트리거
     Webhook->>Pod: Env 주입:<br/>AWS_ROLE_ARN<br/>AWS_WEB_IDENTITY_TOKEN_FILE
     Kubelet->>Pod: Projected Volume 마운트<br/>(JWT Token)
@@ -371,19 +371,19 @@ graph TB
         Role[Role<br/>리소스+동작 정의]
         RoleBinding[RoleBinding<br/>Subject ↔ Role]
     end
-    
+
     subgraph Scope:Cluster-wide
         ClusterRole[ClusterRole<br/>클러스터 리소스+동작]
         ClusterRoleBinding[ClusterRoleBinding<br/>Subject ↔ ClusterRole]
     end
-    
+
     Subject[Subject<br/>User/Group/ServiceAccount]
-    
+
     Subject -.-> RoleBinding
     Subject -.-> ClusterRoleBinding
     RoleBinding --> Role
     ClusterRoleBinding --> ClusterRole
-    
+
     style Role fill:#e1f5ff
     style ClusterRole fill:#fff4e1
     style RoleBinding fill:#ffe1f5
@@ -464,10 +464,10 @@ graph LR
     D --> E[Object Schema Validation]
     E --> F[Validating Admission]
     F --> G[Persisted to etcd]
-    
+
     D -.-> H[MutatingWebhook<br/>예: Pod Identity Webhook]
     F -.-> I[ValidatingWebhook<br/>예: Policy Validation]
-    
+
     style D fill:#ffe1f5
     style F fill:#e1f5ff
 ```
@@ -504,12 +504,12 @@ graph TB
     Client[Client<br/>권한을 위임받는 주체<br/>Third-party Application]
     AS[Authorization Server<br/>인증 서버<br/>권한을 검증하고 부여]
     RS[Resource Server<br/>리소스 서버<br/>인가를 수행하고 리소스를 제공]
-    
+
     RO -.->|1. 인증| AS
     AS -.->|2. Access Token 발급| Client
     Client -.->|3. Access Token 제시| RS
     RS -.->|4. 리소스 제공| Client
-    
+
     style RO fill:#e1f5ff
     style Client fill:#fff4e1
     style AS fill:#ffe1f5
@@ -524,7 +524,7 @@ sequenceDiagram
     participant App as Client<br/>(Third-party App)
     participant AS as Authorization Server<br/>(Google, Keycloak)
     participant RS as Resource Server<br/>(Google Drive)
-    
+
     User->>App: 1. 로그인 요청
     App->>AS: 2. Authorization Request<br/>(client_id, redirect_uri, scope)
     AS->>User: 3. 로그인 페이지 표시
@@ -555,7 +555,7 @@ sequenceDiagram
     participant User
     participant App as Client
     participant Keycloak as OIDC Provider
-    
+
     User->>App: 1. 로그인 요청
     App->>Keycloak: 2. Authorization Request<br/>(scope=openid)
     Keycloak->>User: 3. 로그인 페이지
@@ -577,11 +577,11 @@ sequenceDiagram
 ```mermaid
 graph LR
     JWT[eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c]
-    
+
     JWT --> Header[Header<br/>alg: HS256<br/>typ: JWT]
     JWT --> Payload[Payload<br/>sub: 1234567890<br/>name: John Doe<br/>iat: 1516239022]
     JWT --> Signature[Signature<br/>HMACSHA256<br/>secret]
-    
+
     style Header fill:#e1f5ff
     style Payload fill:#fff4e1
     style Signature fill:#ffe1f5
@@ -615,17 +615,17 @@ graph LR
     AuthN --> AuthZ[Authorization<br/>RBAC]
     AuthZ --> Admission[Admission Control<br/>Webhook]
     Admission --> etcd[(etcd<br/>저장)]
-    
+
     AuthN -.-> X509[X.509 Client Cert]
     AuthN -.-> SA[ServiceAccount JWT]
     AuthN -.-> IAM[AWS IAM Authenticator]
     AuthN -.-> OIDC[OIDC Token]
-    
+
     AuthZ -.-> RBAC[Role + RoleBinding]
-    
+
     Admission -.-> Mutating[MutatingWebhook<br/>요청 변경]
     Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
-    
+
     style AuthN fill:#e1f5ff
     style AuthZ fill:#fff4e1
     style Admission fill:#ffe1f5
@@ -642,12 +642,12 @@ sequenceDiagram
     participant OIDC as EKS OIDC<br/>Provider
     participant IAM as AWS IAM
     participant S3 as AWS S3
-    
+
     Note over Pod: 1. Pod 생성
     Pod->>Webhook: Pod Create Request
     Webhook->>Pod: Env 주입:<br/>AWS_ROLE_ARN<br/>AWS_WEB_IDENTITY_TOKEN_FILE
     Kubelet->>Pod: Projected Volume 마운트<br/>(JWT Token)
-    
+
     Note over Pod: 2. AWS SDK 호출
     Pod->>STS: AssumeRoleWithWebIdentity<br/>(JWT + Role ARN)
     STS->>OIDC: JWT 검증 요청<br/>(iss, aud, sub 확인)
@@ -655,7 +655,7 @@ sequenceDiagram
     STS->>IAM: Trust Policy 확인
     IAM-->>STS: Allow ✓
     STS-->>Pod: 임시 자격 증명<br/>(AccessKeyId, SecretAccessKey, SessionToken)
-    
+
     Note over Pod: 3. AWS API 호출
     Pod->>S3: ListBuckets<br/>(임시 자격 증명)
     S3-->>Pod: Bucket List
@@ -671,20 +671,20 @@ sequenceDiagram
     participant API as K8S API Server
     participant Webhook as aws-iam-authenticator<br/>(Webhook Server)
     participant ConfigMap as ConfigMap<br/>aws-auth
-    
+
     User->>Plugin: kubectl get nodes
     Plugin->>STS: GetCallerIdentity<br/>(Presigned URL 생성)
     STS-->>Plugin: Presigned URL<br/>(15분 유효)
     Plugin->>Plugin: JWT Token 생성<br/>(URL을 Payload에 포함)
     Plugin->>API: Authorization: Bearer <JWT>
-    
+
     API->>Webhook: Token Review 요청
     Webhook->>STS: GetCallerIdentity<br/>(Presigned URL 실행)
     STS-->>Webhook: IAM User/Role ARN
     Webhook->>ConfigMap: ARN → K8S User/Group 조회
     ConfigMap-->>Webhook: Username: arn:aws:iam::...<br/>Groups: system:masters
     Webhook-->>API: Authenticated ✓
-    
+
     API->>API: RBAC 검증<br/>(system:masters → Full Access)
     API-->>User: Node List
 ```
@@ -699,30 +699,30 @@ graph TB
             Role1[Role<br/>pod-viewer]
             RB1[RoleBinding]
             Pod1[Pod<br/>kubectl-pod]
-            
+
             SA1 --> Pod1
             RB1 --> SA1
             RB1 --> Role1
         end
-        
+
         subgraph Namespace: infra-team
             SA2[ServiceAccount<br/>infra-k8s]
             Role2[Role<br/>pod-viewer]
             RB2[RoleBinding]
             Pod2[Pod<br/>kubectl-pod]
-            
+
             SA2 --> Pod2
             RB2 --> SA2
             RB2 --> Role2
         end
     end
-    
+
     Pod1 -.->|kubectl get pods<br/>-n dev-team| Allow1[✅ Allow]
     Pod1 -.->|kubectl get pods<br/>-n infra-team| Deny1[❌ Forbidden]
-    
+
     Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[✅ Allow]
     Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[❌ Forbidden]
-    
+
     style SA1 fill:#e1f5ff
     style SA2 fill:#fff4e1
     style Allow1 fill:#d4edda
@@ -739,19 +739,19 @@ graph TB
         User[User/Pod]
         JWT[JWT Token<br/>Header.Payload.Signature]
     end
-    
+
     subgraph K8S API Server
         Verify[Token Verification]
         PublicKey[Public Key<br/>또는 Secret Key]
     end
-    
+
     User -->|1. API Request<br/>Authorization: Bearer JWT| Verify
     Verify -->|2. Signature 검증| PublicKey
     PublicKey -->|3. Valid ✓| Decode[Payload 디코딩]
     Decode -->|4. Claims 추출| Claims[sub: system:serviceaccount:dev-team:dev-k8s<br/>iss: kubernetes/serviceaccount<br/>aud: kubernetes.default.svc<br/>exp: 1775197429]
     Claims -->|5. RBAC 검증| RBAC[Role + RoleBinding]
     RBAC -->|6. Allow/Deny| Response[API Response]
-    
+
     style JWT fill:#e1f5ff
     style Verify fill:#fff4e1
     style RBAC fill:#ffe1f5
@@ -766,7 +766,7 @@ sequenceDiagram
     participant App as Client<br/>(Application)
     participant Keycloak as Authorization Server<br/>(Keycloak)
     participant API as Resource Server<br/>(API Server)
-    
+
     User->>Browser: 1. "로그인" 클릭
     Browser->>App: 2. GET /login
     App->>Browser: 3. Redirect to Keycloak<br/>(client_id, redirect_uri, scope=openid)
@@ -794,22 +794,22 @@ graph TB
         OA2[Access Token]
         OA3[권한 위임]
     end
-    
+
     subgraph oidc["OIDC"]
         OIDC1[인증 + 인가<br/>Authentication + Authorization]
         OIDC2[ID Token JWT<br/>+ Access Token]
         OIDC3[사용자 신원 확인]
     end
-    
+
     subgraph irsa["IRSA"]
         IRSA1[Pod → AWS 인증<br/>AssumeRoleWithWebIdentity]
         IRSA2[ServiceAccount JWT<br/>→ AWS 임시 자격 증명]
         IRSA3[Pod별 최소 권한]
     end
-    
+
     oauth -.->|+ ID Token| oidc
     oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
-    
+
     style oauth fill:#e1f5ff
     style oidc fill:#fff4e1
     style irsa fill:#ffe1f5

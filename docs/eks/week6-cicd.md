@@ -21,12 +21,12 @@ graph TD
     A --> C[2. Versioned and Immutable 버전 관리 및 불변성]
     A --> D[3. Pulled Automatically 자동 Pull]
     A --> E[4. Continuously Reconciled 지속적 조정]
-    
+
     B --> B1["Git = Single Source of Truth<br/>YAML로 원하는 상태 선언"]
     C --> C1["Git 커밋 = 버전 히스토리<br/>Rollback 가능"]
     D --> D1["Software Agent가 Git 변경 감지<br/>자동으로 클러스터에 적용"]
     E --> E1["Actual State → Desired State<br/>Drift 발생 시 자동 복구"]
-    
+
     style A fill:#f9f,stroke:#333,stroke-width:4px
     style B fill:#bbf,stroke:#333
     style C fill:#bbf,stroke:#333
@@ -48,16 +48,16 @@ graph TD
 graph LR
     A[DevOps<br/>2009~] --> B[GitOps<br/>2017~]
     B --> C[Platform Engineering<br/>2020~]
-    
+
     A --> A1["개발팀과 운영팀 협업<br/>자동화 + 문화 변화"]
     B --> B1["Git = 진실의 단일 소스<br/>선언적 인프라 관리"]
     C --> C1["IDP 구축<br/>셀프서비스 플랫폼"]
-    
+
     C --> D[3대 가치]
     D --> D1[Velocity<br/>속도]
     D --> D2[Governance<br/>거버넌스]
     D --> D3[Efficiency<br/>효율성]
-    
+
     style C fill:#f96,stroke:#333,stroke-width:3px
     style D fill:#9cf,stroke:#333,stroke-width:2px
 ```
@@ -77,32 +77,32 @@ graph TB
         GR[Gitea<br/>GitOps Repository]
         HR[Helm Charts<br/>Application Templates]
     end
-    
+
     subgraph "Amazon EKS Cluster"
         subgraph "GitOps Controllers"
             FC[Flux v2<br/>GitRepository Reconciler]
             TC[Tofu Controller<br/>Terraform CRD]
             HC[Helm Controller<br/>HelmRelease]
         end
-        
+
         subgraph "Argo Workflows"
             AW[Argo Workflows<br/>Tenant Onboarding/Offboarding]
         end
-        
+
         subgraph "Tenants"
             T1[Tenant-1<br/>Premium Tier]
             T2[Tenant-2<br/>Basic Tier]
             T3[Tenant-3<br/>Advanced Tier]
         end
     end
-    
+
     subgraph "AWS Resources"
         ECR[Amazon ECR<br/>Helm Chart Images]
         SQS[Amazon SQS]
         DDB[Amazon DynamoDB]
         S3[Amazon S3]
     end
-    
+
     GR -->|Watch| FC
     HR -->|Pull| HC
     FC -->|Create| TC
@@ -113,9 +113,9 @@ graph TB
     HC -->|Deploy| T2
     HC -->|Deploy| T3
     ECR -.->|Pull Images| HC
-    
+
     AW -->|Trigger| GR
-    
+
     style FC fill:#4495d1,color:#fff
     style TC fill:#7B42BC,color:#fff
     style HC fill:#0f1689,color:#fff
@@ -285,29 +285,29 @@ graph LR
     subgraph "Git Repository"
         TF[Terraform 코드<br/>tenant-apps 모듈]
     end
-    
+
     subgraph "EKS Cluster"
         FC[Flux v2<br/>GitRepository Watch]
         TC[Tofu Controller<br/>Terraform CRD]
         TR[TF-Runner<br/>Pod]
     end
-    
+
     subgraph "AWS"
         SQS[Amazon SQS<br/>Queue]
         DDB[Amazon DynamoDB<br/>Table]
         IAM[IAM Role<br/>IRSA]
     end
-    
+
     TF -->|Git Push| FC
     FC -->|Create| TC
     TC -->|Spawn| TR
     TR -->|Provision| SQS
     TR -->|Provision| DDB
     TR -->|Provision| IAM
-    
+
     TC -.->|tfstate Secret| K8S[(Kubernetes Secret<br/>tfstate)]
     TR -.->|tfplan Secret| K8S
-    
+
     style FC fill:#4495d1,color:#fff
     style TC fill:#7B42BC,color:#fff
     style TR fill:#9cf,stroke:#333
@@ -719,21 +719,21 @@ graph TB
         HR[HelmRepository<br/>ECR Helm Chart URL]
         HC[HelmRelease CRD]
     end
-    
+
     subgraph "Git Repository"
         GR[Gitea<br/>HelmRelease YAML]
     end
-    
+
     subgraph "Amazon ECR"
         ECR[Helm Chart<br/>OCI Image]
     end
-    
+
     subgraph "EKS Cluster"
         DEPLOY[Deployment<br/>Producer Service]
         SVC[Service]
         ING[Ingress]
     end
-    
+
     GR -->|Git Push| FC
     FC -->|Create| HR
     HR -->|Pull| ECR
@@ -741,7 +741,7 @@ graph TB
     HC -->|Install/Upgrade| DEPLOY
     HC -->|Install/Upgrade| SVC
     HC -->|Install/Upgrade| ING
-    
+
     style FC fill:#4495d1,color:#fff
     style HC fill:#0f1689,color:#fff
     style ECR fill:#FF9900,color:#fff
@@ -985,19 +985,19 @@ graph TB
         H[Hybrid Model<br/>혼합 환경]
         P[Pool Model<br/>공유 환경]
     end
-    
+
     subgraph "Silo (Tenant-1, Tenant-2)"
         S1[Web App 1]
         S2[Microservice 1-A]
         S3[Microservice 1-B]
         S4[DB 1]
-        
+
         S5[Web App 2]
         S6[Microservice 2-A]
         S7[Microservice 2-B]
         S8[DB 2]
     end
-    
+
     subgraph "Hybrid (Tenant-3, Tenant-4)"
         H1[Shared Web App]
         H2[Microservice 3]
@@ -1005,18 +1005,18 @@ graph TB
         H4[DB 3]
         H5[DB 4]
     end
-    
+
     subgraph "Pool (Tenant-5~N)"
         P1[Shared Web App]
         P2[Shared Microservice A]
         P3[Shared Microservice B]
         P4[Shared DB]
     end
-    
+
     S --> S1
     H --> H1
     P --> P1
-    
+
     style S fill:#f96,color:#fff
     style H fill:#fc6,color:#000
     style P fill:#6cf,color:#000
@@ -1130,31 +1130,31 @@ graph LR
     subgraph "Trigger"
         SQS[Amazon SQS<br/>Onboarding Queue]
     end
-    
+
     subgraph "Argo Workflows"
         SENSOR[Argo Events Sensor<br/>SQS 메시지 감지]
         WF[Argo Workflow<br/>tenant-onboarding]
     end
-    
+
     subgraph "Workflow Steps"
         S1[1. Clone Repository]
         S2[2. Create Tenant<br/>HelmRelease YAML]
         S3[3. Git Push to Repo]
     end
-    
+
     subgraph "Git Repository"
         GR[Gitea<br/>eks-saas-gitops]
     end
-    
+
     subgraph "Flux v2"
         FC[Flux Controller<br/>Watch]
         HR[HelmRelease CRD]
     end
-    
+
     subgraph "EKS Cluster"
         DEPLOY[Deployment<br/>Producer + Consumer]
     end
-    
+
     SQS -->|Message| SENSOR
     SENSOR -->|Trigger| WF
     WF --> S1
@@ -1164,7 +1164,7 @@ graph LR
     GR -->|Watch| FC
     FC -->|Create| HR
     HR -->|Deploy| DEPLOY
-    
+
     style SQS fill:#FF9900,color:#fff
     style WF fill:#f96,color:#fff
     style FC fill:#4495d1,color:#fff

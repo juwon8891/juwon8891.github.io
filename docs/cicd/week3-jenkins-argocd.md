@@ -38,9 +38,6 @@ graph TB
     K8S_MASTER --> K8S_WORKER1
     K8S_MASTER --> K8S_WORKER2
 
-    style JENKINS fill:#4ECDC4
-    style GOGS fill:#95E1D3
-    style K8S_MASTER fill:#F7DC6F
 ```
 
 #### Docker Compose로 Jenkins와 Gogs 실행
@@ -155,10 +152,6 @@ graph TB
     CP -->|Manages| W1
     CP -->|Manages| W2
 
-    style KIND fill:#FF6B6B
-    style CP fill:#F7DC6F
-    style W1 fill:#98FB98
-    style W2 fill:#98FB98
 ```
 
 **Kind의 주요 특징**:
@@ -631,11 +624,6 @@ graph TB
     POD1 -.크래시.-> DEAD[X]
     NEW[New Pod<br/>10.244.1.5] -.자동 추가.-> SVC
 
-    style SVC fill:#4ECDC4
-    style POD1 fill:#98FB98
-    style POD2 fill:#98FB98
-    style POD3 fill:#98FB98
-    style NEW fill:#F7DC6F
 ```
 
 **Service 주요 기능**:
@@ -856,9 +844,6 @@ graph TB
         SERVICE1 --> BLUE1[Blue<br/>Deployment<br/>v1.0]
         GREEN1[Green<br/>Deployment<br/>v2.0]
 
-        style SERVICE1 fill:#4ECDC4
-        style BLUE1 fill:#87CEEB
-        style GREEN1 fill:#90EE90,stroke-dasharray: 5 5
     end
 
     subgraph "2단계: Green 환경 배포 및 테스트"
@@ -867,9 +852,6 @@ graph TB
         GREEN2[Green<br/>Deployment<br/>v2.0]
         TEST[테스터] -.내부 테스트.-> GREEN2
 
-        style SERVICE2 fill:#4ECDC4
-        style BLUE2 fill:#87CEEB
-        style GREEN2 fill:#90EE90
     end
 
     subgraph "3단계: 트래픽 전환"
@@ -877,9 +859,6 @@ graph TB
         SERVICE3 --> GREEN3[Green<br/>Deployment<br/>v2.0]
         BLUE3[Blue<br/>Deployment<br/>v1.0]
 
-        style SERVICE3 fill:#4ECDC4
-        style GREEN3 fill:#90EE90
-        style BLUE3 fill:#87CEEB,stroke-dasharray: 5 5
     end
 ```
 
@@ -1110,10 +1089,6 @@ graph TB
 
     USER[개발자/운영자] -->|웹 UI/CLI| API
 
-    style GIT fill:#FF6B6B
-    style API fill:#4ECDC4
-    style CTRL fill:#F7DC6F
-    style K8S fill:#98FB98
 ```
 
 **ArgoCD 주요 컴포넌트**:
@@ -1145,10 +1120,6 @@ flowchart TB
 
     ACTION --> DEPLOY
 
-    style DEPLOY fill:#FFB6C1
-    style MONITOR fill:#98FB98
-    style DETECT fill:#87CEEB
-    style ACTION fill:#F7DC6F
 ```
 
 **GitOps 루프 상세 설명**:
@@ -1771,9 +1742,6 @@ graph TB
     ROLLOUT -->|트리거| ANALYSIS
     ANALYSIS -->|성공/실패| ROLLOUT
 
-    style CTRL fill:#4ECDC4
-    style ROLLOUT fill:#F7DC6F
-    style ANALYSIS fill:#FF6B6B
 ```
 
 ### 2. Canary 배포 전략
@@ -1789,8 +1757,6 @@ graph TB
         SVC1 -->|90%| STABLE1[Stable<br/>v1.0]
         SVC1 -->|10%| CANARY1[Canary<br/>v2.0]
 
-        style STABLE1 fill:#87CEEB
-        style CANARY1 fill:#FFB6C1
     end
 
     subgraph "2단계: 50% Canary"
@@ -1798,15 +1764,12 @@ graph TB
         SVC2 -->|50%| STABLE2[Stable<br/>v1.0]
         SVC2 -->|50%| CANARY2[Canary<br/>v2.0]
 
-        style STABLE2 fill:#87CEEB
-        style CANARY2 fill:#FFB6C1
     end
 
     subgraph "3단계: 100% New Version"
         USER3[사용자 100%] --> SVC3[Service]
         SVC3 -->|100%| NEW[New Stable<br/>v2.0]
 
-        style NEW fill:#90EE90
     end
 ```
 
@@ -1968,10 +1931,6 @@ graph LR
     OPS_REPO -->|GitOps| ARGOCD
     ARGOCD -->|배포| K8S[Kubernetes]
 
-    style DEV_REPO fill:#FFB6C1
-    style OPS_REPO fill:#98FB98
-    style JENKINS fill:#4ECDC4
-    style ARGOCD fill:#F7DC6F
 ```
 
 **저장소 분리의 이점**:

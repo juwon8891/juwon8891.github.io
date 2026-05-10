@@ -93,10 +93,6 @@ graph TB
     PROXY0 ---|kubeconfig| API
     PROXY1 ---|kubeconfig| API
 
-    style API fill:#e1f5ff
-    style ETCD fill:#fff4e1
-    style KUBELET0 fill:#e8f5e9
-    style KUBELET1 fill:#e8f5e9
 ```
 
 ---
@@ -163,11 +159,6 @@ graph TD
     SCHED -.->|scheduler| APISERVER
     CM -.->|controller-manager| APISERVER
 
-    style CA fill:#ff9999
-    style ADMIN fill:#99ccff
-    style NODE0 fill:#99ff99
-    style NODE1 fill:#99ff99
-    style API fill:#ffcc99
 ```
 
 ### 2. Admin 클라이언트 인증서
@@ -1686,9 +1677,6 @@ graph LR
     USER1 -->|Group 매칭| CRB1
     CRB1 -->|RoleRef| CR1
 
-    style CERT1 fill:#99ccff
-    style USER1 fill:#ffffcc
-    style CR1 fill:#ffcccc
 
     subgraph "Kubelet 인증서"
         CERT2["인증서<br/>CN=system:node:node-0<br/>O=system:nodes"]
@@ -1707,9 +1695,6 @@ graph LR
     USER2 -->|User/Group 패턴| NA
     USER2 -.->|필요시| CR2
 
-    style CERT2 fill:#99ff99
-    style USER2 fill:#ffffcc
-    style NA fill:#ccffcc
 
     subgraph "Scheduler 인증서"
         CERT3["인증서<br/>CN=system:kube-scheduler"]
@@ -1728,9 +1713,6 @@ graph LR
     USER3 -->|User 매칭| CRB3
     CRB3 -->|RoleRef| CR3
 
-    style CERT3 fill:#ffcc99
-    style USER3 fill:#ffffcc
-    style CR3 fill:#ccccff
 ```
 
 **예시 1: Admin**:

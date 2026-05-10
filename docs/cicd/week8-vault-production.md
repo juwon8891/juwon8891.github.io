@@ -624,10 +624,6 @@ graph TB
     LB -->|Read| VAULT1
     LB -->|Read| VAULT2
 
-    style VAULT0 fill:#2ecc71
-    style VAULT1 fill:#95a5a6
-    style VAULT2 fill:#95a5a6
-    style RAFT fill:#3498db
 ```
 
 **HA 동작 방식**:
@@ -1327,10 +1323,6 @@ graph TB
     MCP1 -->|6. Call| DB
     MCP2 -->|6. Call| API2
 
-    style VAULT fill:#2ecc71
-    style APPROLE1 fill:#3498db
-    style APPROLE2 fill:#3498db
-    style APPROLE3 fill:#3498db
 ```
 
 ### 3. HashiCorp 권장 패턴

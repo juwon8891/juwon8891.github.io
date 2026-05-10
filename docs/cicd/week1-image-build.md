@@ -79,10 +79,6 @@ graph TB
         WORKFLOW --> AUTO
         AUTO --> GIT
 
-        style GIT fill:#FF6B6B
-        style CODE fill:#4ECDC4
-        style WORKFLOW fill:#95E1D3
-        style AUTO fill:#F7DC6F
     end
 ```
 
@@ -140,8 +136,6 @@ graph LR
         POINT_TO_GIT --> AUTO_SYNC[🔄 자동 동기화]
         AUTO_SYNC --> RESTORED[✅ 복구 완료]
 
-        style DISASTER fill:#FF6B6B
-        style RESTORED fill:#98FB98
     end
 ```
 
@@ -168,10 +162,6 @@ graph TB
         GIT_REPO -->|자동 동기화| STAGE_CLUSTER[Staging Cluster]
         GIT_REPO -->|자동 동기화| DEV_CLUSTER[Dev Cluster]
 
-        style GIT_REPO fill:#FF6B6B
-        style PROD_CLUSTER fill:#98FB98
-        style STAGE_CLUSTER fill:#87CEEB
-        style DEV_CLUSTER fill:#F7DC6F
     end
 ```
 
@@ -238,7 +228,6 @@ graph TB
         POLICY --> CODE_BASE
         MONITOR --> CODE_BASE
 
-        style CODE_BASE fill:#4ECDC4
     end
 ```
 
@@ -395,9 +384,6 @@ graph TB
         OPENGITOPS -.-> JENKINS_X
         OPENGITOPS -.-> RANCHER
 
-        style OPENGITOPS fill:#FF6B6B
-        style ARGOCD fill:#98FB98
-        style FLUX fill:#87CEEB
     end
 ```
 
@@ -418,10 +404,6 @@ flowchart TB
     PULLED --> RECONCILED
     RECONCILED -.-> DECLARATIVE
 
-    style DECLARATIVE fill:#FFB6C1
-    style VERSIONED fill:#98FB98
-    style PULLED fill:#87CEEB
-    style RECONCILED fill:#F7DC6F
 ```
 
 #### 원칙 1: 선언적 (Declarative)
@@ -499,14 +481,12 @@ graph LR
     subgraph "전통적 방식 (변경 가능)"
         SERVER1[서버] -->|직접 수정| SERVER1_UPDATED[업데이트된 서버<br/>⚠️ 상태 불확실]
 
-        style SERVER1_UPDATED fill:#FFB6C1
     end
 
     subgraph "GitOps 방식 (불변)"
         POD1[Pod v1.21] -->|삭제| NONE[ ]
         NONE -->|새로 생성| POD2[Pod v1.22<br/>✅ 깨끗한 상태]
 
-        style POD2 fill:#98FB98
     end
 ```
 
@@ -597,10 +577,6 @@ flowchart TB
     ACT --> OBSERVE
     WAIT --> OBSERVE
 
-    style OBSERVE fill:#87CEEB
-    style COMPARE fill:#F7DC6F
-    style DRIFT fill:#FFB6C1
-    style ACT fill:#98FB98
 ```
 
 **구체적인 Reconciliation 시나리오:**
@@ -688,11 +664,6 @@ graph LR
         PR --> REVIEW
         REVIEW --> MERGE
 
-        style BRANCH fill:#FFE5B4
-        style COMMIT fill:#FFB6C1
-        style PR fill:#98FB98
-        style REVIEW fill:#87CEEB
-        style MERGE fill:#F7DC6F
     end
 ```
 
@@ -875,11 +846,6 @@ graph TB
         APP --> ING[Ingress ⚠️<br/>Progressing]
         APP --> CM[ConfigMap ✅<br/>Synced]
 
-        style APP fill:#4ECDC4
-        style DEP fill:#98FB98
-        style SVC fill:#98FB98
-        style ING fill:#F7DC6F
-        style CM fill:#98FB98
     end
 ```
 
@@ -936,10 +902,6 @@ graph TB
     PROD_BRANCH -.->|자동 동기화| PROD_CLUSTER_EU
     PROD_BRANCH -.->|자동 동기화| PROD_CLUSTER_ASIA
 
-    style GIT fill:#FF6B6B
-    style PROD_CLUSTER_US fill:#98FB98
-    style PROD_CLUSTER_EU fill:#98FB98
-    style PROD_CLUSTER_ASIA fill:#98FB98
 ```
 
 **디렉토리 구조로 환경 분리:**
@@ -1038,9 +1000,6 @@ flowchart LR
         SCAN --> PUSH[5. 이미지 푸시]
         PUSH --> UPDATE[6. Manifest 업데이트]
 
-        style CODE fill:#FFE5B4
-        style BUILD fill:#4ECDC4
-        style PUSH fill:#98FB98
     end
 ```
 
@@ -1066,9 +1025,6 @@ flowchart LR
         SYNC --> HEALTH[4. 헬스 체크]
         HEALTH --> NOTIFY[5. 알림]
 
-        style GIT fill:#FFB6C1
-        style SYNC fill:#4ECDC4
-        style HEALTH fill:#98FB98
     end
 ```
 
@@ -1172,10 +1128,6 @@ graph TB
         CD -->|7. 동기화| CLUSTER2[Production<br/>Cluster 2]
         CD -->|7. 동기화| CLUSTER3[Staging<br/>Cluster]
 
-        style APP_REPO fill:#FFB6C1
-        style MANIFEST_REPO fill:#98FB98
-        style CD fill:#4ECDC4
-        style CLUSTER1 fill:#F7DC6F
     end
 ```
 
@@ -1201,10 +1153,6 @@ flowchart TB
 
     TAKE_ACTION --> DEPLOY
 
-    style DEPLOY fill:#FFB6C1
-    style MONITOR fill:#98FB98
-    style DETECT fill:#87CEEB
-    style TAKE_ACTION fill:#F7DC6F
 ```
 
 **1. 배포 (Deploy)**
@@ -1286,7 +1234,6 @@ graph TB
         APP_TESTS[테스트 코드]
         APP_DOCKER[Dockerfile]
 
-        style APP_CODE fill:#FFB6C1
     end
 
     subgraph "Repository 2: Kubernetes Manifests"
@@ -1295,7 +1242,6 @@ graph TB
         K8S_CM[ConfigMap]
         K8S_SEC[Secrets]
 
-        style K8S_DEP fill:#98FB98
     end
 
     subgraph "CI Pipeline"
@@ -1425,9 +1371,6 @@ graph LR
     DEVOPS_DESC -.-> DEVOPS
     GITOPS_DESC -.-> GITOPS
 
-    style AGILE fill:#FFB6C1
-    style DEVOPS fill:#98FB98
-    style GITOPS fill:#87CEEB
 ```
 
 
@@ -1517,8 +1460,6 @@ graph TB
         REGISTRY -->|docker pull| CI[CI 파이프라인]
         REGISTRY -->|docker pull| K8S[Kubernetes<br/>클러스터]
 
-        style REGISTRY fill:#2496ED
-        style K8S fill:#326CE5
     end
 ```
 
@@ -1704,10 +1645,6 @@ graph TB
         DOCKER_ENGINE --> WORKER2
     end
 
-    style DOCKER_ENGINE fill:#2496ED
-    style CONTROL fill:#326CE5
-    style WORKER1 fill:#98FB98
-    style WORKER2 fill:#98FB98
 ```
 
 **Kind의 장점:**
@@ -1808,11 +1745,6 @@ graph TB
         API_132 --> KUBECTL_131
         API_132 -.->|X| KUBECTL_130
 
-        style API_132 fill:#326CE5
-        style KUBECTL_132 fill:#98FB98
-        style KUBECTL_133 fill:#87CEEB
-        style KUBECTL_131 fill:#87CEEB
-        style KUBECTL_130 fill:#FFB6C1
     end
 ```
 
@@ -1979,10 +1911,6 @@ graph TB
     IMAGE_SPEC -.-> PODMAN
     IMAGE_SPEC -.-> BUILDAH
 
-    style OCI fill:#FF6B6B
-    style IMAGE_SPEC fill:#4ECDC4
-    style RUNTIME_SPEC fill:#95E1D3
-    style DIST_SPEC fill:#F7DC6F
 ```
 
 **OCI의 목표:**
@@ -2012,12 +1940,6 @@ graph TB
         RUNTIME --> LIBS
         LIBS --> BASE
 
-        style WRITABLE fill:#FF6B6B
-        style APP fill:#4ECDC4
-        style DEPS fill:#95E1D3
-        style RUNTIME fill:#F7DC6F
-        style LIBS fill:#E59866
-        style BASE fill:#FFE5B4
     end
 ```
 
@@ -2138,10 +2060,6 @@ flowchart TB
     COPY2 --> META[7. ENTRYPOINT/CMD 설정]
     META --> IMAGE[8. 최종 이미지 생성 ✅]
 
-    style START fill:#FFB6C1
-    style IMAGE fill:#98FB98
-    style REUSE1 fill:#4ECDC4
-    style REUSE2 fill:#4ECDC4
 ```
 
 #### 3.1.3 실습: 이미지 빌드 및 푸시
@@ -2381,10 +2299,6 @@ graph LR
         ALPINE[Alpine<br/>5MB]
         SCRATCH[Scratch<br/>0MB]
 
-        style ALPINE fill:#98FB98
-        style SCRATCH fill:#4ECDC4
-        style UBUNTU fill:#FFE5B4
-        style DEBIAN fill:#FFB6C1
     end
 ```
 
@@ -2413,7 +2327,6 @@ graph LR
         DOCKER_BUILD --> DOCKER_DAEMON[Docker Daemon]
         DOCKER_DAEMON --> IMAGE1[컨테이너 이미지]
 
-        style DOCKER_DAEMON fill:#FFB6C1
     end
 
     subgraph "Jib 빌드"
@@ -2421,7 +2334,6 @@ graph LR
         JIB --> IMAGE2[컨테이너 이미지]
         JIB -.->|직접 푸시| REGISTRY[Registry]
 
-        style JIB fill:#98FB98
     end
 ```
 
@@ -2503,10 +2415,6 @@ graph TB
         RES_LAYER --> DEP_LAYER
         DEP_LAYER --> BASE_LAYER
 
-        style APP_LAYER fill:#FF6B6B
-        style RES_LAYER fill:#F7DC6F
-        style DEP_LAYER fill:#98FB98
-        style BASE_LAYER fill:#87CEEB
     end
 ```
 
@@ -2550,8 +2458,6 @@ graph TB
         OCI_IMAGE --> STORAGE[Container Storage<br/>/var/lib/containers]
         OCI_IMAGE --> REGISTRY2[Registry]
 
-        style BUILDAH fill:#E59866
-        style OCI_IMAGE fill:#98FB98
     end
 ```
 
@@ -2640,9 +2546,6 @@ graph LR
         PODMAN --> CONTAINER[실행 중인<br/>컨테이너]
         SKOPEO --> REGISTRY[Registry]
 
-        style BUILDAH fill:#E59866
-        style PODMAN fill:#4ECDC4
-        style SKOPEO fill:#95E1D3
     end
 ```
 
@@ -2700,9 +2603,6 @@ graph TB
 
         BUILD --> IMAGE[OCI Image]
 
-        style DETECT fill:#F7DC6F
-        style BUILD fill:#4ECDC4
-        style IMAGE fill:#98FB98
     end
 ```
 
@@ -2792,8 +2692,6 @@ graph LR
         BP -->|베스트 프랙티스 적용| IMAGE[최적화된<br/>이미지]
         BP <-->|자동 업데이트| OPS
 
-        style BP fill:#4ECDC4
-        style IMAGE fill:#98FB98
     end
 ```
 
@@ -2827,8 +2725,6 @@ graph TB
 
         IMAGE3 --> REGISTRY3[Container<br/>Registry]
 
-        style SHIPWRIGHT fill:#326CE5
-        style IMAGE3 fill:#98FB98
     end
 ```
 
@@ -2850,14 +2746,12 @@ graph LR
             DOCKERFILE1[Dockerfile] --> DOCKER_DAEMON2[Docker Daemon<br/>⚠️ 특권 필요]
             DOCKER_DAEMON2 --> IMAGE4[Image]
 
-            style DOCKER_DAEMON2 fill:#FFB6C1
         end
 
         subgraph "Kaniko (Kubernetes)"
             DOCKERFILE2[Dockerfile] --> KANIKO_POD[Kaniko Pod<br/>✅ 특권 불필요]
             KANIKO_POD --> IMAGE5[Image]
 
-            style KANIKO_POD fill:#98FB98
         end
     end
 ```
@@ -3034,11 +2928,6 @@ graph TB
         OVERLAY_DEV --> DEV_FINAL[Dev 최종 매니페스트<br/>✅ 적용 준비]
         OVERLAY_PROD --> PROD_FINAL[Prod 최종 매니페스트<br/>✅ 적용 준비]
 
-        style BASE fill:#FFB6C1
-        style OVERLAY_DEV fill:#98FB98
-        style OVERLAY_PROD fill:#87CEEB
-        style DEV_FINAL fill:#F7DC6F
-        style PROD_FINAL fill:#E59866
     end
 ```
 
@@ -3396,8 +3285,6 @@ graph TB
 
         NOTE1[⚠️ 레지스트리 병목<br/>⚠️ 대역폭 낭비]
 
-        style REGISTRY1 fill:#FFB6C1
-        style NOTE1 fill:#FFE5B4
     end
 
     subgraph "Dragonfly P2P 방식"
@@ -3414,8 +3301,6 @@ graph TB
 
         NOTE2[✅ 분산 다운로드<br/>✅ 대역폭 절약]
 
-        style SUPERNODE fill:#98FB98
-        style NOTE2 fill:#D4EDDA
     end
 ```
 

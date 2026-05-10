@@ -70,9 +70,6 @@ graph LR
     C -.-> G[What can you do?]
     D -.-> H[Is this valid?]
 
-    style B fill:#e1f5ff
-    style C fill:#fff4e1
-    style D fill:#ffe1f5
 ```
 
 #### Authentication Methods (인증 방법)
@@ -386,10 +383,6 @@ graph TB
     RoleBinding --> Role
     ClusterRoleBinding --> ClusterRole
 
-    style Role fill:#e1f5ff
-    style ClusterRole fill:#fff4e1
-    style RoleBinding fill:#ffe1f5
-    style ClusterRoleBinding fill:#f5e1ff
 ```
 
 #### Role vs ClusterRole
@@ -470,8 +463,6 @@ graph LR
     D -.-> H[MutatingWebhook<br/>예: Pod Identity Webhook]
     F -.-> I[ValidatingWebhook<br/>예: Policy Validation]
 
-    style D fill:#ffe1f5
-    style F fill:#e1f5ff
 ```
 
 **주요 Admission Controllers**:
@@ -512,10 +503,6 @@ graph TB
     Client -.->|3. Access Token 제시| RS
     RS -.->|4. 리소스 제공| Client
 
-    style RO fill:#e1f5ff
-    style Client fill:#fff4e1
-    style AS fill:#ffe1f5
-    style RS fill:#f5e1ff
 ```
 
 #### OAuth 2.0 Authorization Code Flow
@@ -584,9 +571,6 @@ graph LR
     JWT --> Payload[Payload<br/>sub: 1234567890<br/>name: John Doe<br/>iat: 1516239022]
     JWT --> Signature[Signature<br/>HMACSHA256<br/>secret]
 
-    style Header fill:#e1f5ff
-    style Payload fill:#fff4e1
-    style Signature fill:#ffe1f5
 ```
 
 **JWT 검증 흐름**:
@@ -628,9 +612,6 @@ graph LR
     Admission -.-> Mutating[MutatingWebhook<br/>요청 변경]
     Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
 
-    style AuthN fill:#e1f5ff
-    style AuthZ fill:#fff4e1
-    style Admission fill:#ffe1f5
 ```
 
 ### 2. IRSA (IAM Roles for Service Accounts) 전체 흐름
@@ -725,12 +706,6 @@ graph TB
     Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[✅ Allow]
     Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[❌ Forbidden]
 
-    style SA1 fill:#e1f5ff
-    style SA2 fill:#fff4e1
-    style Allow1 fill:#d4edda
-    style Allow2 fill:#d4edda
-    style Deny1 fill:#f8d7da
-    style Deny2 fill:#f8d7da
 ```
 
 ### 5. Bearer Token (JWT) 동작 원리
@@ -754,9 +729,6 @@ graph TB
     Claims -->|5. RBAC 검증| RBAC[Role + RoleBinding]
     RBAC -->|6. Allow/Deny| Response[API Response]
 
-    style JWT fill:#e1f5ff
-    style Verify fill:#fff4e1
-    style RBAC fill:#ffe1f5
 ```
 
 ### 6. OIDC Authorization Code Flow (상세)
@@ -812,9 +784,6 @@ graph TB
     oauth -.->|+ ID Token| oidc
     oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
 
-    style oauth fill:#e1f5ff
-    style oidc fill:#fff4e1
-    style irsa fill:#ffe1f5
 ```
 
 ---

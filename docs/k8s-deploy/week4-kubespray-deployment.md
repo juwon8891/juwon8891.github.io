@@ -898,11 +898,6 @@ graph LR
     C --> D[Role vars<br>roles/*/vars/main.yml]
     D --> E[Role defaults<br>roles/*/defaults/main.yml]
 
-    style A fill:#ff6b6b
-    style B fill:#feca57
-    style C fill:#48dbfb
-    style D fill:#1dd1a1
-    style E fill:#c8d6e5
 ```
 
 **변수 우선순위 (높음 → 낮음)**:

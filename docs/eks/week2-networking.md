@@ -38,9 +38,6 @@ graph TB
     D --> H[VPC Subnet]
     H --> I[AWS Network]
 
-    style B fill:#ff9900
-    style D fill:#00a8e1
-    style H fill:#00a8e1
 ```
 
 **VPC CNI의 장점**:
@@ -124,8 +121,6 @@ graph TB
     D --> G[Pod2: 10.0.0.203]
     E --> H[Pod3: 10.0.1.64]
 
-    style D fill:#ff9900
-    style E fill:#ff9900
 ```
 
 **최대 Pod 수 계산**:
@@ -163,7 +158,6 @@ graph TB
     B --> F[...]
     B --> G[Pod16: 192.168.2.31]
 
-    style B fill:#ff9900
 ```
 
 **최대 Pod 수 계산**:
@@ -201,9 +195,6 @@ graph TB
 
     E[EKS Managed ENI] -->|Node Security Group| F[Node]
 
-    style A fill:#00a8e1
-    style B fill:#ff9900
-    style C fill:#ff9900
 ```
 
 **설정 방법**:
@@ -297,8 +288,6 @@ graph LR
     C --> D[eth0 - veth pair]
     D --> E[Pod2: 10.10.1.20]
 
-    style A fill:#ff9900
-    style E fill:#ff9900
 ```
 
 **다른 노드 간 Pod 통신**:
@@ -350,7 +339,6 @@ graph TB
     A --> D[Virtual Router<br/>Outer Packet]
     D --> E[Pod Packet<br/>10.1.1.1 → 10.1.1.2]
 
-    style D fill:#cccccc
 ```
 
 **특징**:
@@ -374,7 +362,6 @@ graph TB
     D --> B
     D --> C
 
-    style D fill:#00a8e1
 ```
 
 **특징**:
@@ -426,8 +413,6 @@ graph LR
     C --> D[VPC IGW]
     D --> E[Internet]
 
-    style C fill:#ff9900
-    style D fill:#00a8e1
 ```
 
 **단계별 흐름**:
@@ -624,7 +609,6 @@ graph TB
         B --> E[Pod3: 172.16.1.3]
     end
 
-    style B fill:#ff9900
 ```
 
 ### 2. Service 종류
@@ -710,8 +694,6 @@ graph LR
     D --> F[Pod2]
     D --> G[Pod3]
 
-    style B fill:#00a8e1
-    style C fill:#00a8e1
 ```
 
 **특징**:
@@ -758,7 +740,6 @@ graph TB
     F --> H[Pod2]
     F --> I[Pod3]
 
-    style B fill:#ff9900
 ```
 
 **특징**:
@@ -802,7 +783,6 @@ graph TB
     C --> D[Pod1]
     C --> E[Pod2]
 
-    style C fill:#ff9900
 ```
 
 **특징**:
@@ -821,7 +801,6 @@ graph TB
     B --> D[Pod2]
     B --> E[Pod3]
 
-    style B fill:#ff9900
 ```
 
 **동작 원리**:
@@ -849,7 +828,6 @@ graph TB
     B --> D[Pod2]
     B --> E[Pod3]
 
-    style B fill:#ff9900
 ```
 
 **특징**:
@@ -909,7 +887,6 @@ graph TB
     E[eBPF/XDP] --> D
     E --> F[Pod]
 
-    style E fill:#ff9900
 ```
 
 **동작 원리**:
@@ -950,7 +927,6 @@ graph TB
     E --> G[Pod B on Node1]
     E --> H[Pod C on Node2]
 
-    style B fill:#ff9900
 ```
 
 **장점**:
@@ -976,7 +952,6 @@ graph TB
     B --> D[Pod B: 192.168.1.20]
     B --> E[Pod C: 192.168.1.30]
 
-    style B fill:#ff9900
 ```
 
 **장점**:
@@ -1091,7 +1066,6 @@ graph TB
     D --> G[Web Pod 1]
     D --> H[Web Pod 2]
 
-    style B fill:#ff9900
 ```
 
 **주요 Ingress Controller**:
@@ -1179,8 +1153,6 @@ graph LR
     C --> D[DNS Record<br/>api.example.com]
     C --> E[DNS Record<br/>web.example.com]
 
-    style B fill:#ff9900
-    style C fill:#00a8e1
 ```
 
 ### 2. ExternalDNS 설정
@@ -1295,10 +1267,6 @@ graph TB
 
     D --> H[External Service<br/>db.example.com]
 
-    style A fill:#00a8e1
-    style B fill:#ff9900
-    style C fill:#ff9900
-    style D fill:#cccccc
 ```
 
 **선택 기준**:

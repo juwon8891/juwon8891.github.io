@@ -98,11 +98,6 @@ graph TB
         MS3 --> MS4
     end
 
-    style M fill:#95a5a6
-    style MS1 fill:#3498db
-    style MS2 fill:#3498db
-    style MS3 fill:#3498db
-    style MS4 fill:#3498db
 ```
 
 #### 제로 트러스트(Zero Trust) 보안 모델의 대두
@@ -142,9 +137,6 @@ graph LR
         V -.->|Token| S2
     end
 
-    style IN fill:#2ecc71
-    style OUT fill:#e74c3c
-    style V fill:#f39c12
 ```
 
 #### HashiCorp Vault가 해결하는 문제
@@ -390,9 +382,6 @@ graph TB
         MK2 --> V[Vault Unsealed]
     end
 
-    style MK fill:#e74c3c
-    style V fill:#2ecc71
-    style U fill:#f39c12
 ```
 
 **SSS의 장점**:
@@ -494,8 +483,6 @@ graph LR
         P4[4. 에러 처리 부담]
     end
 
-    style SDK fill:#e74c3c
-    style P1 fill:#e74c3c
 ```
 
 **개발자의 부담**:
@@ -526,8 +513,6 @@ graph LR
         AGENT -.->|5. 자동 갱신| V2
     end
 
-    style AGENT fill:#2ecc71
-    style APP2 fill:#3498db
 ```
 
 **Vault Agent가 제공하는 기능**:
@@ -1302,9 +1287,6 @@ graph TB
         ARGOCD -->|6. Apply manifests| K8S
     end
 
-    style ARGOCD fill:#f39c12
-    style VAULT fill:#2ecc71
-    style GIT fill:#3498db
 ```
 
 #### ArgoCD Vault Plugin 동작 방식
@@ -1608,9 +1590,6 @@ graph TB
     VSO -->|9. Create/Update| K8SSECRET
     K8SSECRET -.->|10. Mount| POD
 
-    style VSO fill:#f39c12
-    style VAULT fill:#2ecc71
-    style K8SSECRET fill:#3498db
 ```
 
 ### 2. VSO 구성 요소

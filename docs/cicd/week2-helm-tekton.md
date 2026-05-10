@@ -288,9 +288,6 @@ graph LR
     D -.Secret.-> H[sh.helm.release.v1.pacman.v2]
     F -.Secret.-> I[sh.helm.release.v1.pacman.v3]
 
-    style B fill:#e8f5e9
-    style D fill:#fff3e0
-    style F fill:#e1f5fe
 ```
 
 #### 이미지 버전 업그레이드
@@ -565,8 +562,6 @@ graph LR
     E --> B
     D --> A
 
-    style D fill:#e1f5ff
-    style E fill:#fff4e1
 ```
 
 #### Chart.yaml에 의존성 선언
@@ -848,9 +843,6 @@ graph TB
     B --> D
     G --> E
 
-    style B fill:#e1f5ff
-    style C fill:#fff4e1
-    style E fill:#e8f5e9
 ```
 
 #### Step, Task, Pipeline 관계
@@ -1119,7 +1111,6 @@ graph LR
     T1 --> W
     T2 --> W
 
-    style W fill:#ffe1e1
 ```
 
 #### Pipeline 생성

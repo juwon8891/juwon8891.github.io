@@ -314,10 +314,6 @@ graph TD
     F -->|replicas 감소| H
     H -->|Pod 생성/제거| I[Pod]
 
-    style B fill:#e1f5ff
-    style C fill:#ffe1e1
-    style E fill:#d4edda
-    style F fill:#fff3cd
 ```
 
 ### 2. KEDA 아키텍처
@@ -335,10 +331,6 @@ graph LR
 
     F -->|Scale to Zero<br/>가능| H[0 Replicas]
 
-    style A fill:#fff3cd
-    style B fill:#e1f5ff
-    style D fill:#ffe1e1
-    style H fill:#d4edda
 ```
 
 ### 3. Cluster Autoscaler vs Karpenter
@@ -361,8 +353,6 @@ graph TB
         B5 --> B6[Pod 스케줄링]
     end
 
-    style A4 fill:#ffe1e1
-    style B4 fill:#d4edda
 ```
 
 ### 4. Karpenter Provisioning 워크플로우
@@ -409,8 +399,6 @@ graph TD
     J -->|2분 전 알림| K[신속 Pod 재배치]
     K --> F
 
-    style F fill:#d4edda
-    style K fill:#ffe1e1
 ```
 
 ### 6. VPA 컴포넌트 상호작용
@@ -432,9 +420,6 @@ graph TD
 
     E -->|updateMode: Off| K[권장 값만 표시]
 
-    style C fill:#e1f5ff
-    style F fill:#ffe1e1
-    style H fill:#d4edda
 ```
 
 ### 7. EKS Auto Scaling 전체 구조
@@ -462,10 +447,6 @@ graph TB
 
     Pod_Level -.->|노드 부족 시| Node_Level
 
-    style HPA fill:#e1f5ff
-    style KEDA fill:#d4edda
-    style Karpenter fill:#ffe1e1
-    style Fargate fill:#fff3cd
 ```
 
 ---

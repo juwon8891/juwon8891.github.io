@@ -16,10 +16,6 @@ graph LR
     E --> F[fatbin<br/>다중 아키텍처]
     F --> G[실행 파일]
 
-    style A fill:#e1f5ff
-    style C fill:#fff4e1
-    style E fill:#ffe1e1
-    style F fill:#e1ffe1
 ```
 
 ### 1. nvcc (NVIDIA CUDA Compiler)
@@ -296,9 +292,6 @@ graph TD
     D1 --> E4[Shared Memory<br/>100KB]
     D1 --> E5[L1 Cache<br/>128KB]
 
-    style A fill:#e1f5ff
-    style D1 fill:#ffe1e1
-    style E1 fill:#e1ffe1
 ```
 
 ### 1. SM (Streaming Multiprocessor)
@@ -442,8 +435,6 @@ graph TD
 
     F --> J[NVLink<br/>PCIe<br/>InfiniBand]
 
-    style B fill:#e1f5ff
-    style J fill:#ffe1e1
 ```
 
 ### 1. NCCL 개요
@@ -613,9 +604,6 @@ graph LR
 
     B -.->|JIT| E
 
-    style B fill:#fff4e1
-    style C fill:#ffe1e1
-    style D fill:#e1ffe1
 ```
 
 | 단계 | 형식 | 호환성 | 용도 |

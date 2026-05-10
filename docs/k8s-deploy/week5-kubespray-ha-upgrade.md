@@ -1193,8 +1193,6 @@ graph TB
     PlaybookVars -->|override| ExtraVars["6. --extra-vars (-e)<br/>(CLI에서 준 값 - 최강자)"]
     ExtraVars --> End["최종 변수 값 결정"]
 
-    style ExtraVars fill:#ff6b6b
-    style GroupVars fill:#51cf66
 ```
 
 **실전 팁**:

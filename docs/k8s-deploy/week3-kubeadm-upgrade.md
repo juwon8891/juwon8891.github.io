@@ -99,8 +99,6 @@ flowchart TD
     I --> I1["TLS Bootstrap 설정"]
     J --> J1["CoreDNS<br>kube-proxy"]
 
-    style A fill:#e1f5ff
-    style K fill:#c3e6cb
 ```
 
 #### 1. Preflight Checks
@@ -186,8 +184,6 @@ flowchart TD
     E --> E1["CSR 생성 및 자동 승인"]
     F --> F1["kubelet.conf 생성<br>노드 등록"]
 
-    style A fill:#e1f5ff
-    style G fill:#c3e6cb
 ```
 
 #### 1. Discovery 단계
@@ -444,11 +440,6 @@ graph TB
     G -.-> D
     G -.-> E
 
-    style A fill:#c3e6cb
-    style B fill:#fff3cd
-    style C fill:#d1ecf1
-    style D fill:#d1ecf1
-    style E fill:#d1ecf1
 ```
 
 **장점**:
@@ -476,8 +467,6 @@ flowchart LR
     H[컨테이너 삭제] --> I[Upper Layer 스냅샷 삭제]
     I --> J[Lower Layer 유지]
 
-    style B fill:#e1f5ff
-    style F fill:#c3e6cb
 ```
 
 **Snapshotter 종류**:
@@ -611,10 +600,6 @@ graph TD
         SA["sa.key / sa.pub<br>service-accounts<br>Private/Public Key Pair"]
     end
 
-    style CA fill:#ff9999
-    style ETCDCA fill:#99ccff
-    style FRONTCA fill:#99ff99
-    style SA fill:#ffcc99
 ```
 
 ---
@@ -797,9 +782,6 @@ graph TB
         API2 -.-> API3
     end
 
-    style API fill:#ff9999
-    style API2 fill:#99ccff
-    style API3 fill:#99ccff
 ```
 
 #### kube-apiserver (HA 환경)
@@ -882,8 +864,6 @@ graph LR
         B3 --> B4["Blue 클러스터 제거"]
     end
 
-    style A2 fill:#fff3cd
-    style B2 fill:#c3e6cb
 ```
 
 ---
@@ -1071,12 +1051,6 @@ flowchart TD
 
     G3 --> H[업그레이드 완료]
 
-    style A fill:#e1f5ff
-    style H fill:#c3e6cb
-    style B fill:#fff3cd
-    style E1 fill:#ffcccc
-    style F2 fill:#ccffcc
-    style G2 fill:#ccffcc
 ```
 
 ---

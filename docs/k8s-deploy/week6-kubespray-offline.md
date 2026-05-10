@@ -35,9 +35,6 @@ graph TB
 
     FW2 --> Internal
 
-    style Internet fill:#e1f5ff
-    style DMZ fill:#fff4e1
-    style Internal fill:#ffe1e1
 ```
 
 **특징**:
@@ -147,8 +144,6 @@ graph LR
     Internet -->|"DNAT<br/>10.0.2.15 → 192.168.10.11"| Admin
     Admin --> K8sNode
 
-    style K8sNode fill:#ffe1e1
-    style Admin fill:#e1f5ff
 ```
 
 **MASQUERADE 동작**:
@@ -253,10 +248,6 @@ graph TB
     AdminNTP -->|"allow 192.168.10.0/24"| Node1NTP["k8s-node1<br/>chronyd<br/>Stratum 4"]
     AdminNTP --> Node2NTP["k8s-node2<br/>chronyd<br/>Stratum 4"]
 
-    style Internet fill:#e1f5ff
-    style AdminNTP fill:#fff4e1
-    style Node1NTP fill:#ffe1e1
-    style Node2NTP fill:#ffe1e1
 ```
 
 ---
@@ -526,8 +517,6 @@ graph TB
 
     SearchRegistries --> DirectPull
 
-    style DirectPull fill:#90EE90
-    style Error fill:#FFB6C1
 ```
 
 ---
@@ -636,9 +625,6 @@ graph TB
 
     Deploy -->|"ansible-playbook<br/>cluster.yml"| K8sCluster["✅ K8s Cluster"]
 
-    style Download fill:#e1f5ff
-    style Setup fill:#fff4e1
-    style Deploy fill:#90EE90
 ```
 
 ### kubespray-offline 지원 기능
@@ -733,8 +719,6 @@ graph TB
     CreateRepo --> CopyTargetScripts["copy-target-scripts.sh<br/>target-scripts/* → outputs/"]
     CopyTargetScripts --> Done["✅ Done"]
 
-    style Start fill:#e1f5ff
-    style Done fill:#90EE90
 ```
 
 ### [1] setup-container.sh 실행
@@ -879,10 +863,6 @@ graph LR
 
     Registry --> Storage["Storage<br/>/var/lib/registry"]
 
-    style LocalImage fill:#e1f5ff
-    style NewTag fill:#fff4e1
-    style Registry fill:#90EE90
-    style Storage fill:#FFE4E1
 ```
 
 ### [7] extract-kubespray.sh 실행
@@ -1148,16 +1128,6 @@ graph TB
 
     Kubespray --> K8s["✅ Kubernetes Cluster"]
 
-    style DownloadFiles fill:#e1f5ff
-    style DownloadImages fill:#e1f5ff
-    style DownloadRPMs fill:#e1f5ff
-    style DownloadPyPI fill:#e1f5ff
-    style Nginx fill:#fff4e1
-    style Registry fill:#fff4e1
-    style YumRepo fill:#fff4e1
-    style PyPIMirror fill:#fff4e1
-    style Kubespray fill:#90EE90
-    style K8s fill:#90EE90
 ```
 
 ### 3. Containerd Registry Mirror 설정

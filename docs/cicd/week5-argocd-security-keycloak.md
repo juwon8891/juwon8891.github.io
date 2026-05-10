@@ -441,8 +441,6 @@ graph TB
     AUTH --> APP3
     SSO --> APP3
 
-    style AUTH fill:#4ECDC4
-    style SSO fill:#F7DC6F
 ```
 
 ### 2. 주요 기능 및 특징

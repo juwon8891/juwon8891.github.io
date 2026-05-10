@@ -43,10 +43,6 @@ graph LR
     Ansible -->|"SSH (22)"| Node2
     Ansible -->|"SSH (22)"| Node3
 
-    style Ansible fill:#326CE5,color:#fff
-    style Node1 fill:#4CAF50,color:#fff
-    style Node2 fill:#4CAF50,color:#fff
-    style Node3 fill:#4CAF50,color:#fff
 ```
 
 ### Ansible vs 다른 도구
@@ -579,10 +575,6 @@ graph LR
 
     Task2["Task<br/>(Install package)"] -->|"changed=false"| Skip["Skip Handler"]
 
-    style Task fill:#4CAF50,color:#fff
-    style Task2 fill:#FFC107,color:#000
-    style Handler fill:#2196F3,color:#fff
-    style Skip fill:#9E9E9E,color:#fff
 ```
 
 ### Handler 예제
@@ -708,9 +700,6 @@ graph TB
     Rescue --> Always
     Always --> End([End])
 
-    style Block fill:#4CAF50,color:#fff
-    style Rescue fill:#F44336,color:#fff
-    style Always fill:#2196F3,color:#fff
 ```
 
 ---
@@ -867,7 +856,6 @@ graph TB
     PostTasks --> Handlers[Handlers]
     Handlers --> End([Playbook End])
 
-    style Roles fill:#326CE5,color:#fff
 ```
 
 ---
@@ -1045,8 +1033,6 @@ graph TB
     GroupVars --> RoleVars["6. Role vars<br/>(vars/main.yml)"]
     RoleVars --> RoleDefaults["7. Role Defaults<br/>(defaults/main.yml)<br/>최저 우선순위"]
 
-    style ExtraVars fill:#F44336,color:#fff
-    style RoleDefaults fill:#9E9E9E,color:#fff
 ```
 
 ---

@@ -27,11 +27,6 @@ graph TD
     D --> D1["Software Agent가 Git 변경 감지<br/>자동으로 클러스터에 적용"]
     E --> E1["Actual State → Desired State<br/>Drift 발생 시 자동 복구"]
 
-    style A fill:#f9f,stroke:#333,stroke-width:4px
-    style B fill:#bbf,stroke:#333
-    style C fill:#bbf,stroke:#333
-    style D fill:#bbf,stroke:#333
-    style E fill:#bbf,stroke:#333
 ```
 
 **핵심**:
@@ -58,8 +53,6 @@ graph LR
     D --> D2[Governance<br/>거버넌스]
     D --> D3[Efficiency<br/>효율성]
 
-    style C fill:#f96,stroke:#333,stroke-width:3px
-    style D fill:#9cf,stroke:#333,stroke-width:2px
 ```
 
 **Platform Engineering 3대 가치**:
@@ -116,10 +109,6 @@ graph TB
 
     AW -->|Trigger| GR
 
-    style FC fill:#4495d1,color:#fff
-    style TC fill:#7B42BC,color:#fff
-    style HC fill:#0f1689,color:#fff
-    style AW fill:#f96,color:#fff
 ```
 
 **핵심 구성 요소**:
@@ -310,9 +299,6 @@ graph LR
     TC -.->|tfstate Secret| K8S[(Kubernetes Secret<br/>tfstate)]
     TR -.->|tfplan Secret| K8S
 
-    style FC fill:#4495d1,color:#fff
-    style TC fill:#7B42BC,color:#fff
-    style TR fill:#9cf,stroke:#333
 ```
 
 **동작 흐름**:
@@ -744,9 +730,6 @@ graph TB
     HC -->|Install/Upgrade| SVC
     HC -->|Install/Upgrade| ING
 
-    style FC fill:#4495d1,color:#fff
-    style HC fill:#0f1689,color:#fff
-    style ECR fill:#FF9900,color:#fff
 ```
 
 **동작 흐름**:
@@ -1019,9 +1002,6 @@ graph TB
     H --> H1
     P --> P1
 
-    style S fill:#f96,color:#fff
-    style H fill:#fc6,color:#000
-    style P fill:#6cf,color:#000
 ```
 
 **SaaS 티어별 특징**:
@@ -1167,10 +1147,6 @@ graph LR
     FC -->|Create| HR
     HR -->|Deploy| DEPLOY
 
-    style SQS fill:#FF9900,color:#fff
-    style WF fill:#f96,color:#fff
-    style FC fill:#4495d1,color:#fff
-    style HR fill:#0f1689,color:#fff
 ```
 
 **온보딩 워크플로우 동작**:

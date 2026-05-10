@@ -41,11 +41,6 @@ graph TB
     APP2 --> K8S2
     APP3 --> K8S3
 
-    style APPSET fill:#4ECDC4
-    style GEN fill:#F7DC6F
-    style APP1 fill:#98FB98
-    style APP2 fill:#98FB98
-    style APP3 fill:#98FB98
 ```
 
 **ApplicationSet의 이점**:
@@ -216,10 +211,6 @@ graph LR
     GITGEN -.생성.-> APPB
     GITGEN -.생성.-> APPD
 
-    style GITGEN fill:#F7DC6F
-    style APPF fill:#98FB98
-    style APPB fill:#98FB98
-    style APPD fill:#98FB98
 ```
 
 #### 모노레포 구조 준비
@@ -948,12 +939,6 @@ graph TB
     TEAM3 -.접근 가능.-> APP5
     TEAM3 -.접근 가능.-> APP6
 
-    style APP1 fill:#FFB6C1
-    style APP2 fill:#FFB6C1
-    style APP3 fill:#98FB98
-    style APP4 fill:#98FB98
-    style APP5 fill:#87CEEB
-    style APP6 fill:#87CEEB
 ```
 
 **프로젝트 제약 사항**:
@@ -1295,10 +1280,6 @@ graph LR
     CTRL -->|알림 전송| WEBHOOK
     CTRL -->|알림 전송| MSTEAMS
 
-    style CTRL fill:#4ECDC4
-    style SLACK fill:#FFB6C1
-    style EMAIL fill:#98FB98
-    style WEBHOOK fill:#F7DC6F
 ```
 
 **주요 구성 요소**:

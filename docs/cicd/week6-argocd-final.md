@@ -66,8 +66,6 @@ graph TB
     RH --> RS1
     RH --> RS2
 
-    style LB fill:#4ECDC4
-    style RH fill:#F7DC6F
 ```
 
 **컴포넌트별 역할**:
@@ -168,8 +166,6 @@ graph TB
         NEW -.->|4. Promote| R1
     end
 
-    style M fill:#E74C3C
-    style NEW fill:#2ECC71
 ```
 
 **Sentinel 동작 방식**:
@@ -231,8 +227,6 @@ sequenceDiagram
     K->>S: 7. Lease granted (become leader)
     S->>G: 8. Take over processing
 
-    style L fill:#2ECC71
-    style S fill:#F39C12
 ```
 
 **Leader Election 설정**:
@@ -340,8 +334,6 @@ graph LR
     V2A -.->|Analysis Fail| ROLLBACK[❌ Rollback to V1]
     V2B -.->|Analysis Fail| ROLLBACK
 
-    style V2C fill:#2ECC71
-    style ROLLBACK fill:#E74C3C
 ```
 
 #### Rollout 예시
@@ -601,7 +593,6 @@ graph TB
         M --> A4[app2-prod]
     end
 
-    style M fill:#F39C12
 ```
 
 #### Matrix Generator 예시
@@ -750,8 +741,6 @@ sequenceDiagram
     G->>AS: 8. PR closed webhook
     AS->>K: 9. Delete preview namespace
 
-    style AS fill:#F39C12
-    style K fill:#2ECC71
 ```
 
 #### Pull Request Generator 예시
@@ -847,8 +836,6 @@ graph TB
     C4 --> A3
     C4 --> A4
 
-    style C3 fill:#F39C12
-    style C4 fill:#2ECC71
 ```
 
 #### 클러스터 등록
@@ -959,10 +946,6 @@ graph TB
     ROOT --> T1
     ROOT --> T2
 
-    style ROOT fill:#E74C3C
-    style C1 fill:#4ECDC4
-    style P1 fill:#F7DC6F
-    style T1 fill:#2ECC71
 ```
 
 #### App of Apps 구현
@@ -1320,9 +1303,6 @@ graph TB
     OIDC --> RBAC
     RBAC --> APP
 
-    style LDAP fill:#E74C3C
-    style KC fill:#F39C12
-    style RBAC fill:#2ECC71
 ```
 
 #### Keycloak LDAP 설정
@@ -1474,8 +1454,6 @@ sequenceDiagram
     SS->>SS: 4. Private Key로 복호화
     SS->>KS: 5. 일반 Secret 생성
 
-    style SS fill:#F39C12
-    style KS fill:#2ECC71
 ```
 
 #### Sealed Secrets 설치 및 사용
@@ -1551,8 +1529,6 @@ graph LR
     ESO --> G
     ESO --> KS
 
-    style ESO fill:#F39C12
-    style KS fill:#2ECC71
 ```
 
 #### External Secrets Operator 사용
@@ -1759,8 +1735,6 @@ graph TB
     TM2 --> C2
     TM3 --> C3
 
-    style NC fill:#F39C12
-    style C1 fill:#2ECC71
 ```
 
 #### Slack Notification 설정

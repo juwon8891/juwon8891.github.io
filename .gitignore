@@ -36,6 +36,10 @@ vendor/
 *.gem
 *.rbc
 
+# MkDocs
+site/
+.cache/
+
 # Logs
 *.log
 

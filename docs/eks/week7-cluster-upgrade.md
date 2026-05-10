@@ -3,55 +3,6 @@
 
 > **Week 7 학습 주제**: EKS 클러스터를 안전하게 업그레이드하는 전략과 실습. Control Plane, Add-on, Nodes를 순차적으로 업그레이드하며 HA 전략(PDB, TopologySpread)을 적용합니다.
 
-## 📋 목차
-
-1. [🎯 Week 7 학습 목표](#-week-7-학습-목표)
-   - [학습 목표](#1-학습-목표)
-   - [실습 환경 구성](#2-실습-환경-구성)
-
-2. [📝 실습 메모](#-실습-메모)
-   - [Preparing for Cluster Upgrades](#1-preparing-for-cluster-upgrades)
-   - [In-place Cluster Upgrades](#2-in-place-cluster-upgrades-130--131)
-   - [도전 과제](#3-도전-과제)
-
-3. [🚀 Getting Started](#-getting-started)
-   - [실습 환경 정보 확인](#1-실습-환경-정보-확인)
-   - [Sample Application 배포](#2-sample-application-배포)
-   - [EKS API/ConfigMap, IRSA 정보 확인](#3-eks-apiconfigmap-irsa-정보-확인)
-
-4. [🔍 EKS Upgrade Insights](#-eks-upgrade-insights)
-   - [Upgrade Insights 개요](#1-upgrade-insights-개요)
-   - [Insights 확인](#2-insights-확인)
-
-5. [🛡️ HA 전략 (High Availability Strategies)](#️-ha-전략-high-availability-strategies)
-   - [PodDisruptionBudgets (PDB)](#1-poddisruptionbudgets-pdb)
-   - [TopologySpreadConstraints](#2-topologyspreadconstraints)
-
-6. [⬆️ Control Plane 업그레이드](#️-control-plane-업그레이드)
-   - [업그레이드 방법 1: eksctl](#1-업그레이드-방법-1-eksctl)
-   - [업그레이드 방법 2: AWS 관리 콘솔](#2-업그레이드-방법-2-aws-관리-콘솔)
-   - [업그레이드 방법 3: AWS CLI](#3-업그레이드-방법-3-aws-cli)
-   - [업그레이드 방법 4: Terraform (권장)](#4-업그레이드-방법-4-terraform-권장)
-
-7. [🔧 Add-on 업그레이드](#-add-on-업그레이드)
-   - [CoreDNS](#1-coredns)
-   - [kube-proxy](#2-kube-proxy)
-   - [VPC CNI](#3-vpc-cni)
-   - [EBS CSI Driver](#4-ebs-csi-driver)
-
-8. [🖥️ Nodes 업그레이드](#️-nodes-업그레이드)
-   - [관리형 노드그룹 (Managed Node Group)](#1-관리형-노드그룹-managed-node-group)
-   - [카펜터 노드 (Karpenter)](#2-카펜터-노드-karpenter)
-   - [셀프 노드그룹 (Self-managed)](#3-셀프-노드그룹-self-managed)
-   - [파게이트 프로파일 (Fargate)](#4-파게이트-프로파일-fargate)
-
-9. [💡 핵심 개념 정리](#-핵심-개념-정리)
-   - [EKS 업그레이드 순서](#1-eks-업그레이드-순서)
-   - [In-Place vs Blue-Green](#2-in-place-vs-blue-green)
-   - [업그레이드 Best Practices](#3-업그레이드-best-practices)
-
-10. [🎓 Week 7 학습 정리](#-week-7-학습-정리)
-
 ---
 
 ## 🎯 Week 7 학습 목표

@@ -1,39 +1,6 @@
 
 # 3주차 학습정리 - Jenkins CI/CD와 ArgoCD: GitOps 기반 쿠버네티스 배포 완전 정복
 
-## 📋 목차
-
-1. [🛠️ 실습 환경 구성](#️-실습-환경-구성)
-   - [Jenkins와 Gogs 컨테이너 구성](#1-jenkins와-gogs-컨테이너-구성)
-   - [Kind 로컬 쿠버네티스 클러스터](#2-kind-로컬-쿠버네티스-클러스터)
-   - [Jenkins 초기 설정](#3-jenkins-초기-설정)
-   - [Gogs Git 서버 설정](#4-gogs-git-서버-설정)
-
-2. [🔧 Jenkins CI + K8S](#-jenkins-ci--k8s)
-   - [Jenkins와 Kubernetes 통합](#1-jenkins와-kubernetes-통합)
-   - [애플리케이션 배포 및 관리](#2-애플리케이션-배포-및-관리)
-   - [Service와 Load Balancing](#3-service와-load-balancing)
-   - [Gogs Webhook 연동](#4-gogs-webhook-연동)
-
-3. [🚀 Jenkins CI/CD + Blue-Green 배포](#-jenkins-cicd--blue-green-배포)
-   - [Blue-Green 배포 전략](#1-blue-green-배포-전략)
-   - [Jenkins Pipeline으로 Blue-Green 구현](#2-jenkins-pipeline으로-blue-green-구현)
-
-4. [🎯 ArgoCD GitOps 배포](#-argocd-gitops-배포)
-   - [ArgoCD 소개 및 아키텍처](#1-argocd-소개-및-아키텍처)
-   - [ArgoCD 설치 및 설정](#2-argocd-설치-및-설정)
-   - [Helm Chart를 통한 배포](#3-helm-chart를-통한-배포)
-   - [Full CI/CD 파이프라인 구축](#4-full-cicd-파이프라인-구축)
-
-5. [🎨 Argo Rollouts - 고급 배포 전략](#-argo-rollouts---고급-배포-전략)
-   - [Argo Rollouts 소개](#1-argo-rollouts-소개)
-   - [Canary 배포 전략](#2-canary-배포-전략)
-
-6. [📊 3주차 학습 정리](#-3주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [실무 적용 포인트](#2-실무-적용-포인트)
-   - [다음 단계 학습 방향](#3-다음-단계-학습-방향)
-
 ---
 
 ## 🛠️ 실습 환경 구성

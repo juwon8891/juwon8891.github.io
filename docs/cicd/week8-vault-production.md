@@ -1,48 +1,6 @@
 
 # 8주차 학습정리 - HashiCorp Vault: VSO와 프로덕션 구성
 
-## 📋 목차
-
-1. [⚙️ Vault Secrets Operator (VSO) 심화](#️-vault-secrets-operator-vso-심화)
-   - [VSO 동작 원리 상세](#1-vso-동작-원리-상세)
-   - [Kubernetes 인증 메커니즘](#2-kubernetes-인증-메커니즘)
-   - [Service Account Token 이해](#3-service-account-token-이해)
-
-2. [🔐 Vault on Kubernetes 실습](#-vault-on-kubernetes-실습)
-   - [Kubernetes에 Vault 설치](#1-kubernetes에-vault-설치)
-   - [Vault Unseal 과정](#2-vault-unseal-과정)
-   - [Secret 생성 및 확인](#3-secret-생성-및-확인)
-
-3. [🔑 Kubernetes 인증 설정](#-kubernetes-인증-설정)
-   - [Policy 및 Role 구성](#1-policy-및-role-구성)
-   - [Service Account 권한 확인](#2-service-account-권한-확인)
-   - [Token Volume Projection](#3-token-volume-projection)
-
-4. [🏗️ Vault HA (High Availability)](#️-vault-ha-high-availability)
-   - [HA 아키텍처 이해](#1-ha-아키텍처-이해)
-   - [Raft 스토리지 백엔드](#2-raft-스토리지-백엔드)
-   - [HA 클러스터 구성 실습](#3-ha-클러스터-구성-실습)
-
-5. [🔒 Vault with LDAP 인증](#-vault-with-ldap-인증)
-   - [LDAP 인증 방식 이해](#1-ldap-인증-방식-이해)
-   - [LDAP 인증 설정](#2-ldap-인증-설정)
-   - [정책 매핑 및 테스트](#3-정책-매핑-및-테스트)
-
-6. [🛡️ Vault TLS 보안 설정](#️-vault-tls-보안-설정)
-   - [인증서 생성 및 적용](#1-인증서-생성-및-적용)
-   - [Ingress SSL Passthrough](#2-ingress-ssl-passthrough)
-   - [클라이언트 TLS 설정](#3-클라이언트-tls-설정)
-
-7. [💡 MCP Server와 Vault](#-mcp-server와-vault)
-   - [AI Agent Identity 관리](#1-ai-agent-identity-관리)
-   - [Remote MCP 시크릿 관리](#2-remote-mcp-시크릿-관리)
-   - [HashiCorp 권장 패턴](#3-hashicorp-권장-패턴)
-
-8. [🎓 8주차 학습 정리](#-8주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [프로덕션 체크리스트](#2-프로덕션-체크리스트)
-   - [마무리 및 다음 단계](#3-마무리-및-다음-단계)
-
 ---
 
 ## ⚙️ Vault Secrets Operator (VSO) 심화

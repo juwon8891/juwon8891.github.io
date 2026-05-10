@@ -1,53 +1,6 @@
 
 # 7주차 학습정리 - HashiCorp Vault: 엔터프라이즈급 시크릿 관리와 CI/CD 통합
 
-## 📋 목차
-
-1. [🔏 Vault 개요와 시크릿 관리의 필요성](#-vault-개요와-시크릿-관리의-필요성)
-   - [정보보안의 3요소 (CIA Triad)](#1-정보보안의-3요소-cia-triad)
-   - [시크릿의 종류](#2-시크릿의-종류)
-   - [Vault의 필요성](#3-vault의-필요성)
-
-2. [🏗️ Vault 기본 구조와 동작 방식](#️-vault-기본-구조와-동작-방식)
-   - [Vault의 핵심 워크플로우](#1-vault의-핵심-워크플로우)
-   - [Vault의 4가지 핵심 요소](#2-vault의-4가지-핵심-요소)
-   - [호텔 체크인에 비유한 동작 방식](#3-호텔-체크인에-비유한-동작-방식)
-
-3. [☸️ Kubernetes에 Vault 설치](#️-kubernetes에-vault-설치)
-   - [Helm을 사용한 Vault 배포](#1-helm을-사용한-vault-배포)
-   - [Vault 초기화 및 Unseal](#2-vault-초기화-및-unseal)
-   - [Shamir Secret Sharing (SSS) 방식](#3-shamir-secret-sharing-sss-방식)
-
-4. [🤖 Vault Agent와 Sidecar 패턴](#-vault-agent와-sidecar-패턴)
-   - [왜 Vault Agent가 필요한가](#1-왜-vault-agent가-필요한가)
-   - [Vault Agent 동작 방식](#2-vault-agent-동작-방식)
-   - [Kubernetes에서 Vault Agent 활용](#3-kubernetes에서-vault-agent-활용)
-
-5. [🔨 Jenkins + Vault (CI 파이프라인)](#-jenkins--vault-ci-파이프라인)
-   - [CI/CD 파이프라인 보안 고려사항](#1-cicd-파이프라인-보안-고려사항)
-   - [Jenkins에서 KV 시크릿 사용](#2-jenkins에서-kv-시크릿-사용)
-   - [동적(Dynamic) DB 시크릿](#3-동적dynamic-db-시크릿)
-
-6. [🔐 암호화와 Vault Transit 엔진](#-암호화와-vault-transit-엔진)
-   - [암호화 기본 개념](#1-암호화-기본-개념)
-   - [Vault Transit vs Cloud KMS](#2-vault-transit-vs-cloud-kms)
-   - [Transit 엔진 실습](#3-transit-엔진-실습)
-
-7. [🚀 ArgoCD + Vault Plugin (CD 파이프라인)](#-argocd--vault-plugin-cd-파이프라인)
-   - [ArgoCD Vault Plugin 소개](#1-argocd-vault-plugin-소개)
-   - [AppRole 인증 설정](#2-approle-인증-설정)
-   - [샘플 애플리케이션 배포](#3-샘플-애플리케이션-배포)
-
-8. [⚙️ Vault Secrets Operator (VSO)](#️-vault-secrets-operator-vso)
-   - [VSO란 무엇인가](#1-vso란-무엇인가)
-   - [VSO 구성 요소](#2-vso-구성-요소)
-   - [Static Secrets와 Dynamic Secrets](#3-static-secrets와-dynamic-secrets)
-
-9. [🎓 7주차 학습 정리](#-7주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [프로덕션 체크리스트](#2-프로덕션-체크리스트)
-   - [마무리 및 다음 단계](#3-마무리-및-다음-단계)
-
 ---
 
 ## 🔏 Vault 개요와 시크릿 관리의 필요성

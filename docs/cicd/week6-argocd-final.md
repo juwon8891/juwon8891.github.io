@@ -1,54 +1,6 @@
 
 # 6주차 학습정리 - ArgoCD 완전 정복: 프로덕션 환경 구축과 고급 GitOps 패턴
 
-## 📋 목차
-
-1. [🏗️ ArgoCD 고가용성 구성](#️-argocd-고가용성-구성)
-   - [고가용성 아키텍처](#1-고가용성-아키텍처)
-   - [Redis HA 설정](#2-redis-ha-설정)
-   - [ApplicationSet Controller 확장](#3-applicationset-controller-확장)
-
-2. [🔄 고급 Sync 전략](#-고급-sync-전략)
-   - [Sync Windows](#1-sync-windows)
-   - [Progressive Delivery](#2-progressive-delivery)
-   - [Automated Self-Healing](#3-automated-self-healing)
-
-3. [📊 Resource Tracking](#-resource-tracking)
-   - [Tracking Methods](#1-tracking-methods)
-   - [Annotation vs Label](#2-annotation-vs-label)
-   - [Best Practices](#3-best-practices)
-
-4. [🎯 ApplicationSet 고급 활용](#-applicationset-고급-활용)
-   - [Matrix Generator](#1-matrix-generator)
-   - [Git File Generator](#2-git-file-generator)
-   - [Pull Request Generator](#3-pull-request-generator)
-
-5. [🚀 멀티 클러스터 관리](#-멀티-클러스터-관리)
-   - [Cluster Bootstrap](#1-cluster-bootstrap)
-   - [Cluster Credentials 관리](#2-cluster-credentials-관리)
-   - [App of Apps 패턴](#3-app-of-apps-패턴)
-
-6. [🔑 LDAP/Active Directory 통합](#-ldapactive-directory-통합)
-   - [OpenLDAP 서버 구축](#1-openldap-서버-구축)
-   - [Keycloak LDAP Federation](#2-keycloak-ldap-federation)
-   - [ArgoCD RBAC with LDAP Groups](#3-argocd-rbac-with-ldap-groups)
-   - [LDAP 동기화 및 캐싱](#4-ldap-동기화-및-캐싱)
-
-7. [🔐 시크릿 관리 전략](#-시크릿-관리-전략)
-   - [Sealed Secrets](#1-sealed-secrets)
-   - [External Secrets Operator](#2-external-secrets-operator)
-   - [HashiCorp Vault 통합](#3-hashicorp-vault-통합)
-
-8. [📈 모니터링 및 관찰성](#-모니터링-및-관찰성)
-   - [Prometheus Metrics](#1-prometheus-metrics)
-   - [Notification 설정](#2-notification-설정)
-   - [Audit Logging](#3-audit-logging)
-
-9. [🎓 6주차 학습 정리](#-6주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [프로덕션 체크리스트](#2-프로덕션-체크리스트)
-   - [마무리 및 다음 단계](#3-마무리-및-다음-단계)
-
 ---
 
 ## 🏗️ ArgoCD 고가용성 구성

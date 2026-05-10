@@ -3,47 +3,6 @@
 
 > **고가용성 Kubernetes 클러스터 운영**: Kubespray를 활용한 HA 구성, API 엔드포인트 전략, 노드 관리 및 클러스터 업그레이드
 
-## 📋 목차
-
-1. [🎯 Week 5 학습 목표](#-week-5-학습-목표)
-   - [핵심 주제](#1-핵심-주제)
-   - [실습 환경](#2-실습-환경)
-
-2. [🏗️ 실습 환경 구성](#️-실습-환경-구성)
-   - [가상머신 구성](#1-가상머신-구성)
-   - [초기화 스크립트 분석](#2-초기화-스크립트-분석)
-   - [Kubespray 배포](#3-kubespray-배포)
-
-3. [🌐 K8S API 엔드포인트 전략](#-k8s-api-엔드포인트-전략)
-   - [Case 1: Client-Side LoadBalancing](#case-1-client-side-loadbalancing)
-   - [Case 2: External LB + Client-Side LB](#case-2-external-lb--client-side-lb)
-   - [Case 3: External LB Only](#case-3-external-lb-only)
-
-4. [🔧 노드 관리](#-노드-관리)
-   - [노드 추가 (scale.yml)](#1-노드-추가-scaleyml)
-   - [노드 제거 (remove-node.yml)](#2-노드-제거-remove-nodeyml)
-   - [비정상 노드 강제 삭제](#3-비정상-노드-강제-삭제)
-   - [클러스터 리셋 (reset.yml)](#4-클러스터-리셋-resetyml)
-
-5. [📊 모니터링 설정](#-모니터링-설정)
-   - [kube-ops-view 설치](#1-kube-ops-view-설치)
-   - [HAProxy 통계 페이지](#2-haproxy-통계-페이지)
-
-6. [💡 핵심 개념 정리](#-핵심-개념-정리)
-   - [Client-Side vs External LoadBalancing](#1-client-side-vs-external-loadbalancing)
-   - [Kubespray 변수 우선순위](#2-kubespray-변수-우선순위)
-   - [etcd Deployment Type](#3-etcd-deployment-type)
-   - [PodDisruptionBudget과 Drain](#4-poddisruptionbudget과-drain)
-
-7. [🐛 트러블슈팅](#-트러블슈팅)
-   - [인증서 SAN 추가](#1-인증서-san-추가)
-   - [Containerd rlimits 이슈](#2-containerd-rlimits-이슈)
-   - [PDB로 인한 Drain 실패](#3-pdb로-인한-drain-실패)
-
-8. [🎓 Week 5 학습 정리](#-week-5-학습-정리)
-
-9. [📚 참고 자료](#-참고-자료)
-
 ---
 
 ## 🎯 Week 5 학습 목표

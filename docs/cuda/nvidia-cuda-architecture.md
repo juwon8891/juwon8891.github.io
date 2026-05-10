@@ -5,26 +5,6 @@
 
 CUDA 소스 코드가 GPU에서 실행되기까지의 전체 과정을 정리했다. nvcc 컴파일러가 소스 코드를 PTX(중간 표현)로 변환하고, 이것이 다시 SASS(GPU 기계어)로 변환되어 fatbin에 저장된다. GPU 아키텍처는 SM(Streaming Multiprocessor) 단위로 구성되며, 각 SM은 CUDA Core, Tensor Core, 메모리를 포함한다. Compute Capability는 GPU의 기능 버전을 나타내며(7.0 Volta, 8.0 Ampere, 9.0 Hopper), 컴파일 시 타겟 아키텍처를 지정할 수 있다. 다중 GPU 환경에서는 NCCL 라이브러리가 AllReduce, Broadcast 같은 Collective 연산을 제공하며, NVLink/PCIe/InfiniBand를 자동으로 최적화한다. cuobjdump로 바이너리를 분석하고, Ray 같은 분산 프레임워크에서 GPU 스케줄링을 할 수 있다.
 
-## 📋 목차
-
-1. [🔨 CUDA 컴파일 과정](#-cuda-컴파일-과정)
-   - [nvcc (NVIDIA CUDA Compiler)](#1-nvcc-nvidia-cuda-compiler)
-   - [PTX (Parallel Thread Execution)](#2-ptx-parallel-thread-execution)
-   - [SASS (Shader ASSembler)](#3-sass-shader-assembler)
-   - [fatbin (Fat Binary)](#4-fatbin-fat-binary)
-   - [cuobjdump (CUDA Object Dump)](#5-cuobjdump-cuda-object-dump)
-2. [🏗️ GPU 아키텍처](#️-gpu-아키텍처)
-   - [SM (Streaming Multiprocessor)](#1-sm-streaming-multiprocessor)
-   - [Compute Capability](#2-compute-capability)
-   - [아키텍처 세대별 특징](#3-아키텍처-세대별-특징)
-3. [🌐 NCCL (NVIDIA Collective Communications Library)](#-nccl-nvidia-collective-communications-library)
-   - [NCCL 개요](#1-nccl-개요)
-   - [libnccl.so](#2-libnccl-so)
-   - [NCCL Operations](#3-nccl-operations)
-4. [🚀 Ray와 CUDA 통합](#-ray와-cuda-통합)
-5. [💡 핵심 개념 정리](#-핵심-개념-정리)
-6. [마무리](#마무리)
-
 ---
 
 ## 🔨 CUDA 컴파일 과정

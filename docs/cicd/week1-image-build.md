@@ -1,39 +1,6 @@
 
 # 1주차 학습정리 - Image Build: GitOps와 컨테이너 이미지 빌드 완전 정복
 
-## 📋 목차
-
-1. [🌐 GitOps 소개](#-gitops-소개)
-   - [GitOps의 정의와 핵심 가치](#1-gitops의-정의와-핵심-가치)
-   - [GitOps 3대 핵심 원칙](#2-gitops-3대-핵심-원칙)
-   - [OpenGitOps 표준과 4대 원칙](#3-opengitops-표준과-4대-원칙)
-   - [GitOps 도입의 4가지 이점](#4-gitops-도입의-4가지-이점)
-   - [쿠버네티스 CI/CD 파이프라인](#5-쿠버네티스-cicd-파이프라인)
-   - [쿠버네티스에 GitOps를 접목한 앱 배포](#6-쿠버네티스에-gitops를-접목한-앱-배포)
-   - [데브옵스와 애자일의 관계](#7-데브옵스와-애자일의-관계)
-
-2. [🛠️ 실습 준비](#️-실습-준비)
-   - [컨테이너 레지스트리 등록](#1-컨테이너-레지스트리-등록)
-   - [Git 저장소 설정](#2-git-저장소-설정)
-   - [로컬 쿠버네티스 클러스터 구성](#3-로컬-쿠버네티스-클러스터-구성-kind)
-
-3. [📦 컨테이너 이미지 빌드](#-컨테이너-이미지-빌드)
-   - [컨테이너와 OCI 표준](#컨테이너와-oci-표준)
-   - [Docker를 사용한 컨테이너 빌드](#31-도커를-사용한-컨테이너-빌드)
-   - [Jib을 사용한 Dockerless 빌드](#32-jib을-사용한-dockerless-빌드)
-   - [Buildah를 사용한 Daemonless 빌드](#33-buildah를-사용한-daemonless-빌드)
-   - [Buildpacks를 통한 자동 빌드](#34-buildpacks를-통한-자동-빌드)
-   - [Shipwright와 Kaniko를 사용한 쿠버네티스 빌드](#35-shipwright와-kaniko를-사용한-쿠버네티스-빌드)
-
-4. [🎨 Kustomize](#-kustomize)
-   - [Kustomize 소개와 철학](#1-kustomize-소개와-철학)
-   - [Base와 Overlay 패턴](#2-base와-overlay-패턴)
-   - [주요 기능과 사용법](#3-주요-기능과-사용법)
-
-5. [🚀 Dragonfly - P2P 기반 이미지 배포](#-dragonfly---p2p-기반-이미지-배포)
-
-6. [📚 참고 자료 및 추가 학습](#-참고-자료-및-추가-학습)
-
 ---
 
 ## 🌐 GitOps 소개

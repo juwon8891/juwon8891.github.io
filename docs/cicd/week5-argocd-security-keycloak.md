@@ -1,43 +1,6 @@
 
 # 5주차 학습정리 - ArgoCD 보안 및 인증: Keycloak SSO 연동과 접근 제어로 완성하는 엔터프라이즈 GitOps
 
-## 📋 목차
-
-1. [🚀 실습 환경 구성](#-실습-환경-구성)
-   - [kind Kubernetes 클러스터 배포](#1-kind-kubernetes-클러스터-배포)
-   - [Ingress-Nginx 설치 및 설정](#2-ingress-nginx-설치-및-설정)
-   - [ArgoCD with TLS 설치](#3-argocd-with-tls-설치)
-
-2. [🔐 ArgoCD 접근 제어](#-argocd-접근-제어)
-   - [선언적 사용자 관리](#1-선언적-사용자-관리)
-   - [RBAC 권한 부여](#2-rbac-권한-부여)
-   - [서비스 어카운트](#3-서비스-어카운트)
-
-3. [🔑 Keycloak 소개](#-keycloak-소개)
-   - [Keycloak이란?](#1-keycloak이란)
-   - [주요 기능 및 특징](#2-주요-기능-및-특징)
-   - [표준 프로토콜 지원](#3-표준-프로토콜-지원)
-
-4. [⚙️ Keycloak 설치 및 구성](#️-keycloak-설치-및-구성)
-   - [Keycloak Docker 배포](#1-keycloak-docker-배포)
-   - [Realm 생성 및 설정](#2-realm-생성-및-설정)
-   - [사용자, 그룹, 역할 관리](#3-사용자-그룹-역할-관리)
-
-5. [🔗 ArgoCD와 Keycloak SSO 연동](#-argocd와-keycloak-sso-연동)
-   - [Client 생성](#1-client-생성)
-   - [ArgoCD OIDC 설정](#2-argocd-oidc-설정)
-   - [Keycloak 인증 테스트](#3-keycloak-인증-테스트)
-
-6. [🎯 OAuth 2.0과 OIDC 이해](#-oauth-20과-oidc-이해)
-   - [OAuth 2.0 Authorization Code Flow](#1-oauth-20-authorization-code-flow)
-   - [OIDC와 OAuth 2.0의 관계](#2-oidc와-oauth-20의-관계)
-   - [토큰 종류와 역할](#3-토큰-종류와-역할)
-
-7. [🎓 5주차 학습 정리](#-5주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [실무 적용 시나리오](#2-실무-적용-시나리오)
-   - [다음 학습 방향](#3-다음-학습-방향)
-
 ---
 
 ## 🚀 실습 환경 구성

@@ -1,44 +1,6 @@
 
 # 4주차 학습정리 - ArgoCD 심화: ApplicationSet, Sync Waves, RBAC로 완성하는 엔터프라이즈 GitOps
 
-## 📋 목차
-
-1. [🚀 ArgoCD ApplicationSet](#-argocd-applicationset)
-   - [ApplicationSet 소개](#1-applicationset-소개)
-   - [List Generator로 멀티 환경 배포](#2-list-generator로-멀티-환경-배포)
-   - [Git Generator로 자동 앱 생성](#3-git-generator로-자동-앱-생성)
-   - [Matrix Generator로 복잡한 패턴 구성](#4-matrix-generator로-복잡한-패턴-구성)
-
-2. [🎯 Sync Waves와 Resource Hooks](#-sync-waves와-resource-hooks)
-   - [Sync Waves 개념 및 활용](#1-sync-waves-개념-및-활용)
-   - [Resource Hooks로 배포 제어](#2-resource-hooks로-배포-제어)
-   - [실전 예제: 데이터베이스 마이그레이션](#3-실전-예제-데이터베이스-마이그레이션)
-
-3. [🔐 ArgoCD RBAC 및 프로젝트 관리](#-argocd-rbac-및-프로젝트-관리)
-   - [프로젝트 기반 멀티테넌시](#1-프로젝트-기반-멀티테넌시)
-   - [RBAC 정책 구성](#2-rbac-정책-구성)
-   - [팀별 권한 분리 실습](#3-팀별-권한-분리-실습)
-
-4. [📢 ArgoCD Notifications](#-argocd-notifications)
-   - [Notifications 아키텍처](#1-notifications-아키텍처)
-   - [Slack 연동 설정](#2-slack-연동-설정)
-   - [트리거 및 템플릿 커스터마이징](#3-트리거-및-템플릿-커스터마이징)
-
-5. [🎨 Argo Rollouts 심화 전략](#-argo-rollouts-심화-전략)
-   - [Blue-Green 배포 전략](#1-blue-green-배포-전략)
-   - [Analysis Template과 메트릭 분석](#2-analysis-template과-메트릭-분석)
-   - [Prometheus 기반 자동 롤백](#3-prometheus-기반-자동-롤백)
-
-6. [📊 GitOps 베스트 프랙티스](#-gitops-베스트-프랙티스)
-   - [저장소 구조 전략](#1-저장소-구조-전략)
-   - [환경별 설정 관리](#2-환경별-설정-관리)
-   - [보안 및 시크릿 관리](#3-보안-및-시크릿-관리)
-
-7. [🎓 4주차 학습 정리](#-4주차-학습-정리)
-   - [핵심 성취 목표](#1-핵심-성취-목표)
-   - [실무 적용 시나리오](#2-실무-적용-시나리오)
-   - [다음 학습 방향](#3-다음-학습-방향)
-
 ---
 
 ## 🚀 ArgoCD ApplicationSet

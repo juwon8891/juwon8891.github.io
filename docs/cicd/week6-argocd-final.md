@@ -1065,7 +1065,6 @@ dc=example,dc=org          # Base DN (Root DN)
         └── member: uid=alice,ou=people,dc=example,dc=org
 ```
 
-**주요 용어**:
 - **DN (Distinguished Name)**: `uid=alice,ou=people,dc=example,dc=org`
 - **RDN (Relative Distinguished Name)**: `uid=alice`
 - **Base DN**: `dc=example,dc=org`

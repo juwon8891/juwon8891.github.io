@@ -73,7 +73,6 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 
 **정의**: CPU, 메모리, 커스텀 메트릭 기반으로 Pod 수를 자동 조정
 
-**주요 특징**:
 - Metrics Server 필수 (resource metrics)
 - Target 메트릭 도달 시 ReplicaSet 조정
 - **ScaleUp**: 즉시 실행
@@ -118,7 +117,6 @@ spec:
 
 **정의**: Pod의 CPU/메모리 requests/limits를 자동으로 조정
 
-**주요 컴포넌트**:
 - **Recommender**: 과거 메트릭 분석, 권장 값 계산
 - **Updater**: 오래된 Pod 제거 (재생성 트리거)
 - **Admission Controller**: 새 Pod 생성 시 권장 값 주입
@@ -162,7 +160,6 @@ spec:
 
 **정의**: 외부 이벤트 소스 메트릭 기반 Pod 스케일링 (0 → N, N → 0 지원)
 
-**주요 컴포넌트**:
 - **Metrics Server**: 외부 메트릭을 Kubernetes Metrics API로 변환
 - **Controller**: ScaledObject/ScaledJob CRD 관리
 - **Admission Webhooks**: 리소스 검증
@@ -215,7 +212,6 @@ spec:
 
 **정의**: AWS Auto Scaling Group과 연동하여 노드 수 자동 조정
 
-**주요 동작**:
 - **Scale Up**: Pending Pod 발생 시 노드 추가 (약 3~5분 소요)
 - **Scale Down**: 노드 사용률 낮을 시 제거 (10분 안정화 후)
 
@@ -238,7 +234,6 @@ spec:
 - **비용 최적화**: Spot/On-Demand 혼합, 다양한 인스턴스 타입 활용
 - **통합 관리**: Auto Scaling Group 불필요, Karpenter가 EC2 직접 관리
 
-**주요 CRD**:
 - **NodePool**: 노드 프로비저닝 정책 정의
 - **EC2NodeClass**: AWS 인프라 설정 (AMI, UserData, Security Group 등)
 
@@ -280,7 +275,6 @@ spec:
 
 **정의**: 서버리스 컨테이너 컴퓨팅 엔진, Pod별 격리된 실행 환경 제공
 
-**주요 특징**:
 - **노드 관리 불필요**: EC2 인스턴스 없이 Pod 직접 실행
 - **보안 격리**: 각 Pod가 독립된 microVM에서 실행
 - **자동 스케일링**: Pod 수만큼 컴퓨팅 리소스 자동 할당

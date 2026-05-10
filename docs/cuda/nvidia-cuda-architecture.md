@@ -20,11 +20,9 @@ graph LR
 
 ### 1. nvcc (NVIDIA CUDA Compiler)
 
-**nvcc란?**
-- CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버
+nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버
 - 내부적으로 여러 단계의 컴파일러를 조율 (host compiler, ptxas, fatbinary)
 
-**주요 역할**:
 1. **코드 분리**:
    - Host 코드 (CPU) → GCC/Clang/MSVC로 컴파일
    - Device 코드 (GPU) → PTX 생성
@@ -61,8 +59,7 @@ nvcc -arch=compute_80 -code=compute_80 -ptx myapp.cu
 
 ### 2. PTX (Parallel Thread Execution)
 
-**PTX란?**
-- CUDA의 **중간 표현(IR, Intermediate Representation)**
+PTX는 CUDA의 **중간 표현(IR, Intermediate Representation)**
 - 가상의 GPU 명령어 집합 (LLVM IR과 유사)
 - 아키텍처 독립적 (portable across GPU architectures)
 
@@ -131,8 +128,7 @@ nvcc -arch=compute_80 -code=compute_80 -ptx myapp.cu
 
 ### 3. SASS (Shader ASSembler)
 
-**SASS란?**
-- GPU의 **실제 기계어 코드** (native machine code)
+SASS는 GPU의 **실제 기계어 코드** (native machine code)
 - 특정 Compute Capability에 특화된 명령어
 - PTX보다 **성능 최적화**, 하지만 **포팅 불가**
 
@@ -169,8 +165,7 @@ ncu --set full --target-processes all myapp
 
 ### 4. fatbin (Fat Binary)
 
-**fatbin이란?**
-- **다중 아키텍처** SASS + PTX를 하나의 바이너리에 포함
+fatbin이는 **다중 아키텍처** SASS + PTX를 하나의 바이너리에 포함
 - 런타임에 현재 GPU에 맞는 코드 선택 실행
 
 **fatbin 구조**:
@@ -225,11 +220,9 @@ cuobjdump -arch sm_80 -sass myapp
 
 ### 5. cuobjdump (CUDA Object Dump)
 
-**cuobjdump란?**
-- CUDA 바이너리 분석 도구 (objdump의 CUDA 버전)
+cuobjdump는 CUDA 바이너리 분석 도구 (objdump의 CUDA 버전)
 - fatbin 내부 구조, PTX, SASS 추출 가능
 
-**주요 사용법**:
 
 ```bash
 # 1. fatbin 아키텍처 목록 확인
@@ -296,8 +289,7 @@ graph TD
 
 ### 1. SM (Streaming Multiprocessor)
 
-**SM이란?**
-- GPU의 **핵심 연산 유닛** (CPU의 코어와 유사)
+SM이는 GPU의 **핵심 연산 유닛** (CPU의 코어와 유사)
 - 독립적으로 warp(32 threads)를 실행
 
 **SM 구성 요소** (Ampere 아키텍처 기준):
@@ -329,8 +321,7 @@ graph TD
 
 ### 2. Compute Capability
 
-**Compute Capability란?**
-- GPU의 **기능 세트 버전** (하드웨어 기능 정의)
+Compute Capability는 GPU의 **기능 세트 버전** (하드웨어 기능 정의)
 - `major.minor` 형식 (예: 8.0, 8.6, 9.0)
 
 **Compute Capability 버전 체계**:
@@ -439,8 +430,7 @@ graph TD
 
 ### 1. NCCL 개요
 
-**NCCL이란?**
-- **다중 GPU 통신 최적화 라이브러리**
+NCCL이는 **다중 GPU 통신 최적화 라이브러리**
 - MPI (Message Passing Interface)의 GPU 버전
 - PyTorch, TensorFlow의 분산 학습 백엔드로 사용
 
@@ -461,8 +451,7 @@ graph TD
 
 ### 2. libnccl.so
 
-**libnccl.so란?**
-- NCCL의 **공유 라이브러리 파일** (Shared Object)
+libnccl.so는 NCCL의 **공유 라이브러리 파일** (Shared Object)
 - PyTorch/TensorFlow가 런타임에 로드
 
 **libnccl.so 위치 확인**:
@@ -504,7 +493,6 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 ### 3. NCCL Operations
 
-**주요 Collective 연산**:
 
 #### AllReduce
 ```python
@@ -547,8 +535,7 @@ mpirun -np 4 ./build/all_reduce_perf -b 8 -e 1G -f 2
 
 ## 🚀 Ray와 CUDA 통합
 
-**Ray란?**
-- **분산 컴퓨팅 프레임워크** (병렬 처리, Actor 모델)
+Ray는 **분산 컴퓨팅 프레임워크** (병렬 처리, Actor 모델)
 - GPU 리소스 스케줄링 지원
 
 **Ray에서 GPU 사용**:
@@ -664,18 +651,6 @@ nvcc -gencode arch=compute_80,code=sm_80 \
 | **AllGather** | 각 GPU: 배치 데이터 | 모든 GPU: 전체 데이터 | 샘플 공유 |
 
 ---
-
-## 마무리
-
-CUDA 컴파일 과정을 살펴보면서 소스 코드가 GPU에서 실행되기까지 여러 단계를 거친다는 걸 알게 되었다. nvcc가 PTX로 변환하고, 이게 다시 SASS로 변환되며, 여러 아키텍처를 지원하려면 fatbin으로 패키징된다. PTX를 포함시키면 미래 GPU에서도 JIT 컴파일로 동작하니 호환성 측면에서 유리하다.
-
-GPU 아키텍처는 SM 단위로 구성되는데, SM 하나에 수십 개의 CUDA Core와 Tensor Core가 들어있고, Shared Memory와 L1 Cache를 공유한다. Compute Capability 숫자만 봐도 어떤 기능을 지원하는지 대략 감이 온다. 7.0이면 Volta(Tensor Core 1세대), 8.0이면 Ampere(TF32 지원), 9.0이면 Hopper(FP8 지원) 이런 식이다.
-
-다중 GPU 학습에서 NCCL은 필수다. PyTorch나 TensorFlow가 내부적으로 libnccl.so를 로드해서 AllReduce 같은 연산을 처리한다. GPU 물리 배치(NVLink로 연결됐는지, PCIe 스위치를 거치는지)에 따라 자동으로 최적화해주니 편하다. NCCL 버전이 안 맞으면 학습이 안 돌아가니 `torch.cuda.nccl.version()`으로 확인하는 습관을 들이는 게 좋다.
-
-cuobjdump는 바이너리 분석할 때 유용하다. 레지스터를 32개 이상 쓰면 occupancy가 떨어지는데, `-res-usage` 옵션으로 금방 확인할 수 있다. SASS를 직접 볼 일은 많지 않지만, 성능 문제가 생기면 Nsight Compute와 함께 써보면 도움이 된다.
-
-Ray 같은 분산 프레임워크에서는 GPU를 리소스로 추상화해서 스케줄링할 수 있다. `@ray.remote(num_gpus=1)` 데코레이터 하나로 GPU 할당이 되고, Ray Train을 쓰면 NCCL 백엔드를 자동으로 설정해준다.
 
 ---
 

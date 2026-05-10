@@ -8,7 +8,7 @@
 
 ## 🔐 RKE2 소개
 
-### 1. RKE2란?
+### 1. RKE2
 
 **RKE2 (RKE Government)** = **Rancher Kubernetes Engine 2**
 
@@ -146,7 +146,6 @@ graph TB
     KUBELET --> COREDNS
 ```
 
-**주요 디렉터리**:
 ```bash
 /var/lib/rancher/rke2/
 ├── agent/              # kubelet, containerd 데이터
@@ -801,7 +800,7 @@ systemctl start rke2-server
 
 ## 🌐 Cluster API (CAPI) 소개
 
-### 1. Cluster API란?
+### 1. Cluster API
 
 **Cluster API (CAPI)** = Kubernetes를 사용하여 Kubernetes 클러스터를 관리하는 프로젝트
 

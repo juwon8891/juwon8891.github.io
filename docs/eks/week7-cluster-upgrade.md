@@ -356,7 +356,6 @@ eksctl get iamidentitymapping --cluster $CLUSTER_NAME
 
 **추가 설명**: AWS 관리 콘솔에서 `964061878287:role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0` admin 권한 확인.
 
-**주요 컴포넌트별 서비스 어카운트**:
 - `kube-system`: `aws-load-balancer-controller`, `ebs-csi-controller`, `aws-efs-csi-driver` 등 사용
 
 #### 3.3 IRSA (IAM Roles for Service Accounts) 확인

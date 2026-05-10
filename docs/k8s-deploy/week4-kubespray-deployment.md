@@ -8,7 +8,7 @@
 
 ## 🎯 Kubespray 소개
 
-### 1. Kubespray란?
+### 1. Kubespray
 
 **Kubespray**는 Ansible 기반의 Kubernetes 클러스터 배포 자동화 도구입니다.
 
@@ -157,7 +157,6 @@ graph TD
     Z --> END[Complete: Cluster Ready]
 ```
 
-**주요 PLAY 목록**:
 
 1. **Check Ansible version** - Ansible 버전 검증
 2. **Inventory setup and validation** - 인벤토리 검증
@@ -203,7 +202,6 @@ graph LR
     D2 --> D2B[group_vars/]
 ```
 
-**주요 디렉터리**:
 
 - **`playbooks/`**: 메인 Playbook 파일들
   - `cluster.yml`: 클러스터 전체 배포
@@ -741,7 +739,6 @@ flannel_interface: eth0
 kubectl apply -f /etc/kubernetes/flannel.yaml
 ```
 
-**주요 CNI 옵션**:
 
 | CNI | 특징 | 네트워크 모드 |
 |-----|------|-------------|
@@ -754,7 +751,6 @@ kubectl apply -f /etc/kubernetes/flannel.yaml
 
 **kubernetes-apps Role**은 다양한 애드온을 설치합니다.
 
-**주요 애드온**:
 
 ```yaml
 # inventory/mycluster/group_vars/k8s_cluster/addons.yml

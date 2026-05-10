@@ -465,7 +465,6 @@ graph LR
 
 ```
 
-**주요 Admission Controllers**:
 - **MutatingAdmissionWebhook**: 요청 변경 (Pod Env 주입 등)
 - **ValidatingAdmissionWebhook**: 요청 검증 (Policy 위반 차단)
 - **PodSecurityAdmission**: Pod 보안 정책 강제

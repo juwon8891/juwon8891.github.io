@@ -404,7 +404,7 @@ kubectl rollout restart deployment argocd-server -n argocd
 
 ## 🔑 Keycloak 소개
 
-### 1. Keycloak이란?
+### 1. Keycloak이
 
 **Keycloak**은 애플리케이션에 초점을 맞춘 오픈 소스 **ID 및 접근(권한) 관리 도구**입니다.
 
@@ -627,7 +627,6 @@ docker logs dev-keycloak -f
 
 **Account Console**은 사용자가 자신의 계정을 관리할 수 있는 인터페이스입니다.
 
-**주요 기능**:
 - 사용자 프로필 업데이트
 - 패스워드 업데이트
 - 2단계 인증 활성화

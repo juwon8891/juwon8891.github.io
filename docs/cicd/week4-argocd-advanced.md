@@ -1282,7 +1282,6 @@ graph LR
 
 ```
 
-**주요 구성 요소**:
 - **Trigger**: 언제 알림을 보낼지 (예: on-sync-failed)
 - **Template**: 알림 메시지 형식
 - **Service**: 알림 채널 (Slack, Email 등)

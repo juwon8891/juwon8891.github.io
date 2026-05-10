@@ -8,11 +8,10 @@
 
 ## 🌐 AWS VPC CNI 소개
 
-### 1. VPC CNI란?
+### 1. VPC CNI
 
 **AWS VPC CNI**는 EKS에서 기본으로 사용하는 Container Network Interface 플러그인입니다.
 
-**주요 특징**:
 - Pod에 VPC IP 주소를 직접 할당
 - AWS Security Group for Pods 지원
 - Overlay Network 없이 Native VPC 라우팅
@@ -433,7 +432,6 @@ iptables -t nat -A AWS-SNAT-CHAIN-0 ! -d <VPC_CIDR> -j SNAT --to-source <NODE_IP
 iptables -t nat -A AWS-SNAT-CHAIN-0 ! -d 192.168.0.0/16 -j SNAT --to-source 192.168.1.10
 ```
 
-**주요 규칙**:
 - `! -d 192.168.0.0/16`: VPC CIDR 외부 트래픽만
 - `-j SNAT --to-source 192.168.1.10`: Node IP로 변환
 
@@ -1068,7 +1066,6 @@ graph TB
 
 ```
 
-**주요 Ingress Controller**:
 - **AWS ALB Ingress Controller** (AWS Load Balancer Controller)
 - **NGINX Ingress Controller**
 - **Traefik**
@@ -1141,7 +1138,7 @@ sequenceDiagram
 
 ## 🌐 ExternalDNS
 
-### 1. ExternalDNS란?
+### 1. ExternalDNS
 
 **ExternalDNS**는 Kubernetes Service/Ingress를 Route53에 자동 등록합니다.
 

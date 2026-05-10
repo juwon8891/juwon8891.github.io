@@ -674,7 +674,6 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-**주요 플래그**:
 | 플래그 | 설명 |
 |--------|------|
 | `--name` | etcd 멤버 이름 (클러스터 내 고유) |
@@ -1129,7 +1128,6 @@ ExecStart=/usr/local/bin/kubelet \
   --v=2
 ```
 
-**주요 특징**:
 - **Webhook 인증/인가**: kube-apiserver에 위임하여 SA 토큰, bootstrap 토큰 처리
 - **TLS 서버**: apiserver가 kubelet API에 접근하기 위해 필요 (포트 10250)
 - **cgroupDriver=systemd**: containerd와 일치시켜야 함 (불일치 시 Pod 생성 실패)

@@ -103,7 +103,6 @@ kubectl rolesum vault -n vault
 
 **ServiceAccount**는 Pod에서 실행되는 애플리케이션 프로세스에 대한 식별자를 제공합니다.
 
-**주요 특징**:
 - ✅ Pod 내부 애플리케이션 프로세스가 자신에게 부여된 SA 식별자로 K8S API 서버 인증
 - ✅ kubelet이 kube-apiserver로부터 TokenRequest API를 통해 토큰 발급
 - ✅ 토큰은 Pod 삭제 시 또는 수명 주기 이후 만료 (기본 1시간)
@@ -1253,7 +1252,6 @@ func main() {
 
 **MCP Server**는 AI Agent가 외부 시스템과 통신하기 위한 프로토콜입니다.
 
-**주요 과제**:
 - ❌ AI Agent별로 개별 시크릿(Token, Password) 관리 필요
 - ❌ 시크릿 유출 시 범위가 넓어 보안 위험 증가
 - ❌ 시크릿 Rotation 시 모든 Agent 재설정 필요
@@ -1331,7 +1329,6 @@ graph TB
 
 **참고 리포지토리**: [mcp-remote-vault-demo](https://github.com/Great-Stone/mcp-remote-vault-demo)
 
-**주요 구성 요소**:
 
 **1. Agent별 AppRole 생성**:
 

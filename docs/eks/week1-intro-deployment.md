@@ -8,7 +8,7 @@
 
 ## ☁️ Amazon EKS 소개
 
-### 1. Amazon EKS란?
+### 1. Amazon EKS
 
 **Amazon EKS (Elastic Kubernetes Service)**
 
@@ -1055,7 +1055,6 @@ Outbound:
 
 **EKS Auto Mode**는 **2025년 출시**된 새로운 클러스터 관리 모드입니다.
 
-**주요 특징**:
 - **완전 관리형**: Control Plane + **Data Plane + Add-ons**까지 자동 관리
 - **Karpenter** 자동 설치: 노드 자동 스케일링
 - **EBS CSI Driver** 자동 설치: 스토리지 자동 프로비저닝
@@ -1138,7 +1137,6 @@ aws eks create-cluster \
 
 **Cluster Insights**는 **업그레이드 가능 여부**를 분석하고 권장사항을 제공합니다.
 
-**주요 기능**:
 - **Deprecated API 감지**: Kubernetes 버전 업그레이드 시 제거되는 API 사용 여부 확인
 - **호환성 검사**: 현재 클러스터에서 사용 중인 리소스가 다음 버전에서 호환되는지 확인
 - **권장사항 제공**: 업그레이드 전 수정해야 할 사항 안내
@@ -1166,7 +1164,6 @@ aws eks list-insights \
 
 **EKS Global Dashboard**는 **모든 리전의 클러스터를 한눈에 확인**할 수 있습니다.
 
-**주요 기능**:
 - **Cross-Region 클러스터 목록**: 모든 리전의 클러스터 상태 확인
 - **버전 분포**: Kubernetes 버전별 클러스터 수
 - **업그레이드 상태**: 업그레이드 필요 클러스터 표시
@@ -1175,7 +1172,6 @@ aws eks list-insights \
 
 **Enhanced Container Network Observability**는 **Pod 간 네트워크 흐름을 시각화**합니다.
 
-**주요 기능**:
 - **Pod-to-Pod 통신 흐름**: VPC Flow Monitor 통합
 - **DNS 쿼리 추적**: 실패한 DNS 쿼리 분석
 - **Network Performance**: 레이턴시, 패킷 드롭 모니터링

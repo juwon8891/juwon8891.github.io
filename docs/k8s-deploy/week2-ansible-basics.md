@@ -21,7 +21,6 @@
 
 Ansible은 **오픈소스 자동화 도구**로, 서버 구성, 애플리케이션 배포, 태스크 자동화를 간편하게 수행할 수 있습니다.
 
-**주요 특징**:
 - **Agentless**: Managed Node에 에이전트 설치 불필요 (SSH 기반)
 - **Idempotent**: 동일한 플레이북을 여러 번 실행해도 결과가 동일
 - **Easy to Use**: YAML 문법으로 선언적 구성
@@ -282,7 +281,6 @@ user:
 
 Facts는 Ansible이 Managed Node로부터 자동으로 수집하는 **시스템 정보**입니다.
 
-**주요 Facts**:
 - `ansible_facts['hostname']`: 호스트명
 - `ansible_facts['os_family']`: OS 계열 (Debian, RedHat 등)
 - `ansible_facts['distribution']`: 배포판 (Ubuntu, CentOS 등)
@@ -447,7 +445,6 @@ EOT
 
 Ansible 2.5 이전에는 `with_*` 접두사를 사용한 반복문을 사용했습니다. 현재는 권장되지 않지만, 기존 플레이북 분석 시 알아두면 유용합니다.
 
-**주요 with_ 키워드**:
 
 | 키워드 | 설명 | loop 대체 |
 |--------|------|-----------|

@@ -58,7 +58,6 @@ end
 
 #### (1) admin-lb.sh - Kubespray 실행 노드
 
-**주요 작업**:
 
 ```bash
 #!/bin/bash
@@ -158,7 +157,6 @@ curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
 
 #### (2) init-cfg.sh - K8s 노드 초기화
 
-**주요 작업**:
 
 ```bash
 #!/bin/bash
@@ -239,7 +237,6 @@ kube_control_plane
 kube_node
 ```
 
-**주요 그룹**:
 - ✅ **kube_control_plane**: API Server, Scheduler, Controller-Manager
 - ✅ **etcd**: etcd 클러스터 노드
 - ✅ **kube_node**: kubelet, kube-proxy 실행 노드 (Control Plane도 포함)
@@ -1062,7 +1059,6 @@ ssh k8s-node1 poweroff
 open "http://192.168.10.10:9000/haproxy_stats"
 ```
 
-**주요 지표**:
 - ✅ **Backend Status**: k8s-node1~3의 Health Check 상태
 - ✅ **Session Rate**: 초당 요청 수
 - ✅ **Total Sessions**: 총 세션 수
@@ -1073,7 +1069,6 @@ open "http://192.168.10.10:9000/haproxy_stats"
 curl http://192.168.10.10:8405/metrics
 ```
 
-**주요 메트릭**:
 ```
 haproxy_backend_up{backend="kube-apiserver-backend"} 3
 haproxy_server_up{server="k8s-node1"} 1

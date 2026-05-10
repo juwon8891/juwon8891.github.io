@@ -1,0 +1,51 @@
+/* Mermaid dark theme override */
+.mermaid {
+  /* Force dark background for all diagrams */
+  background-color: transparent !important;
+}
+
+/* Dark mode Mermaid colors */
+[data-md-color-scheme="slate"] .mermaid .node rect,
+[data-md-color-scheme="slate"] .mermaid .node circle,
+[data-md-color-scheme="slate"] .mermaid .node ellipse,
+[data-md-color-scheme="slate"] .mermaid .node polygon,
+[data-md-color-scheme="slate"] .mermaid .cluster rect {
+  fill: #1e2124 !important;
+  stroke: #666 !important;
+}
+
+[data-md-color-scheme="slate"] .mermaid .node .label,
+[data-md-color-scheme="slate"] .mermaid text,
+[data-md-color-scheme="slate"] .mermaid .nodeLabel,
+[data-md-color-scheme="slate"] .mermaid .edgeLabel {
+  color: #ddd !important;
+  fill: #ddd !important;
+}
+
+[data-md-color-scheme="slate"] .mermaid .edgePath .path,
+[data-md-color-scheme="slate"] .mermaid .flowchart-link {
+  stroke: #888 !important;
+}
+
+[data-md-color-scheme="slate"] .mermaid .marker {
+  fill: #888 !important;
+  stroke: #888 !important;
+}
+
+/* Light mode - keep readable */
+[data-md-color-scheme="default"] .mermaid .node rect,
+[data-md-color-scheme="default"] .mermaid .node circle,
+[data-md-color-scheme="default"] .mermaid .node ellipse,
+[data-md-color-scheme="default"] .mermaid .node polygon,
+[data-md-color-scheme="default"] .mermaid .cluster rect {
+  fill: #f5f5f5 !important;
+  stroke: #666 !important;
+}
+
+[data-md-color-scheme="default"] .mermaid .node .label,
+[data-md-color-scheme="default"] .mermaid text,
+[data-md-color-scheme="default"] .mermaid .nodeLabel,
+[data-md-color-scheme="default"] .mermaid .edgeLabel {
+  color: #333 !important;
+  fill: #333 !important;
+}

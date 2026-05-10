@@ -71,8 +71,8 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/juwon8891
 
-extra_javascript:
-  - javascripts/mermaid-zoom.js
+extra_css:
+  - stylesheets/extra.css
 
 nav:
   - Home: index.md

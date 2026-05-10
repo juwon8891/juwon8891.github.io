@@ -1,57 +1,11 @@
 
 # [EKS] Week 7 - EKS Cluster In-place Upgrades (1.30 → 1.31)
 
+
 > **Week 7 학습 주제**: EKS 클러스터를 안전하게 업그레이드하는 전략과 실습. Control Plane, Add-on, Nodes를 순차적으로 업그레이드하며 HA 전략(PDB, TopologySpread)을 적용합니다.
 
 ---
 
-## 🎯 Week 7 학습 목표
-
-### 1. 학습 목표
-
-**Week 7**에서는 EKS 클러스터를 안전하게 업그레이드하는 전략과 실습을 진행합니다.
-
-**이번 주 핵심 학습 포인트**:
-- ✅ EKS Upgrade Insights로 업그레이드 사전 점검
-- ✅ Control Plane → Add-on → Nodes 순차 업그레이드
-- ✅ 관리형 노드그룹 업그레이드 (In-Place vs Blue-Green)
-- ✅ Karpenter 노드 자동 업그레이드
-- ✅ PodDisruptionBudgets(PDB)로 가용성 보장
-- ✅ TopologySpreadConstraints로 Pod 분산 배치
-- ✅ ArgoCD GitOps로 샘플 애플리케이션 배포
-
-**왜 EKS 업그레이드를 배우는가?**
-- **보안**: Kubernetes 버전별 취약점 패치 필수
-- **기능**: 신규 API 및 기능 사용 (Deprecated API 제거)
-- **지원**: AWS EKS는 최신 3개 버전만 지원 (n, n-1, n-2)
-
-### 2. 실습 환경 구성
-
-#### EKS 클러스터 정보
-
-| 항목 | 값 |
-|------|-----|
-| **리전** | us-west-2 (오리건) |
-| **Kubernetes 버전** | 1.30 → 1.31 업그레이드 |
-| **노드 OS** | Amazon Linux 2023 |
-| **커널** | 6.1 |
-| **Container Runtime** | containerd 2.2.1 |
-
-#### 노드 구성
-
-| 노드 타입 | 이름 | 설명 |
-|----------|------|------|
-| **관리형 노드그룹** | blue-mng (initial) | 초기 노드그룹 |
-| **셀프 노드그룹** | default-selfmng | 수동 관리 노드그룹 |
-| **파게이트 프로파일** | fp-profile | 서버리스 컴퓨팅 |
-| **카펜터 노드** | default-spot | Spot 인스턴스 자동 프로비저닝 |
-
-#### 주요 컴포넌트
-
-- **kube-ops-view**: 클러스터 시각화 도구
-- **ArgoCD**: GitOps 기반 배포 도구
-- **Sample Application**: UI, Orders, Checkout, Carts, Catalog, Assets
-- **AWS CodeCommit**: GitOps 저장소
 
 ---
 
@@ -1088,76 +1042,6 @@ graph TB
 
 ---
 
-## 🎓 Week 7 학습 정리
-
-### 학습한 내용
-
-**EKS Cluster Upgrades**:
-1. ✅ EKS Upgrade Insights로 사전 점검 (6가지 항목)
-2. ✅ Control Plane 업그레이드 (eksctl, AWS 콘솔, AWS CLI, Terraform)
-3. ✅ Add-on 업그레이드 (CoreDNS, kube-proxy, VPC CNI, EBS CSI Driver)
-4. ✅ 관리형 노드그룹 업그레이드 (In-Place vs Blue-Green)
-5. ✅ 카펜터 노드 자동 업그레이드
-6. ✅ 셀프 노드그룹 업그레이드 (ASG Launch Template)
-7. ✅ 파게이트 프로파일 업그레이드 (Pod 재시작)
-8. ✅ PodDisruptionBudgets(PDB)로 가용성 보장
-9. ✅ TopologySpreadConstraints로 Pod 분산 배치
-10. ✅ ArgoCD GitOps로 샘플 애플리케이션 배포
-
-**HA 전략**:
-1. ✅ PDB로 계획된 중단 시 최소 가용 Pod 수 보장
-2. ✅ TopologySpreadConstraints로 AZ 분산 배치
-3. ✅ kube-ops-view로 실시간 모니터링
-
-### 실습 성과
-
-**Control Plane 업그레이드**:
-- Terraform을 사용하여 EKS 1.30 → 1.31 업그레이드 (10분 소요)
-- Upgrade Insights로 사전 점검 완료
-
-**Add-on 업그레이드**:
-- CoreDNS, kube-proxy, VPC CNI, EBS CSI Driver 업그레이드 (2분 소요)
-
-**Nodes 업그레이드**:
-- 관리형 노드그룹 In-Place 업그레이드
-- 관리형 노드그룹 Blue-Green 업그레이드 (30분 소요)
-- 카펜터 노드 자동 업그레이드
-- 셀프 노드그룹 ASG Launch Template 업데이트
-- 파게이트 프로파일 Pod 재시작
-
-**HA 전략 적용**:
-- orders 애플리케이션에 PDB 설정 (minAvailable: 1)
-- TopologySpreadConstraints로 Pod AZ 분산 배치
-
-### 핵심 개념
-
-**EKS 업그레이드의 핵심**:
-- **순차 업그레이드**: Control Plane → Add-on → Nodes
-- **한 버전씩**: 1.30 → 1.31 (두 버전 점프 불가)
-- **되돌릴 수 없음**: 업그레이드 전 충분한 검증 필수
-- **Terraform 권장**: IaC로 재현 가능한 업그레이드
-
-**HA 전략의 핵심**:
-- **PDB**: 최소 가용 Pod 수 보장 (계획된 중단 시)
-- **TopologySpreadConstraints**: AZ 분산 배치 (장애 대응)
-- **모니터링**: kube-ops-view, CloudWatch로 실시간 확인
-
-### 마무리
-
-**Week 7**에서는 EKS 클러스터를 안전하게 업그레이드하는 전략과 실습을 진행했습니다.
-
-**핵심 요약**:
-- **Upgrade Insights**로 사전 점검하여 잠재적 문제 파악
-- **Control Plane → Add-on → Nodes** 순차 업그레이드
-- **PDB + TopologySpreadConstraints**로 가용성 보장
-- **Terraform**으로 재현 가능한 업그레이드 구현
-- **In-Place vs Blue-Green** 전략 이해 및 실습
-
-**실무 적용**:
-- 프로덕션 EKS 클러스터 업그레이드 시 본 실습의 HA 전략 적용
-- Terraform을 사용하여 업그레이드 자동화
-- Upgrade Insights를 활용한 사전 점검 필수
-- PDB와 TopologySpreadConstraints로 무중단 업그레이드 구현
 
 ---
 

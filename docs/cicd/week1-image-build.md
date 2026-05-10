@@ -61,6 +61,7 @@ timeline
 
 GitOps는 Git 저장소를 **단일 소스(Single Source of Truth)**로 사용하여 인프라를 코드로 제공하는 방법론 및 관행입니다.
 
+
 > GitOps is a methodology and practice that uses **Git repositories** as a **single source of truth** to deliver infrastructure as code.
 
 ```mermaid
@@ -424,6 +425,7 @@ flowchart TB
 #### 원칙 1: 선언적 (Declarative)
 
 **정의:**
+
 > GitOps로 관리되는 시스템은 **원하는 상태(Desired State)**를 선언적으로 표현해야 한다.
 
 **선언적 시스템의 특징:**
@@ -474,6 +476,7 @@ spec:
 #### 원칙 2: 비전 및 불변성 (Versioned and Immutable)
 
 **정의:**
+
 > 상태 관리에는 **불변성(Immutable)** 원칙과 **버전 관리(Versioning)** 방법론을 적용한다. 버전 변경 이력은 완벽하게 유지해야 한다.
 
 **Git을 통한 버전 관리:**
@@ -527,6 +530,7 @@ git tag -a prod-2024-01-15 -m "Production snapshot"
 #### 원칙 3: 자동 반영 (Pulled Automatically)
 
 **정의:**
+
 > 배포 환경에 설치된 **소프트웨어 에이전트**가 원하는 상태에 대한 선언적 표현을 Git 저장소에서 **자동으로 끌어온다(Pull)**.
 
 **Pull vs Push 모델 비교:**
@@ -574,6 +578,7 @@ spec:
 #### 원칙 4: 지속적 조정 (Continuously Reconciled)
 
 **정의:**
+
 > 소프트웨어 에이전트는 실제 시스템 상태를 **계속 관찰**하고 **원하는 상태**에 맞도록 변경한다.
 
 **Reconciliation Loop (조정 루프):**
@@ -1423,6 +1428,7 @@ graph LR
     style GITOPS fill:#87CEEB
 ```
 
+
 > As DevOps is complementary to Agile software development, **GitOps is complementary to DevOps** for infrastructure automation and application lifecycle management.
 
 #### 7.2 각 방법론의 특징
@@ -1808,9 +1814,12 @@ graph TB
     end
 ```
 
+
 > **중요**: kubectl은 kube-apiserver의 **한 버전 차이(older or newer)**까지 지원됩니다.
 >
+
 > - kube-apiserver가 1.32라면
+
 > - kubectl 1.31, 1.32, 1.33 모두 지원됨
 
 #### 3.5 Kind 클러스터 생성
@@ -2660,6 +2669,7 @@ skopeo copy \
 
 **Buildpacks의 철학:**
 
+
 > "**Dockerfile을 작성하지 않아도** 소스 코드만으로 프로덕션 준비된 컨테이너 이미지를 생성"
 
 ```mermaid
@@ -3423,76 +3433,6 @@ graph TB
 
 ---
 
-## 📚 참고 자료 및 추가 학습
-
-### 공식 문서
-
-**GitOps:**
-- [OpenGitOps](https://opengitops.dev/) - GitOps 공식 표준
-- [Argo CD Documentation](https://argo-cd.readthedocs.io/)
-- [Flux Documentation](https://fluxcd.io/docs/)
-
-**컨테이너 레지스트리:**
-- [Docker Hub](https://hub.docker.com/)
-- [Quay.io](https://quay.io/)
-- [GitHub Container Registry](https://ghcr.io/)
-
-**Kubernetes:**
-- [Kind](https://kind.sigs.k8s.io/)
-- [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-
-### 빌드 도구
-
-**Docker:**
-- [Docker Documentation](https://docs.docker.com/)
-- [Dockerfile Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
-
-**Jib:**
-- [Jib GitHub](https://github.com/GoogleContainerTools/jib)
-- [Jib Documentation](https://github.com/GoogleContainerTools/jib/tree/master/docs)
-
-**Buildah:**
-- [Buildah](https://buildah.io/)
-- [Buildah Tutorial](https://github.com/containers/buildah/blob/main/docs/tutorials/01-intro.md)
-
-**Podman:**
-- [Podman](https://podman.io/)
-- [Podman Getting Started](https://podman.io/getting-started/)
-
-**Cloud Native Buildpacks:**
-- [Buildpacks.io](https://buildpacks.io/)
-- [Paketo Buildpacks](https://paketo.io/)
-
-**Shipwright:**
-- [Shipwright](https://shipwright.io/)
-- [Shipwright Documentation](https://shipwright.io/docs/)
-
-**Kaniko:**
-- [Kaniko GitHub](https://github.com/GoogleContainerTools/kaniko)
-
-### Kustomize
-
-- [Kustomize](https://kustomize.io/)
-- [Kustomize Documentation](https://kubectl.docs.kubernetes.io/references/kustomize/)
-- [Kustomize Examples](https://github.com/kubernetes-sigs/kustomize/tree/master/examples)
-
-### 추천 영상
-
-- [궁극의 CI 환경을 만들기 위한 여정 | 2024 당근 테크 밋업](https://www.youtube.com/watch?v=example)
-
-### 학습 블로그 및 튜토리얼
-
-- [Building OCI Images Without Docker](https://blog.example.com)
-- [Jib vs Docker: Performance Comparison](https://blog.example.com)
-- [Buildah Tutorial Series](https://blog.example.com)
-- [Cloud Native Buildpacks 시작하기](https://blog.example.com)
-- [Kustomize Best Practices](https://blog.example.com)
-
-### 실습 저장소
-
-- [GitOps Cookbook](https://github.com/gitops-cookbook/chapters)
-- [Argo CD Examples](https://github.com/argoproj/argocd-example-apps)
-- [Flux2 Examples](https://github.com/fluxcd/flux2-kustomize-helm-example)
 
 ---
 

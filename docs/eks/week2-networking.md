@@ -1,71 +1,11 @@
 
 # [EKS] Week 2 - EKS Networking
 
+
 > **Week 2 학습 주제**: Amazon EKS의 네트워킹 구조를 깊이 이해하고, VPC CNI, Service, LoadBalancer, Ingress, ExternalDNS 등 네트워크 관련 핵심 기능을 학습합니다.
 
 ---
 
-## 🎯 Week 2 학습 목표
-
-### 1. 학습 목표
-
-**Week 2**에서는 Amazon EKS의 네트워킹 구조와 핵심 개념을 학습합니다.
-
-**이번 주 핵심 학습 포인트**:
-- ✅ AWS VPC CNI 플러그인의 동작 원리 이해
-- ✅ Secondary IP mode vs Prefix Delegation mode 비교
-- ✅ Pod 간 통신 흐름 및 라우팅 메커니즘
-- ✅ Kubernetes Service 종류 및 동작 원리
-- ✅ kube-proxy 모드 (iptables, IPVS, eBPF/XDP) 이해
-- ✅ AWS Load Balancer Controller 활용
-- ✅ Ingress Controller와 ALB 연동
-- ✅ ExternalDNS를 통한 DNS 자동화
-
-**왜 EKS Networking이 중요한가?**
-- **VPC Native**: Pod가 VPC IP를 직접 할당받아 AWS 서비스와 직접 통신
-- **보안 그룹 지원**: Pod 단위로 AWS Security Group 적용 가능
-- **성능**: Overlay Network 없이 직접 라우팅으로 낮은 Latency
-- **AWS 통합**: ELB, Route53, CloudWatch와 완벽한 통합
-
-### 2. 실습 환경 배포
-
-#### Terraform을 이용한 EKS 클러스터 배포
-
-```bash
-# 코드 다운로드
-git clone https://github.com/gasida/aews.git
-cd aews/2w
-
-# Terraform 변수 확인
-cat <<EOF > terraform.tfvars
-KeyName = "$AWS_KEY_PAIR"
-MyIAMUser = "<본인 IAM 사용자명>"
-SgIngressSshCidr = "$(curl -s ipinfo.io/ip)/32"
-EOF
-
-# Terraform 배포
-terraform init
-terraform apply -auto-approve
-
-# kubeconfig 설정
-aws eks update-kubeconfig --region ap-northeast-2 --name myeks --kubeconfig ~/.kube/config
-```
-
-#### 배포된 리소스 확인
-
-```bash
-# EKS 클러스터 확인
-eksctl get cluster
-
-# 노드 확인
-kubectl get nodes -o wide
-
-# VPC CNI 버전 확인
-kubectl get ds aws-node -n kube-system -o json | jq -r '.spec.template.spec.containers[0].image'
-
-# kube-proxy 버전 확인
-kubectl get ds kube-proxy -n kube-system -o json | jq -r '.spec.template.spec.containers[0].image'
-```
 
 ---
 
@@ -1372,47 +1312,6 @@ graph TB
 
 ---
 
-## 🎓 Week 2 학습 정리
-
-### 이번 주 핵심 요약
-
-**1. AWS VPC CNI**
-- EKS는 VPC CNI를 기본 사용
-- Pod가 VPC IP를 직접 할당받아 Native 성능
-- Secondary IP mode vs Prefix Delegation mode
-
-**2. IP 주소 관리**
-- WARM_ENI_TARGET, WARM_IP_TARGET, MINIMUM_IP_TARGET 설정
-- maxPods 계산: ENI × (IP/ENI - 1) + 2
-- Prefix Delegation 시 최대 16배 증가
-
-**3. Service 종류**
-- ClusterIP: 내부 통신
-- NodePort: 외부 접근 (NodeIP:Port)
-- LoadBalancer: AWS ELB 연동
-- ExternalName: 외부 도메인 참조
-
-**4. kube-proxy 모드**
-- iptables: 기본 모드, 안정적
-- IPVS: 대규모 클러스터, Hash Table 기반
-- eBPF/XDP: 극한 성능, Kernel 우회
-
-**5. AWS LoadBalancer Controller**
-- Instance mode vs IP mode
-- IRSA (IAM Roles for Service Accounts)
-- NLB/ALB 자동 생성
-
-**6. Ingress & ExternalDNS**
-- ALB Ingress Controller로 L7 라우팅
-- ExternalDNS로 Route53 자동 등록
-
-### 다음 주 예고
-
-**Week 3 학습 주제** (예정):
-- EKS Storage (EBS, EFS, FSx)
-- StatefulSet과 Persistent Volume
-- CSI Driver
-- Snapshot과 Backup
 
 ---
 

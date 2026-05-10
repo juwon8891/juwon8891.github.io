@@ -1,50 +1,11 @@
 
 # [K8s-Deploy] Week 5 - Kubespray HA & Upgrade
 
+
 > **고가용성 Kubernetes 클러스터 운영**: Kubespray를 활용한 HA 구성, API 엔드포인트 전략, 노드 관리 및 클러스터 업그레이드
 
 ---
 
-## 🎯 Week 5 학습 목표
-
-### 1. 핵심 주제
-
-Week 5에서는 **Kubespray를 활용한 고가용성(HA) Kubernetes 클러스터 구성 및 운영**을 학습합니다.
-
-**주요 학습 포인트**:
-- ✅ **HA 클러스터 구성**: 3-Node Control Plane, 2-Node Worker
-- ✅ **API 엔드포인트 전략**: Client-Side LB vs External LB
-- ✅ **노드 라이프사이클 관리**: 추가(scale), 제거(remove-node), 리셋(reset)
-- ✅ **장애 시나리오**: Control Plane 노드 장애 시 동작 확인
-- ✅ **LoadBalancing**: HAProxy, Nginx, Kube-VIP 비교
-- ✅ **모니터링**: kube-ops-view, HAProxy 통계
-
-### 2. 실습 환경
-
-**가상머신 구성** (Case2: External LB + HA Control Plane):
-
-| 호스트명 | 역할 | CPU | RAM | IP 주소 |
-|----------|------|-----|-----|----------|
-| admin-lb | Kubespray 실행, API LB | 2 | 1GB | 192.168.10.10 |
-| k8s-node1 | Control Plane | 4 | 2GB | 192.168.10.11 |
-| k8s-node2 | Control Plane | 4 | 2GB | 192.168.10.12 |
-| k8s-node3 | Control Plane | 4 | 2GB | 192.168.10.13 |
-| k8s-node4 | Worker | 4 | 2GB | 192.168.10.14 |
-| k8s-node5 | Worker | 4 | 2GB | 192.168.10.15 |
-
-**소프트웨어 버전**:
-- **OS**: Rocky Linux 10.0
-- **Kubernetes**: v1.32.9
-- **Kubespray**: v2.29.1
-- **Containerd**: v2.1.5
-- **etcd**: v3.5.25
-- **Python**: 3.12.9
-
-**네트워크 설정**:
-- **Pod CIDR**: 10.233.64.0/18
-- **Service CIDR**: 10.233.0.0/18
-- **CNI**: Flannel
-- **Kube Proxy Mode**: iptables
 
 ---
 
@@ -829,6 +790,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
 **프롬프트**:
 ```
 Are you sure you want to remove node k8s-node5? (yes/no)
+
 > yes
 ```
 
@@ -973,6 +935,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v reset.yml
 **프롬프트**:
 ```
 Are you sure you want to reset the entire cluster? (yes/no)
+
 > yes
 ```
 
@@ -1754,21 +1717,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
 
 ---
 
-## 🎓 Week 5 학습 정리
-
-### 1. 핵심 개념 요약
-
-#### (1) Kubespray HA 구성
-
-**3가지 API 엔드포인트 전략**:
-- ✅ **Case 1**: Client-Side LB (Nginx Static Pod) - 외부 LB 불필요
-- ✅ **Case 2**: External LB + Client-Side LB - 이중 장애 보호
-- ✅ **Case 3**: External LB Only - 중앙 집중식 관리
-
-**선택 기준**:
-- **On-Premise**: Case 1 (Client-Side LB)
-- **Cloud**: Case 3 (External LB - AWS ELB, GCP LB)
-- **하이브리드**: Case 2 (이중 보호)
 
 ---
 

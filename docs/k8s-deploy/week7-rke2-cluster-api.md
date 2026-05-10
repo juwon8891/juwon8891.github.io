@@ -1,60 +1,11 @@
 
 # [K8s-Deploy] Week 7 - RKE2 & Cluster API
 
+
 > **Week 7 학습 주제**: Rancher Government의 보안 강화 Kubernetes 배포판 RKE2와 선언적 클러스터 관리를 위한 Cluster API를 학습합니다.
 
 ---
 
-## 🎯 Week 7 학습 목표
-
-### 1. 학습 목표
-
-**Week 7**에서는 프로덕션 환경에서 사용 가능한 Kubernetes 배포판과 클러스터 관리 도구를 학습합니다.
-
-**이번 주 핵심 학습 포인트**:
-- ✅ RKE2의 보안 강화 기능과 특징 이해
-- ✅ RKE2 Server/Agent 아키텍처 구성
-- ✅ RKE2 클러스터 설치 및 구성
-- ✅ RKE2 업그레이드 전략 (수동 vs 자동)
-- ✅ Cluster API를 통한 선언적 클러스터 관리
-- ✅ Management Cluster와 Workload Cluster 개념
-- ✅ Infrastructure Provider를 통한 멀티 클라우드 지원
-
-**왜 RKE2와 Cluster API를 배우는가?**
-- **RKE2**: FIPS 140-2, CIS Benchmark 준수가 필요한 보안 강화 환경
-- **Cluster API**: GitOps 기반 선언적 클러스터 관리 및 멀티 클라우드 환경
-
-### 2. 실습 환경 구성
-
-#### RKE2 실습 환경
-
-**가상머신 구성** (VirtualBox, Ubuntu 22.04):
-
-| 호스트명 | IP 주소 | 역할 | vCPU | Memory |
-|---------|---------|------|------|--------|
-| rke2-server1 | 192.168.56.11 | Server (Control Plane) | 2 | 4GB |
-| rke2-server2 | 192.168.56.12 | Server (Control Plane) | 2 | 4GB |
-| rke2-server3 | 192.168.56.13 | Server (Control Plane) | 2 | 4GB |
-| rke2-agent1 | 192.168.56.21 | Agent (Worker) | 2 | 4GB |
-| rke2-agent2 | 192.168.56.22 | Agent (Worker) | 2 | 4GB |
-
-**네트워크 대역**:
-- Cluster CIDR (Pod Network): 10.42.0.0/16
-- Service CIDR: 10.43.0.0/16
-
-#### Cluster API 실습 환경
-
-**가상머신 구성**:
-
-| 호스트명 | IP 주소 | 역할 | vCPU | Memory |
-|---------|---------|------|------|--------|
-| capi-mgmt | 192.168.56.100 | Management Cluster | 2 | 4GB |
-
-**컴포넌트 버전**:
-- RKE2: v1.28.x
-- Cluster API: v1.6.x
-- clusterctl: v1.6.x
-- Docker Provider: v1.6.x
 
 ---
 
@@ -1359,63 +1310,6 @@ spec:
 
 ---
 
-## 🎓 Week 7 학습 정리
-
-### 학습한 내용
-
-**RKE2**:
-1. ✅ RKE2의 보안 강화 기능 (FIPS, CIS, SELinux/AppArmor)
-2. ✅ Server/Agent 아키텍처 이해
-3. ✅ 간편한 설치 및 구성 (스크립트 한 줄)
-4. ✅ Embedded etcd를 사용한 HA 구성
-5. ✅ CNI 선택 (Canal, Cilium, Calico)
-6. ✅ System Upgrade Controller를 통한 자동 업그레이드
-7. ✅ 인증서 자동 관리
-
-**Cluster API**:
-1. ✅ Management vs Workload Cluster 개념
-2. ✅ 선언적 클러스터 관리 (Infrastructure as Code)
-3. ✅ 멀티 클라우드 지원 (AWS, Azure, GCP, vSphere)
-4. ✅ clusterctl을 통한 Provider 관리
-5. ✅ 클러스터 생성, 스케일링, 업그레이드, 삭제
-6. ✅ MachineDeployment, KubeadmControlPlane 리소스
-7. ✅ GitOps 워크플로 통합
-
-### 실습 성과
-
-**RKE2**:
-- HA Server 클러스터 (3 Servers + 2 Agents) 구축
-- Cilium CNI 적용
-- System Upgrade Controller로 자동 업그레이드
-- CIS Profile 적용 및 검증
-
-**Cluster API**:
-- Kind로 Management Cluster 구성
-- Docker Provider로 Workload Cluster 생성
-- Worker 노드 스케일링 (2 → 5)
-- Control Plane HA 구성 (1 → 3)
-- Kubernetes 버전 업그레이드 (v1.28.0 → v1.29.0)
-
-### 핵심 개념
-
-**RKE2의 핵심**:
-- **보안 우선**: FIPS, CIS 기본 준수
-- **간편함**: 스크립트 한 줄로 설치
-- **프로덕션 준비**: HA, 자동 업그레이드, 인증서 관리
-
-**Cluster API의 핵심**:
-- **선언적**: YAML로 클러스터 정의
-- **GitOps**: Git = Single Source of Truth
-- **멀티 클라우드**: 동일한 API, 다양한 인프라
-- **Self-Service**: 개발자가 직접 클러스터 생성/관리
-
-### 다음 주 학습 예고
-
-다음 주차에서는 다음 주제를 다룰 예정입니다:
-- Kubernetes 모니터링 및 로깅
-- Prometheus, Grafana 스택
-- EFK/ELK 스택
-- 분산 추적 (Jaeger, Tempo)
 
 ---
 

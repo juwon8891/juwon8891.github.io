@@ -1,6 +1,7 @@
 
 # [K8s-Deploy] Week 4 - Kubespray 배포 분석
 
+
 > **Ansible 기반 K8s 배포 자동화**: Kubespray를 활용한 프로덕션급 Kubernetes 클러스터 배포 및 내부 동작 분석
 
 ---
@@ -1369,90 +1370,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
 
 ---
 
-## 🎓 Week 4 학습 정리
-
-### 핵심 학습 내용
-
-**1. Kubespray 이해**:
-- ✅ Ansible 기반 K8s 배포 자동화 도구
-- ✅ 559개 Task를 통한 완전한 클러스터 구축
-- ✅ 프로덕션급 Best Practice 자동 적용
-
-**2. 전체 배포 흐름**:
-- ✅ 15개 PLAY를 통한 단계별 배포
-- ✅ Role 의존성 및 실행 순서 이해
-- ✅ 사전 검증 → Bootstrap → Container Engine → etcd → K8s → CNI → 애드온
-
-**3. Container Engine 설치**:
-- ✅ Containerd, Runc, CNI Plugins 설치
-- ✅ Registry 미러 설정 (certs.d 구조)
-- ✅ Systemd Cgroup 활성화
-
-**4. etcd 구성**:
-- ✅ etcd_deployment_type: host (systemd) vs kubeadm (Static Pod)
-- ✅ etcd 인증서 체계 (CA, Member, Admin, Node)
-- ✅ systemd unit으로 etcd 관리
-
-**5. Kubernetes 배포**:
-- ✅ kubeadm init을 통한 Control Plane 구성
-- ✅ External etcd 연동
-- ✅ CNI 플러그인 설치 (Flannel)
-- ✅ 애드온 설치 (CoreDNS, Metrics Server, Helm)
-
-**6. 인증서 관리**:
-- ✅ auto_renew_certificates 설정
-- ✅ systemd timer를 통한 매달 자동 갱신
-- ✅ kubeadm certs renew 명령어
-
-**7. HA 환경**:
-- ✅ Control Plane HA (Leader Election)
-- ✅ etcd HA (Raft consensus, 홀수 개)
-- ✅ Client-Side LoadBalancing (Nginx)
-
-**8. 클러스터 운영**:
-- ✅ 업그레이드 (upgrade-cluster.yml)
-- ✅ 스케일링 (scale.yml, remove-node.yml)
-- ✅ 백업/복구 (etcd snapshot)
-
-### Kubespray vs Week 3 Kubeadm 비교
-
-| 항목 | Week 3 (Kubeadm 수동) | Week 4 (Kubespray) |
-|------|----------------------|-------------------|
-| **배포 방식** | 수동 SSH 접속 후 명령어 실행 | Ansible Playbook 자동 실행 |
-| **사전 준비** | 수동 설정 (SELinux, Firewall, Swap) | Ansible이 자동 수행 |
-| **멀티 노드** | 각 노드 개별 접속 | 전체 노드 동시 배포 |
-| **etcd 배포** | kubeadm init (Static Pod) | systemd unit (독립 관리) |
-| **HA 구성** | 수동 설정 | 자동 구성 |
-| **인증서 갱신** | 수동 galley (timer 직접 생성) | 자동 설정 (timer 자동 생성) |
-| **업그레이드** | 각 노드에서 kubeadm upgrade | upgrade-cluster.yml 실행 |
-| **설정 관리** | 각 노드별 파일 | Inventory 중앙 관리 |
-
-### 실무 적용 포인트
-
-**1. 프로덕션 배포**:
-- Kubespray를 활용한 빠른 클러스터 구축
-- Inventory 기반 IaC 구현
-- Best Practice 설정 자동 적용
-
-**2. 폐쇄망 환경**:
-- Air-Gap 배포 전략 수립
-- Private Registry 구성
-- 바이너리/이미지 사전 다운로드
-
-**3. HA 구성**:
-- 3개 또는 5개 Control Plane 노드
-- 홀수 개 etcd 클러스터
-- Client-Side LoadBalancing
-
-**4. 운영 자동화**:
-- 인증서 자동 갱신 (systemd timer)
-- etcd 자동 백업 스크립트
-- 모니터링 스택 통합 (Prometheus, Grafana)
-
-**5. 버전 관리 전략**:
-- Dev: Kubespray 최신 + K8s N-1
-- Prd: Kubespray 최신-1 + K8s N-2
-- Version Skew Policy 준수
 
 ---
 

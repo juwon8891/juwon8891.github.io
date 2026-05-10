@@ -1072,6 +1072,7 @@ watch -d 'kubectl get deploy -o wide; echo; kubectl get svc,ep echo-server-servi
 
 **ArgoCD**는 쿠버네티스를 위한 **선언적 GitOps 지속적 배포(CD) 도구**입니다.
 
+
 > Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
 
 **ArgoCD 핵심 철학**:

@@ -1,8 +1,13 @@
 title: 학습 정리
-description: 주차별 학습 내용 정리
-theme: minima
+description: 학습 내용 정리
+theme: just-the-docs
 baseurl: ""
 url: "https://juwon8891.github.io"
+
+# Just the Docs 테마 설정
+color_scheme: light
+search_enabled: true
+heading_anchors: true
 
 # RSS 비활성화
 plugins:

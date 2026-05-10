@@ -1,6 +1,7 @@
 ---
-layout: home
-title: 학습 정리
+layout: default
+title: Home
+nav_order: 1
 ---
 
 # 학습 정리

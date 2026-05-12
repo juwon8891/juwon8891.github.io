@@ -45,12 +45,6 @@ graph TB
     style SW fill:#2d4a6b,stroke:#5b8dd9,color:#e8e8e8
 
 ```
-| 통신 유형 | 경로 | 핵심 기술 | 대역폭 |
-|-----------|------|-----------|--------|
-| **CPU ↔ GPU** | 스토리지 → CPU RAM → GPU | PCIe, NVMe | ~64 GB/s |
-| **서버 내 GPU ↔ GPU** | GPU → NVSwitch → GPU | NVLink 4.0 | 900 GB/s |
-| **서버 간 GPU ↔ GPU** | GPU → HCA → IB Switch → HCA → GPU | InfiniBand RDMA | 400 Gbps |
-
 ---
 
 ## CPU ↔ GPU 통신

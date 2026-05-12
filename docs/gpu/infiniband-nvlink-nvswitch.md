@@ -2,34 +2,6 @@
 
 > LLM 학습 등 고성능 컴퓨팅 환경에서 GPU 간 통신을 최적화하는 핵심 기술을 다룬다. CPU-GPU, 서버 내 GPU-GPU, 서버 간 GPU-GPU 통신 경로와 각각의 핵심 기술(NVLink, NVSwitch, InfiniBand)을 정리한다.
 
-## 목차
-
-1. [GPU 클러스터의 3가지 통신 유형](#gpu-클러스터의-3가지-통신-유형)
-2. [CPU ↔ GPU 통신](#cpu--gpu-통신)
-   - [PCIe와 병목](#1-pcie와-병목)
-   - [NVMe SSD 해결책](#2-nvme-ssd-해결책)
-3. [서버 내 GPU ↔ GPU 통신](#서버-내-gpu--gpu-통신)
-   - [NVLink](#1-nvlink)
-   - [NVBridge](#2-nvbridge)
-   - [NVSwitch - SXM vs PCIe](#3-nvswitch---sxm-vs-pcie)
-4. [서버 간 GPU ↔ GPU 통신 - InfiniBand](#서버-간-gpu--gpu-통신---infiniband)
-   - [InfiniBand란?](#1-infiniband란)
-   - [세대별 속도 (EDR → HDR → NDR)](#2-세대별-속도-edr--hdr--ndr)
-   - [핵심 컴포넌트 (HCA, Switch, Cable, Fabric)](#3-핵심-컴포넌트-hca-switch-cable-fabric)
-5. [InfiniBand 소프트웨어 스택](#infiniband-소프트웨어-스택)
-   - [MLNX_OFED (호스트 드라이버)](#1-mlnx_ofed-호스트-드라이버)
-   - [MLNX_OS (스위치 OS)](#2-mlnx_os-스위치-os)
-   - [Subnet Manager](#3-subnet-manager)
-6. [InfiniBand 네트워크 식별자](#infiniband-네트워크-식별자)
-   - [GUID](#1-guid-global-unique-identifier)
-   - [LID](#2-lid-local-identifier)
-   - [Partition (P_Key)](#3-partition-p_key)
-7. [GPU 클러스터 설계 고려사항](#gpu-클러스터-설계-고려사항)
-8. [핵심 개념 정리](#핵심-개념-정리)
-9. [참고 자료](#참고-자료)
-
----
-
 ## GPU 클러스터의 3가지 통신 유형
 
 LLM 학습처럼 대규모 GPU 클러스터를 운영할 때 데이터가 이동하는 경로는 크게 세 가지다.

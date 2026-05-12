@@ -76,9 +76,9 @@ extra_css:
 
 nav:
   - Home: index.md
-  - CUDA:
-    - NVIDIA CUDA 아키텍처: cuda/nvidia-cuda-architecture.md
-    - InfiniBand & GPU 인터커넥트: cuda/infiniband-nvlink-nvswitch.md
+  - GPU:
+    - NVIDIA CUDA 아키텍처: gpu/nvidia-cuda-architecture.md
+    - InfiniBand & GPU 인터커넥트: gpu/infiniband-nvlink-nvswitch.md
   - EKS:
     - Week 1 - Intro & Deployment: eks/week1-intro-deployment.md
     - Week 2 - Networking: eks/week2-networking.md

@@ -4,8 +4,9 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 
 ## 주요 카테고리
 
-### [ CUDA](cuda/nvidia-cuda-architecture/)
-- [NVIDIA CUDA 컴파일 과정 및 GPU 아키텍처 심화](cuda/nvidia-cuda-architecture/)
+### [ GPU](gpu/nvidia-cuda-architecture/)
+- [NVIDIA CUDA 컴파일 과정 및 GPU 아키텍처 심화](gpu/nvidia-cuda-architecture/)
+- [InfiniBand, NVLink, NVSwitch 등 GPU 인터커넥트 기술](gpu/infiniband-nvlink-nvswitch/)
 
 ### [ EKS (Amazon Elastic Kubernetes Service)](eks/week1-intro-deployment/)
 - [Week 1 - EKS 소개 및 배포](eks/week1-intro-deployment/)

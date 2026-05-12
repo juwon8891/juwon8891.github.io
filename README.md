@@ -13,7 +13,7 @@ juwon8891.github.io/
 ├── mkdocs.yml          # MkDocs 설정
 ├── docs/               # 문서 디렉토리
 │   ├── index.md        # 홈페이지
-│   ├── cuda/           # CUDA 관련 문서
+│   ├── gpu/            # GPU 관련 문서
 │   ├── eks/            # EKS 관련 문서
 │   ├── k8s-deploy/     # K8s Deploy 관련 문서
 │   └── cicd/           # CI/CD 관련 문서
@@ -29,16 +29,6 @@ juwon8891.github.io/
 2. `mkdocs.yml`의 `nav` 섹션에 새 문서 추가
 3. 본문 작성 (마크다운 형식, Front matter 불필요)
 
-예시:
-```bash
-# 새 CUDA 관련 문서 작성
-vim docs/cuda/new-topic.md
-
-# mkdocs.yml에 추가
-# nav:
-#   - CUDA:
-#     - New Topic: cuda/new-topic.md
-```
 
 ## 🚀 배포
 

@@ -6,7 +6,7 @@
 
 ---
 
-## 🏗️ 실습 환경 구성
+## 실습 환경 구성
 
 ### 1. 가상머신 구성
 
@@ -27,9 +27,10 @@ vagrant status
 
 # admin-lb 접속
 vagrant ssh admin-lb
-```
 
+```
 **Vagrantfile 구조**:
+
 ```ruby
 Vagrant.configure("2") do |config|
   config.vm.box = "rockylinux/10"
@@ -50,8 +51,8 @@ Vagrant.configure("2") do |config|
     end
   end
 end
-```
 
+```
 ---
 
 ### 2. 초기화 스크립트 분석
@@ -144,14 +145,14 @@ curl -L https://github.com/hidetatz/kubecolor/releases/latest/download/kubecolor
 mv kubecolor /usr/local/bin/
 
 curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-```
 
+```
 **HAProxy 설정 포인트**:
-- ✅ **Frontend**: `*:6443` - 모든 인터페이스에서 수신
-- ✅ **Backend**: roundrobin 알고리즘으로 3개 Control Plane에 분산
-- ✅ **Health Check**: `check` 옵션으로 장애 노드 자동 제외
-- ✅ **통계 페이지**: `http://192.168.10.10:9000/haproxy_stats`
-- ✅ **Prometheus 메트릭**: `http://192.168.10.10:8405/metrics`
+- **Frontend**: `*:6443` - 모든 인터페이스에서 수신
+- **Backend**: roundrobin 알고리즘으로 3개 Control Plane에 분산
+- **Health Check**: `check` 옵션으로 장애 노드 자동 제외
+- **통계 페이지**: `http://192.168.10.10:9000/haproxy_stats`
+- **Prometheus 메트릭**: `http://192.168.10.10:8405/metrics`
 
 ---
 
@@ -185,13 +186,13 @@ sysctl --system
 sed -i 's/^#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
 sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
 systemctl restart sshd
-```
 
+```
 **설정 이유**:
-- ✅ **Swap 비활성화**: Kubernetes는 메모리 예측 가능성을 위해 Swap 사용 금지
-- ✅ **overlay**: OverlayFS 파일시스템 (Container 이미지 레이어링)
-- ✅ **br_netfilter**: Bridge 트래픽이 iptables를 거치도록 설정
-- ✅ **ip_forward**: Pod 간 통신을 위한 IP 포워딩
+- **Swap 비활성화**: Kubernetes는 메모리 예측 가능성을 위해 Swap 사용 금지
+- **overlay**: OverlayFS 파일시스템 (Container 이미지 레이어링)
+- **br_netfilter**: Bridge 트래픽이 iptables를 거치도록 설정
+- **ip_forward**: Pod 간 통신을 위한 IP 포워딩
 
 ---
 
@@ -204,9 +205,10 @@ cd /root/kubespray/
 
 # 기본 inventory 확인
 cat inventory/mycluster/inventory.ini
-```
 
+```
 **inventory.ini 구조**:
+
 ```ini
 [all]
 k8s-node1 ansible_host=192.168.10.11 ip=192.168.10.11
@@ -235,11 +237,11 @@ k8s-node5
 [k8s_cluster:children]
 kube_control_plane
 kube_node
-```
 
-- ✅ **kube_control_plane**: API Server, Scheduler, Controller-Manager
-- ✅ **etcd**: etcd 클러스터 노드
-- ✅ **kube_node**: kubelet, kube-proxy 실행 노드 (Control Plane도 포함)
+```
+- **kube_control_plane**: API Server, Scheduler, Controller-Manager
+- **etcd**: etcd 클러스터 노드
+- **kube_node**: kubelet, kube-proxy 실행 노드 (Control Plane도 포함)
 
 ---
 
@@ -269,13 +271,13 @@ echo "flannel_interface: enp0s9" >> \
 # Metrics Server 활성화
 sed -i 's|metrics_server_enabled: false|metrics_server_enabled: true|g' \
   inventory/mycluster/group_vars/k8s_cluster/addons.yml
-```
 
+```
 **설정 이유**:
-- ✅ **Flannel**: 가볍고 간단한 CNI (VXLAN)
-- ✅ **iptables**: ipvs보다 디버깅 용이
-- ✅ **flannel_interface**: Vagrant Private Network 인터페이스 지정
-- ✅ **NodeLocalDNS 비활성화**: 실습 환경 단순화
+- **Flannel**: 가볍고 간단한 CNI (VXLAN)
+- **iptables**: ipvs보다 디버깅 용이
+- **flannel_interface**: Vagrant Private Network 인터페이스 지정
+- **NodeLocalDNS 비활성화**: 실습 환경 단순화
 
 ---
 
@@ -287,8 +289,8 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook \
   -v cluster.yml \
   -e kube_version="1.32.9" \
   | tee kubespray_install.log
-```
 
+```
 **소요 시간**: 약 8분
 
 **배포 과정**:
@@ -312,9 +314,10 @@ sed -i 's/127.0.0.1/192.168.10.11/g' /root/.kube/config
 
 # 노드 확인
 kubectl get node -owide
-```
 
+```
 **출력 예시**:
+
 ```
 NAME         STATUS   ROLES           AGE   VERSION   INTERNAL-IP     OS-IMAGE
 k8s-node1    Ready    control-plane   5m    v1.32.9   192.168.10.11   Rocky Linux 10.0
@@ -322,14 +325,15 @@ k8s-node2    Ready    control-plane   5m    v1.32.9   192.168.10.12   Rocky Linu
 k8s-node3    Ready    control-plane   5m    v1.32.9   192.168.10.13   Rocky Linux 10.0
 k8s-node4    Ready    <none>          5m    v1.32.9   192.168.10.14   Rocky Linux 10.0
 k8s-node5    Ready    <none>          5m    v1.32.9   192.168.10.15   Rocky Linux 10.0
-```
 
+```
 ```bash
 # etcd 클러스터 확인
 ssh k8s-node1 etcdctl.sh member list -w table
-```
 
+```
 **출력 예시**:
+
 ```
 +------------------+---------+-----------+----------------------------+----------------------------+
 |        ID        | STATUS  |   NAME    |         PEER ADDRS         |        CLIENT ADDRS        |
@@ -338,14 +342,15 @@ ssh k8s-node1 etcdctl.sh member list -w table
 | 2f98a53f33e3d3a4 | started | k8s-node2 | https://192.168.10.12:2380 | https://192.168.10.12:2379 |
 | fd422379fda50e48 | started | k8s-node3 | https://192.168.10.13:2380 | https://192.168.10.13:2379 |
 +------------------+---------+-----------+----------------------------+----------------------------+
-```
 
+```
 ```bash
 # Control Plane Static Pod 확인
 kubectl get pod -n kube-system -o wide | grep -E "node1|node2|node3"
-```
 
+```
 **출력**:
+
 ```
 kube-apiserver-k8s-node1            1/1   Running   k8s-node1
 kube-controller-manager-k8s-node1   1/1   Running   k8s-node1
@@ -353,11 +358,11 @@ kube-scheduler-k8s-node1            1/1   Running   k8s-node1
 kube-apiserver-k8s-node2            1/1   Running   k8s-node2
 kube-controller-manager-k8s-node2   1/1   Running   k8s-node2
 kube-scheduler-k8s-node3            1/1   Running   k8s-node3
-```
 
+```
 ---
 
-## 🌐 K8S API 엔드포인트 전략
+## K8S API 엔드포인트 전략
 
 Kubernetes 클러스터에서 **API Server에 접근하는 방법**은 다음 3가지 Case로 구분됩니다.
 
@@ -402,13 +407,13 @@ graph TB
     CP1 -->|자기 자신| CP1
     CP2 -->|자기 자신| CP2
     CP3 -->|자기 자신| CP3
-```
 
+```
 **특징**:
-- ✅ **Control Plane 노드**: 로컬 API Server 직접 접근 (`127.0.0.1:6443`)
-- ✅ **Worker 노드**: Nginx Static Pod를 통한 Client-Side LB
-- ✅ **외부 LB 불필요**: 각 노드가 독립적으로 LB 운영
-- ✅ **장애 조치**: Nginx가 `least_conn` 알고리즘으로 자동 failover
+- **Control Plane 노드**: 로컬 API Server 직접 접근 (`127.0.0.1:6443`)
+- **Worker 노드**: Nginx Static Pod를 통한 Client-Side LB
+- **외부 LB 불필요**: 각 노드가 독립적으로 LB 운영
+- **장애 조치**: Nginx가 `least_conn` 알고리즘으로 자동 failover
 
 **Nginx 설정** (`/etc/kubernetes/nginx-proxy.conf`):
 
@@ -434,8 +439,8 @@ stream {
         proxy_connect_timeout 1s;
     }
 }
-```
 
+```
 **Nginx Static Pod Manifest** (`/etc/kubernetes/manifests/nginx-proxy.yaml`):
 
 ```yaml
@@ -463,20 +468,21 @@ spec:
   - name: nginx-config
     hostPath:
       path: /etc/kubernetes/nginx-proxy.conf
-```
 
+```
 **kubelet 엔드포인트 확인**:
 
 ```bash
 # Worker 노드에서 kubelet이 사용하는 API Server 엔드포인트
 ssh k8s-node4 grep "server:" /etc/kubernetes/kubelet.conf
-```
 
+```
 **출력**:
+
 ```yaml
 server: https://127.0.0.1:6443
-```
 
+```
 ---
 
 ### Case 2: External LB + Client-Side LB
@@ -515,13 +521,13 @@ graph TB
     CP1 -->|127.0.0.1:6443| CP1
     CP2 -->|127.0.0.1:6443| CP2
     CP3 -->|127.0.0.1:6443| CP3
-```
 
+```
 **특징**:
-- ✅ **External LB**: kubectl 등 외부 접근용
-- ✅ **Control Plane**: 로컬 API Server 직접 접근
-- ✅ **Worker**: Client-Side LB (Nginx Static Pod)
-- ✅ **이중 장애 보호**: HAProxy + Nginx 모두 장애 대응
+- **External LB**: kubectl 등 외부 접근용
+- **Control Plane**: 로컬 API Server 직접 접근
+- **Worker**: Client-Side LB (Nginx Static Pod)
+- **이중 장애 보호**: HAProxy + Nginx 모두 장애 대응
 
 **설정 방법**:
 
@@ -534,8 +540,8 @@ loadbalancer_apiserver:
 
 # 인증서 SAN에 External LB IP 추가
 supplementary_addresses_in_ssl_keys: [192.168.10.10, k8s-api-srv.admin-lb.com]
-```
 
+```
 **재배포** (Control Plane 인증서만):
 
 ```bash
@@ -543,20 +549,21 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v cluster.yml \
   --tags "control-plane" \
   --limit kube_control_plane \
   -e kube_version="1.32.9"
-```
 
+```
 **인증서 SAN 확인**:
 
 ```bash
 ssh k8s-node1 openssl x509 -in /etc/kubernetes/ssl/apiserver.crt -text -noout | grep -A1 "Subject Alternative Name"
-```
 
+```
 **출력**:
+
 ```
 X509v3 Subject Alternative Name:
     DNS:k8s-api-srv.admin-lb.com, DNS:k8s-node1, DNS:kubernetes, DNS:kubernetes.default, DNS:kubernetes.default.svc, DNS:kubernetes.default.svc.cluster.local, IP Address:192.168.10.10, IP Address:192.168.10.11, IP Address:192.168.10.12, IP Address:192.168.10.13, IP Address:10.233.0.1
-```
 
+```
 ---
 
 ### Case 3: External LB Only
@@ -589,13 +596,13 @@ graph TB
     HAP -->|roundrobin| CP1
     HAP -->|roundrobin| CP2
     HAP -->|roundrobin| CP3
-```
 
+```
 **특징**:
-- ✅ **단일 엔드포인트**: 모든 노드가 HAProxy 사용
-- ✅ **Client-Side LB 비활성화**: Nginx Static Pod 미배포
-- ✅ **중앙 집중식 관리**: LB 설정 변경 용이
-- ⚠️ **SPOF**: HAProxy 자체가 단일 장애점
+- **단일 엔드포인트**: 모든 노드가 HAProxy 사용
+- **Client-Side LB 비활성화**: Nginx Static Pod 미배포
+- **중앙 집중식 관리**: LB 설정 변경 용이
+- **주의** **SPOF**: HAProxy 자체가 단일 장애점
 
 **설정 방법**:
 
@@ -607,15 +614,15 @@ loadbalancer_apiserver:
   port: 6443
 loadbalancer_apiserver_localhost: false  # Client-Side LB 미사용
 supplementary_addresses_in_ssl_keys: [192.168.10.10, k8s-api-srv.admin-lb.com]
-```
 
+```
 **프로덕션 환경**:
-- ✅ **HAProxy HA**: Keepalived + VIP로 HAProxy 자체 HA 구성
-- ✅ **Cloud LB**: AWS ELB, GCP LB, Azure LB 사용
+- **HAProxy HA**: Keepalived + VIP로 HAProxy 자체 HA 구성
+- **Cloud LB**: AWS ELB, GCP LB, Azure LB 사용
 
 ---
 
-## 🔧 노드 관리
+## 노드 관리
 
 ### 1. 노드 추가 (scale.yml)
 
@@ -641,8 +648,8 @@ graph TB
     CNI --> Label["8. Node Label 및 Taint 적용"]
     Label --> DNS["9. DNS 설정 업데이트"]
     DNS --> End["노드 추가 완료"]
-```
 
+```
 ---
 
 #### (2) 실습: k8s-node5 제거 후 재추가
@@ -652,14 +659,14 @@ graph TB
 ```bash
 ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e node=k8s-node5
-```
 
+```
 **Step 2**: inventory.ini 수정
 
 ```bash
 vi inventory/mycluster/inventory.ini
-```
 
+```
 ```ini
 # k8s-node5를 [kube_node] 그룹에 추가
 [kube_node]
@@ -668,8 +675,8 @@ k8s-node2
 k8s-node3
 k8s-node4
 k8s-node5  # 추가
-```
 
+```
 **Step 3**: scale.yml 실행
 
 ```bash
@@ -678,17 +685,18 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook \
   -v scale.yml \
   --limit=k8s-node5 \
   -e kube_version="1.32.9"
-```
 
+```
 **소요 시간**: 약 3분
 
 **Step 4**: 노드 확인
 
 ```bash
 kubectl get node
-```
 
+```
 **출력**:
+
 ```
 NAME         STATUS   ROLES           AGE
 k8s-node1    Ready    control-plane   20m
@@ -696,8 +704,8 @@ k8s-node2    Ready    control-plane   20m
 k8s-node3    Ready    control-plane   20m
 k8s-node4    Ready    <none>          20m
 k8s-node5    Ready    <none>          1m   # 새로 추가됨
-```
 
+```
 ---
 
 #### (3) scale.yml 주요 Task 분석
@@ -710,16 +718,16 @@ k8s-node5    Ready    <none>          1m   # 새로 추가됨
     etcdctl member add k8s-node5 \
       --peer-urls=https://192.168.10.15:2380
   when: "'kube_control_plane' in group_names"
-```
 
+```
 **Task 2**: Container Engine 설치
 
 ```yaml
 - name: Install containerd
   import_role:
     name: container-engine/containerd
-```
 
+```
 **Task 3**: kubeadm join 실행
 
 ```yaml
@@ -729,8 +737,8 @@ k8s-node5    Ready    <none>          1m   # 새로 추가됨
       --token {{ bootstrap_token }} \
       --discovery-token-ca-cert-hash sha256:{{ ca_cert_hash }} \
       --node-name k8s-node5
-```
 
+```
 **Task 4**: Node Label 적용
 
 ```yaml
@@ -739,8 +747,8 @@ k8s-node5    Ready    <none>          1m   # 새로 추가됨
     kubectl label node k8s-node5 \
       node-role.kubernetes.io/worker=worker
   delegate_to: "{{ groups['kube_control_plane'][0] }}"
-```
 
+```
 ---
 
 ### 2. 노드 제거 (remove-node.yml)
@@ -768,8 +776,8 @@ graph TB
     etcdRemove --> Reset
     Reset --> Delete["5. kubectl delete node"]
     Delete --> End["노드 제거 완료"]
-```
 
+```
 ---
 
 #### (2) 실습: k8s-node5 제거
@@ -779,24 +787,26 @@ graph TB
 ```bash
 ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e node=k8s-node5
-```
 
+```
 **프롬프트**:
+
 ```
 Are you sure you want to remove node k8s-node5? (yes/no)
 
 > yes
-```
 
+```
 **소요 시간**: 약 2분 (PDB 없을 경우 20초)
 
 **Step 2**: 노드 확인
 
 ```bash
 kubectl get node
-```
 
+```
 **출력**:
+
 ```
 NAME         STATUS   ROLES           AGE
 k8s-node1    Ready    control-plane   25m
@@ -804,8 +814,8 @@ k8s-node2    Ready    control-plane   25m
 k8s-node3    Ready    control-plane   25m
 k8s-node4    Ready    <none>          25m
 # k8s-node5 제거됨
-```
 
+```
 ---
 
 #### (3) PodDisruptionBudget (PDB) 이슈
@@ -824,8 +834,8 @@ spec:
   selector:
     matchLabels:
       app: webpod
-```
 
+```
 **Drain 실패 로그**:
 
 ```
@@ -833,29 +843,32 @@ TASK [remove-node/pre-remove : Drain node] ****
 fatal: [k8s-node5]: FAILED! => {
   "msg": "error: cannot delete Pods with local storage (use --delete-emptydir-data to override): default/webpod-xxx\nerror: unable to drain node \"k8s-node5\" due to error:cannot delete Pods with local storage (continuing command...)\nThere are pending nodes to be drained:\n k8s-node5\nerror: cannot delete DaemonSet-managed Pods (use --ignore-daemonsets to ignore): kube-system/kube-flannel-xxx"
 }
-```
 
+```
 **해결 방법**:
 
 1. **PDB 삭제**:
+
 ```bash
 kubectl delete pdb webpod
-```
 
+```
 2. **PDB 설정 변경**:
+
 ```bash
 kubectl edit pdb webpod
 # maxUnavailable: 0 → 1로 변경
-```
 
+```
 3. **강제 Drain**:
+
 ```bash
 kubectl drain k8s-node5 \
   --ignore-daemonsets \
   --delete-emptydir-data \
   --force
-```
 
+```
 ---
 
 ### 3. 비정상 노드 강제 삭제
@@ -867,20 +880,22 @@ kubectl drain k8s-node5 \
 ```bash
 # k8s-node5가 NotReady 상태
 kubectl get node
-```
 
+```
 **출력**:
+
 ```
 NAME         STATUS     ROLES   AGE
 k8s-node5    NotReady   <none>  10m
-```
 
+```
 **SSH 접속 실패**:
+
 ```bash
 ssh k8s-node5
 # Connection refused
-```
 
+```
 ---
 
 #### (2) 강제 삭제 명령어
@@ -891,12 +906,12 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e reset_nodes=false \
   -e allow_ungraceful_removal=true \
   -e skip_confirmation=true
-```
 
+```
 **파라미터 설명**:
-- ✅ **reset_nodes=false**: 노드에 SSH 접속하여 kubeadm reset 수행 안 함
-- ✅ **allow_ungraceful_removal=true**: Drain 실패 시에도 계속 진행
-- ✅ **skip_confirmation=true**: 확인 프롬프트 스킵
+- **reset_nodes=false**: 노드에 SSH 접속하여 kubeadm reset 수행 안 함
+- **allow_ungraceful_removal=true**: Drain 실패 시에도 계속 진행
+- **skip_confirmation=true**: 확인 프롬프트 스킵
 
 ---
 
@@ -912,27 +927,28 @@ kubectl delete node k8s-node5
 
 # iptables 규칙 정리
 ssh k8s-node1 iptables -t nat -D KUBE-SERVICES -d 192.168.10.15 -j REJECT
-```
 
+```
 ---
 
 ### 4. 클러스터 리셋 (reset.yml)
 
-**경고**: ⚠️ **전체 클러스터를 설치 전 상태로 완전 제거 (복구 불가)**
+**경고**: **주의** **전체 클러스터를 설치 전 상태로 완전 제거 (복구 불가)**
 
 #### (1) reset.yml 실행
 
 ```bash
 ansible-playbook -i inventory/mycluster/inventory.ini -v reset.yml
-```
 
+```
 **프롬프트**:
+
 ```
 Are you sure you want to reset the entire cluster? (yes/no)
 
 > yes
-```
 
+```
 ---
 
 #### (2) reset.yml 주요 Task
@@ -974,8 +990,8 @@ Are you sure you want to reset the entire cluster? (yes/no)
 # 6. iptables 규칙 삭제
 - name: Flush iptables
   command: iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
-```
 
+```
 ---
 
 #### (3) 재배포
@@ -986,11 +1002,11 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook \
   -i inventory/mycluster/inventory.ini \
   -v cluster.yml \
   -e kube_version="1.32.9"
-```
 
+```
 ---
 
-## 📊 모니터링 설정
+## 모니터링 설정
 
 ### 1. kube-ops-view 설치
 
@@ -1010,8 +1026,8 @@ helm install kube-ops-view geek-cookbook/kube-ops-view \
   --namespace kube-system \
   --set image.repository="abihf/kube-ops-view" \
   --set image.tag="latest"
-```
 
+```
 ---
 
 #### (2) 접속
@@ -1019,66 +1035,71 @@ helm install kube-ops-view geek-cookbook/kube-ops-view \
 ```bash
 # 브라우저 열기
 open "http://192.168.10.14:30000/#scale=1.5"
-```
 
+```
 **화면 구성**:
-- ✅ **노드별 Pod 배치**: 각 노드에 실행 중인 Pod 시각화
-- ✅ **리소스 사용률**: CPU, Memory 사용률 표시
-- ✅ **실시간 업데이트**: Pod 생성/삭제 실시간 반영
+- **노드별 Pod 배치**: 각 노드에 실행 중인 Pod 시각화
+- **리소스 사용률**: CPU, Memory 사용률 표시
+- **실시간 업데이트**: Pod 생성/삭제 실시간 반영
 
 ---
 
 #### (3) 장애 시나리오 모니터링
 
 **신규 터미널 1**: kube-ops-view 접속
+
 ```bash
 open "http://192.168.10.14:30000/#scale=1.5"
-```
 
+```
 **신규 터미널 2**: 노드 상태 모니터링
+
 ```bash
 watch -d kubectl get node
-```
 
+```
 **admin-lb**: k8s-node1 중지
+
 ```bash
 ssh k8s-node1 poweroff
-```
 
+```
 **결과**:
-- ✅ k8s-node1 상태: Ready → NotReady (약 40초 후)
-- ✅ k8s-node1 Pod 상태: Terminating → 다른 노드에서 재생성
-- ✅ API Server 접근: 정상 (k8s-node2, k8s-node3로 자동 failover)
+- k8s-node1 상태: Ready → NotReady (약 40초 후)
+- k8s-node1 Pod 상태: Terminating → 다른 노드에서 재생성
+- API Server 접근: 정상 (k8s-node2, k8s-node3로 자동 failover)
 
 ---
 
 ### 2. HAProxy 통계 페이지
 
 **접속**:
+
 ```bash
 open "http://192.168.10.10:9000/haproxy_stats"
-```
 
-- ✅ **Backend Status**: k8s-node1~3의 Health Check 상태
-- ✅ **Session Rate**: 초당 요청 수
-- ✅ **Total Sessions**: 총 세션 수
-- ✅ **Bytes In/Out**: 트래픽 통계
+```
+- **Backend Status**: k8s-node1~3의 Health Check 상태
+- **Session Rate**: 초당 요청 수
+- **Total Sessions**: 총 세션 수
+- **Bytes In/Out**: 트래픽 통계
 
 **Prometheus 메트릭**:
+
 ```bash
 curl http://192.168.10.10:8405/metrics
-```
 
+```
 ```
 haproxy_backend_up{backend="kube-apiserver-backend"} 3
 haproxy_server_up{server="k8s-node1"} 1
 haproxy_server_up{server="k8s-node2"} 1
 haproxy_server_up{server="k8s-node3"} 1
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. Client-Side vs External LoadBalancing
 
@@ -1118,8 +1139,8 @@ graph TB
     CP1 -.->|Health Check| NginxPod
     CP2 -.->|Health Check| NginxPod
     CP3 -.->|Health Check| NginxPod
-```
 
+```
 **동작 과정**:
 1. kubelet이 `127.0.0.1:6443`으로 API 요청
 2. Nginx Static Pod가 요청 수신
@@ -1165,8 +1186,8 @@ graph TB
     CP1 -.->|Health Check| Backend
     CP2 -.->|Health Check| Backend
     CP3 -.->|Health Check| Backend
-```
 
+```
 **동작 과정**:
 1. Client가 `192.168.10.10:6443`으로 요청
 2. HAProxy Frontend가 요청 수신
@@ -1189,12 +1210,11 @@ graph TB
     ExtraVars --> End["최종 변수 값 결정"]
 
 ```
-
 **실전 팁**:
-- ✅ **99% 조절**: `inventory/mycluster/group_vars/`에서 조절
-- ✅ **긴급 변경**: `-e` 옵션으로 CLI에서 즉시 override
-- ✅ **특정 노드만**: `host_vars/` 사용
-- ✅ **변수 검색**: `grep -Rn "변수명" inventory/ roles/ playbooks/`
+- **99% 조절**: `inventory/mycluster/group_vars/`에서 조절
+- **긴급 변경**: `-e` 옵션으로 CLI에서 즉시 override
+- **특정 노드만**: `host_vars/` 사용
+- **변수 검색**: `grep -Rn "변수명" inventory/ roles/ playbooks/`
 
 **예시**:
 
@@ -1206,8 +1226,8 @@ grep -Rn "kube_version" inventory/mycluster/ roles/ playbooks/
 # 1. roles/kubernetes/defaults/main.yml: kube_version: "1.32.0" (기본값)
 # 2. inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml: kube_version: "1.32.9" (사용자 설정)
 # 3. CLI: -e kube_version="1.33.0" (최우선)
-```
 
+```
 ---
 
 ### 3. etcd Deployment Type
@@ -1217,13 +1237,13 @@ grep -Rn "kube_version" inventory/mycluster/ roles/ playbooks/
 ```yaml
 # inventory/mycluster/group_vars/etcd.yml
 etcd_deployment_type: host
-```
 
+```
 **특징**:
-- ✅ **독립 관리**: systemd unit으로 etcd 실행
-- ✅ **kubeadm 독립**: kubeadm에 종속되지 않음
-- ✅ **업그레이드 용이**: etcd만 별도 업그레이드 가능
-- ✅ **백업/복구**: systemctl로 간편하게 관리
+- **독립 관리**: systemd unit으로 etcd 실행
+- **kubeadm 독립**: kubeadm에 종속되지 않음
+- **업그레이드 용이**: etcd만 별도 업그레이드 가능
+- **백업/복구**: systemctl로 간편하게 관리
 
 **etcd.service**:
 
@@ -1251,8 +1271,8 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
-```
 
+```
 **관리 명령어**:
 
 ```bash
@@ -1270,8 +1290,8 @@ etcdctl member list -w table
 
 # etcd 백업
 etcdctl snapshot save /tmp/etcd-backup.db
-```
 
+```
 ---
 
 #### (2) kubeadm (Static Pod)
@@ -1279,13 +1299,13 @@ etcdctl snapshot save /tmp/etcd-backup.db
 ```yaml
 # inventory/mycluster/group_vars/etcd.yml
 etcd_deployment_type: kubeadm
-```
 
+```
 **특징**:
-- ✅ **kubeadm 통합**: kubeadm이 etcd 관리
-- ✅ **Static Pod**: `/etc/kubernetes/manifests/etcd.yaml`
-- ⚠️ **종속성**: kubeadm에 의존적
-- ⚠️ **업그레이드 복잡**: kubeadm upgrade 시 함께 업그레이드
+- **kubeadm 통합**: kubeadm이 etcd 관리
+- **Static Pod**: `/etc/kubernetes/manifests/etcd.yaml`
+- **주의** **종속성**: kubeadm에 의존적
+- **주의** **업그레이드 복잡**: kubeadm upgrade 시 함께 업그레이드
 
 **etcd Static Pod Manifest**:
 
@@ -1312,8 +1332,8 @@ spec:
     hostPath:
       path: /var/lib/etcd
       type: DirectoryOrCreate
-```
 
+```
 ---
 
 #### (3) 비교표
@@ -1333,9 +1353,9 @@ spec:
 #### (1) PDB 동작 원리
 
 **PodDisruptionBudget (PDB)**:
-- ✅ **목적**: 자발적 중단(Voluntary Disruption) 시 최소 가용 Pod 수 보장
-- ✅ **자발적 중단**: 노드 Drain, 클러스터 업그레이드, Pod 삭제
-- ⚠️ **비자발적 중단**: 노드 장애, OOM, 하드웨어 고장 (PDB 적용 안 됨)
+- **목적**: 자발적 중단(Voluntary Disruption) 시 최소 가용 Pod 수 보장
+- **자발적 중단**: 노드 Drain, 클러스터 업그레이드, Pod 삭제
+- **주의** **비자발적 중단**: 노드 장애, OOM, 하드웨어 고장 (PDB 적용 안 됨)
 
 **PDB 예시**:
 
@@ -1349,8 +1369,8 @@ spec:
   selector:
     matchLabels:
       app: webpod
-```
 
+```
 **또는**:
 
 ```yaml
@@ -1359,8 +1379,8 @@ spec:
   selector:
     matchLabels:
       app: webpod
-```
 
+```
 ---
 
 #### (2) Drain과 PDB 충돌
@@ -1395,21 +1415,22 @@ spec:
   selector:
     matchLabels:
       app: webpod
-```
 
+```
 **Drain 실행**:
 
 ```bash
 kubectl drain k8s-node4 --ignore-daemonsets
-```
 
+```
 **결과**:
+
 ```
 error: cannot evict pod as it would violate the pod's disruption budget.
 evicting pod default/webpod-xxx
 error: Cannot evict pod as it would violate the pod's disruption budget.
-```
 
+```
 **타임아웃**: Drain이 무한 대기 (기본 타임아웃 없음)
 
 ---
@@ -1421,8 +1442,8 @@ error: Cannot evict pod as it would violate the pod's disruption budget.
 ```bash
 kubectl edit pdb webpod
 # maxUnavailable: 0 → 1로 변경
-```
 
+```
 **방법 2**: PDB 임시 삭제
 
 ```bash
@@ -1433,8 +1454,8 @@ kubectl drain k8s-node4 --ignore-daemonsets
 
 # PDB 재생성
 kubectl apply -f pdb.yaml
-```
 
+```
 **방법 3**: 강제 Drain (권장하지 않음)
 
 ```bash
@@ -1443,8 +1464,8 @@ kubectl drain k8s-node4 \
   --delete-emptydir-data \
   --force \
   --grace-period=0
-```
 
+```
 ---
 
 #### (4) Best Practice
@@ -1461,23 +1482,23 @@ spec:
   selector:
     matchLabels:
       app: webpod
-```
 
+```
 **또는**:
 
 ```yaml
 spec:
   maxUnavailable: 1  # 최대 1개만 동시 중단 가능
-```
 
+```
 **이유**:
-- ✅ **고가용성 유지**: 최소 2개 Pod가 항상 서비스
-- ✅ **Drain 가능**: 1개씩 축출 가능
-- ✅ **Rolling Update 가능**: 점진적 업데이트
+- **고가용성 유지**: 최소 2개 Pod가 항상 서비스
+- **Drain 가능**: 1개씩 축출 가능
+- **Rolling Update 가능**: 점진적 업데이트
 
 ---
 
-## 🐛 트러블슈팅
+## 트러블슈팅
 
 ### 1. 인증서 SAN 추가
 
@@ -1487,13 +1508,14 @@ spec:
 
 ```bash
 kubectl --server=https://192.168.10.10:6443 get node
-```
 
+```
 **에러**:
+
 ```
 Unable to connect to the server: x509: certificate is valid for 192.168.10.11, 192.168.10.12, 192.168.10.13, 10.233.0.1, 127.0.0.1, localhost, kubernetes, kubernetes.default, kubernetes.default.svc, kubernetes.default.svc.cluster.local, not 192.168.10.10
-```
 
+```
 ---
 
 #### (2) 원인
@@ -1502,14 +1524,15 @@ Unable to connect to the server: x509: certificate is valid for 192.168.10.11, 1
 
 ```bash
 ssh k8s-node1 openssl x509 -in /etc/kubernetes/ssl/apiserver.crt -text -noout | grep -A1 "Subject Alternative Name"
-```
 
+```
 **출력**:
+
 ```
 X509v3 Subject Alternative Name:
     DNS:k8s-node1, DNS:kubernetes, IP Address:192.168.10.11, IP Address:10.233.0.1
-```
 
+```
 ---
 
 #### (3) 해결 방법
@@ -1521,8 +1544,8 @@ X509v3 Subject Alternative Name:
 supplementary_addresses_in_ssl_keys:
   - 192.168.10.10
   - k8s-api-srv.admin-lb.com
-```
 
+```
 **Step 2**: Control Plane 재배포 (인증서만)
 
 ```bash
@@ -1530,20 +1553,21 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v cluster.yml \
   --tags "control-plane" \
   --limit kube_control_plane \
   -e kube_version="1.32.9"
-```
 
+```
 **Step 3**: 인증서 확인
 
 ```bash
 ssh k8s-node1 openssl x509 -in /etc/kubernetes/ssl/apiserver.crt -text -noout | grep -A1 "Subject Alternative Name"
-```
 
+```
 **출력**:
+
 ```
 X509v3 Subject Alternative Name:
     DNS:k8s-api-srv.admin-lb.com, DNS:k8s-node1, IP Address:192.168.10.10, IP Address:192.168.10.11
-```
 
+```
 ---
 
 ### 2. Containerd rlimits 이슈
@@ -1554,13 +1578,14 @@ X509v3 Subject Alternative Name:
 
 ```bash
 kubectl logs -n kube-system nginx-proxy-k8s-node4
-```
 
+```
 **에러**:
+
 ```
 2026/02/04 12:00:00 [alert] 1#1: setrlimit(RLIMIT_NOFILE, 130048) failed (1: Operation not permitted)
-```
 
+```
 ---
 
 #### (2) 원인
@@ -1569,9 +1594,10 @@ kubectl logs -n kube-system nginx-proxy-k8s-node4
 
 ```bash
 ssh k8s-node4 cat /etc/containerd/config.toml | grep -A5 rlimits
-```
 
+```
 **출력**:
+
 ```toml
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
   BinaryName = "/usr/local/bin/runc"
@@ -1582,8 +1608,8 @@ ssh k8s-node4 cat /etc/containerd/config.toml | grep -A5 rlimits
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options.rlimits.NOFILE]
       hard = 65535
       soft = 65535
-```
 
+```
 ---
 
 #### (3) 해결 방법
@@ -1595,8 +1621,8 @@ ssh k8s-node4 cat /etc/containerd/config.toml | grep -A5 rlimits
 containerd_default_base_runtime_spec_patch:
   process:
     rlimits: []  # 빈 배열로 설정하여 제한 제거
-```
 
+```
 **Step 2**: Containerd 재설정
 
 ```bash
@@ -1604,27 +1630,28 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v cluster.yml \
   --tags "containerd" \
   --limit k8s-node4,k8s-node5 \
   -e kube_version="1.32.9"
-```
 
+```
 **Step 3**: Nginx Proxy Pod 재시작
 
 ```bash
 ssh k8s-node4 crictl rmp $(crictl pods --name nginx-proxy -q)
-```
 
+```
 **Step 4**: 로그 확인
 
 ```bash
 kubectl logs -n kube-system nginx-proxy-k8s-node4
-```
 
+```
 **정상 출력**:
+
 ```
 2026/02/04 12:05:00 [notice] 1#1: using the "epoll" event method
 2026/02/04 12:05:00 [notice] 1#1: nginx/1.27.3
 2026/02/04 12:05:00 [notice] 1#1: start worker processes
-```
 
+```
 ---
 
 ### 3. PDB로 인한 Drain 실패
@@ -1636,16 +1663,17 @@ kubectl logs -n kube-system nginx-proxy-k8s-node4
 ```bash
 ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e node=k8s-node4
-```
 
+```
 **에러**:
+
 ```
 TASK [remove-node/pre-remove : Drain node] ****
 fatal: [k8s-node4]: FAILED! => {
   "msg": "error: cannot evict pod as it would violate the pod's disruption budget."
 }
-```
 
+```
 ---
 
 #### (2) 원인 확인
@@ -1653,20 +1681,22 @@ fatal: [k8s-node4]: FAILED! => {
 ```bash
 # PDB 확인
 kubectl get pdb
-```
 
+```
 **출력**:
+
 ```
 NAME     MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
 webpod   N/A             0                 0                     10m
-```
 
+```
 ```bash
 # PDB 상세 확인
 kubectl describe pdb webpod
-```
 
+```
 **출력**:
+
 ```
 Name:           webpod
 Min available:  N/A
@@ -1677,8 +1707,8 @@ Status:
   Current:              3
   Desired:              3
   Total:                3
-```
 
+```
 ---
 
 #### (3) 해결 방법
@@ -1687,15 +1717,15 @@ Status:
 
 ```bash
 kubectl delete pdb webpod
-```
 
+```
 **방법 2**: PDB 설정 변경
 
 ```bash
 kubectl edit pdb webpod
 # maxUnavailable: 0 → 1로 변경
-```
 
+```
 **방법 3**: 강제 제거 (비추천)
 
 ```bash
@@ -1703,21 +1733,21 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e node=k8s-node4 \
   -e allow_ungraceful_removal=true \
   -e skip_confirmation=true
-```
 
+```
 ---
 
 #### (2) 노드 라이프사이클 관리
 
 **3가지 Playbook**:
-- ✅ **scale.yml**: 노드 추가 (약 3분)
-- ✅ **remove-node.yml**: 노드 제거 (약 2분, PDB 없을 시 20초)
-- ✅ **reset.yml**: 클러스터 완전 삭제 (복구 불가)
+- **scale.yml**: 노드 추가 (약 3분)
+- **remove-node.yml**: 노드 제거 (약 2분, PDB 없을 시 20초)
+- **reset.yml**: 클러스터 완전 삭제 (복구 불가)
 
 **주의사항**:
-- ⚠️ **첫 번째 Control Plane 노드 제거 불가**: 클러스터 파괴 위험
-- ⚠️ **PDB 확인**: Drain 전 PodDisruptionBudget 설정 확인
-- ⚠️ **etcd 백업**: 노드 제거 전 etcd 스냅샷 백업 권장
+- **주의** **첫 번째 Control Plane 노드 제거 불가**: 클러스터 파괴 위험
+- **주의** **PDB 확인**: Drain 전 PodDisruptionBudget 설정 확인
+- **주의** **etcd 백업**: 노드 제거 전 etcd 스냅샷 백업 권장
 
 ---
 
@@ -1736,8 +1766,8 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
 #### (4) etcd Deployment Type
 
 **2가지 배포 방식**:
-- ✅ **host (systemd unit)**: 독립 관리, 업그레이드 용이 (프로덕션 권장)
-- ✅ **kubeadm (Static Pod)**: kubeadm 통합 관리
+- **host (systemd unit)**: 독립 관리, 업그레이드 용이 (프로덕션 권장)
+- **kubeadm (Static Pod)**: kubeadm 통합 관리
 
 **프로덕션 권장**: `etcd_deployment_type: host`
 
@@ -1761,6 +1791,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
 ### 3. 주요 명령어
 
 **배포**:
+
 ```bash
 # 전체 배포
 ansible-playbook -i inventory/mycluster/inventory.ini -v cluster.yml -e kube_version="1.32.9"
@@ -1773,17 +1804,18 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml -e node
 
 # 클러스터 리셋
 ansible-playbook -i inventory/mycluster/inventory.ini -v reset.yml
-```
 
+```
 **모니터링**:
+
 ```bash
 # kube-ops-view
 open "http://192.168.10.14:30000/#scale=1.5"
 
 # HAProxy 통계
 open "http://192.168.10.10:9000/haproxy_stats"
-```
 
+```
 ---
 
 ### 4. 트러블슈팅 체크리스트
@@ -1815,14 +1847,14 @@ open "http://192.168.10.10:9000/haproxy_stats"
 ### 5. Next Steps
 
 **Week 6 Preview** (예상):
-- ✅ **Kubernetes Upgrade**: Kubespray를 통한 클러스터 업그레이드
-- ✅ **etcd Backup & Restore**: 백업 및 복구 전략
-- ✅ **Certificate Management**: 인증서 갱신 및 관리
-- ✅ **프로덕션 전환**: Best Practice 및 보안 강화
+- **Kubernetes Upgrade**: Kubespray를 통한 클러스터 업그레이드
+- **etcd Backup & Restore**: 백업 및 복구 전략
+- **Certificate Management**: 인증서 갱신 및 관리
+- **프로덕션 전환**: Best Practice 및 보안 강화
 
 ---
 
-## 📚 참고 자료
+## 참고 자료
 
 ### 공식 문서
 - [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)

@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 K8s-Deploy 스터디 소개
+## K8s-Deploy 스터디 소개
 
 ### 1. 스터디 목표
 
@@ -17,12 +17,12 @@
 **Kubernetes The Hard Way**는 Kubernetes 클러스터를 kubeadm과 같은 자동화 도구 없이 처음부터 수동으로 구축하는 실습입니다.
 
 **이번 주 핵심 학습 포인트**:
-- ✅ Kubernetes 각 컴포넌트의 역할과 상호작용 이해
-- ✅ mTLS(상호 TLS) 통신을 위한 CA 및 인증서 생성
-- ✅ 인증서 Subject(CN, O)와 Kubernetes RBAC의 연관성
-- ✅ Systemd를 사용한 각 컴포넌트 서비스 관리
-- ✅ etcd에 저장되는 Secret 데이터 암호화
-- ✅ CNI 없이 수동 라우팅으로 Pod 네트워크 구성
+- Kubernetes 각 컴포넌트의 역할과 상호작용 이해
+- mTLS(상호 TLS) 통신을 위한 CA 및 인증서 생성
+- 인증서 Subject(CN, O)와 Kubernetes RBAC의 연관성
+- Systemd를 사용한 각 컴포넌트 서비스 관리
+- etcd에 저장되는 Secret 데이터 암호화
+- CNI 없이 수동 라우팅으로 Pod 네트워크 구성
 
 **왜 "The Hard Way"인가?**
 - 자동화 도구가 숨기고 있는 내부 동작을 직접 경험
@@ -94,10 +94,9 @@ graph TB
     PROXY1 ---|kubeconfig| API
 
 ```
-
 ---
 
-## 🔐 CA 및 TLS 인증서 구성
+## CA 및 TLS 인증서 구성
 
 ### 1. Root CA 생성
 
@@ -112,14 +111,15 @@ openssl req -x509 -new -sha512 -noenc \
   -key ca.key -days 3653 \
   -config ca.conf \
   -out ca.crt
-```
 
+```
 **CA 인증서 특징**:
 - `basicConstraints = CA:TRUE` - CA 역할 가능
 - `keyUsage = cRLSign, keyCertSign` - 다른 인증서를 서명 가능
 - Kubernetes 모든 인증의 신뢰 루트(Root of Trust)
 
 **ca.conf 주요 섹션**:
+
 ```ini
 [ca_x509_extensions]
 basicConstraints = CA:TRUE
@@ -130,13 +130,14 @@ C = US
 ST = Washington
 L = Seattle
 CN = CA
-```
 
+```
 **인증서 확인**:
+
 ```bash
 openssl x509 -in ca.crt -text -noout
-```
 
+```
 **인증서 체인 구조**:
 
 ```mermaid
@@ -160,7 +161,6 @@ graph TD
     CM -.->|controller-manager| APISERVER
 
 ```
-
 ### 2. Admin 클라이언트 인증서
 
 kubectl을 사용할 관리자용 클라이언트 인증서:
@@ -180,29 +180,31 @@ openssl x509 -req -days 3653 -in admin.csr \
   -sha256 -CA ca.crt -CAkey ca.key \
   -CAcreateserial \
   -out admin.crt
-```
 
+```
 **Admin 인증서의 중요 필드**:
+
 ```
 Subject: CN=admin, O=system:masters
 X509v3 Extended Key Usage: TLS Web Client Authentication
-```
 
+```
 **핵심 포인트**:
 - **CN = admin**: Kubernetes에서 **user**로 매핑
 - **O = system:masters**: Kubernetes에서 **group**으로 매핑
 - `system:masters` 그룹은 **인가를 우회하는 슈퍼유저 권한** 보유
 
 **RBAC 확인**:
+
 ```bash
 kubectl describe clusterrolebindings cluster-admin
 
 # Subjects:
-#   Kind   Name             Namespace
-#   ----   ----             ---------
-#   Group  system:masters
-```
+# Kind Name Namespace
+# ---- ---- ---------
+# Group system:masters
 
+```
 **system:masters 그룹의 특별함**:
 - ClusterRole `cluster-admin`에 바인딩
 - 모든 리소스(`*.*`)에 대한 모든 동작(`*`) 허용
@@ -226,17 +228,18 @@ openssl x509 -req -days 3653 -in node-0.csr \
   -sha256 -CA ca.crt -CAkey ca.key \
   -CAcreateserial \
   -out node-0.crt
-```
 
+```
 **Node 인증서의 중요 필드**:
+
 ```
 Subject: CN=system:node:node-0, O=system:nodes, C=US, ST=Washington, L=Seattle
 X509v3 Extended Key Usage:
     TLS Web Client Authentication, TLS Web Server Authentication
 X509v3 Subject Alternative Name:
     DNS:node-0, IP Address:127.0.0.1
-```
 
+```
 **핵심 포인트**:
 - **CN = system:node:node-0**: Node Authorizer가 요구하는 명명 규칙 (`system:node:<nodeName>`)
 - **O = system:nodes**: Node Authorizer가 요구하는 그룹
@@ -263,6 +266,7 @@ X509v3 Subject Alternative Name:
 | service-accounts | service-accounts | - | SA 토큰 서명용 |
 
 **일괄 생성 스크립트**:
+
 ```bash
 certs=("node-0" "node-1" "kube-proxy" "kube-scheduler" \
        "kube-controller-manager" "kube-api-server" "service-accounts")
@@ -283,9 +287,10 @@ for i in ${certs[*]}; do
     -CAcreateserial \
     -out "${i}.crt"
 done
-```
 
+```
 **인증서 검증**:
+
 ```bash
 # kube-proxy 인증서 확인
 openssl x509 -in kube-proxy.crt -text -noout
@@ -295,8 +300,8 @@ openssl x509 -in kube-proxy.crt -text -noout
 # kube-scheduler 인증서 확인
 openssl x509 -in kube-scheduler.crt -text -noout
 # Subject: CN=system:kube-scheduler, O=system:kube-scheduler
-```
 
+```
 ### 5. API Server 인증서 특징
 
 **kube-apiserver 인증서는 특별합니다**:
@@ -317,8 +322,8 @@ X509v3 Subject Alternative Name:
     DNS:kubernetes.svc.cluster.local,
     DNS:server.kubernetes.local,
     DNS:api-server.kubernetes.local
-```
 
+```
 **SAN(Subject Alternative Name)에 포함된 항목**:
 - `127.0.0.1`: 로컬 접근
 - `10.32.0.1`: Service CIDR의 첫 번째 IP (kubernetes Service의 ClusterIP)
@@ -333,6 +338,7 @@ X509v3 Subject Alternative Name:
   - `apiserver-etcd-client.crt`: etcd 클라이언트 인증서
 
 **인증서 배포**:
+
 ```bash
 # Worker Node에 배포
 for host in node-0 node-1; do
@@ -347,17 +353,18 @@ scp ca.key ca.crt \
     kube-api-server.key kube-api-server.crt \
     service-accounts.key service-accounts.crt \
     root@server:~/
-```
 
+```
 ---
 
-## 📝 Kubeconfig 파일 생성
+## Kubeconfig 파일 생성
 
 ### 1. Kubeconfig 구조 이해
 
 Kubeconfig는 Kubernetes API Server와 통신하기 위한 **클라이언트 인증 설정 파일**입니다.
 
 **구성 요소**:
+
 ```yaml
 clusters:
   - name: kubernetes-the-hard-way
@@ -378,8 +385,8 @@ contexts:
       user: admin
 
 current-context: default
-```
 
+```
 **4가지 주요 섹션**:
 1. **clusters**: API Server 주소 및 CA 인증서
 2. **users**: 클라이언트 인증 정보 (인증서 또는 토큰)
@@ -389,6 +396,7 @@ current-context: default
 ### 2. Kubelet용 Kubeconfig
 
 **node-0.kubeconfig 생성**:
+
 ```bash
 # 1. Cluster 설정
 kubectl config set-cluster kubernetes-the-hard-way \
@@ -413,9 +421,10 @@ kubectl config set-context default \
 # 4. Current Context 설정
 kubectl config use-context default \
   --kubeconfig=node-0.kubeconfig
-```
 
+```
 **생성된 node-0.kubeconfig**:
+
 ```yaml
 apiVersion: v1
 kind: Config
@@ -435,8 +444,8 @@ contexts:
     user: system:node:node-0
   name: default
 current-context: default
-```
 
+```
 **Node Authorizer와의 관계**:
 - Kubelet의 클라이언트 인증서 CN은 **kubelet의 node 이름과 일치**해야 함
 - 이를 통해 Node Authorizer가 Kubelet을 적절히 인가
@@ -460,6 +469,7 @@ current-context: default
 - 나머지는 `server.kubernetes.local`로 원격 접근
 
 **일괄 생성 예시 (kube-proxy)**:
+
 ```bash
 kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=ca.crt \
@@ -480,9 +490,10 @@ kubectl config set-context default \
 
 kubectl config use-context default \
   --kubeconfig=kube-proxy.kubeconfig
-```
 
+```
 **배포**:
+
 ```bash
 # Worker Node에 배포
 for host in node-0 node-1; do
@@ -496,11 +507,11 @@ scp admin.kubeconfig \
     kube-controller-manager.kubeconfig \
     kube-scheduler.kubeconfig \
     root@server:~/
-```
 
+```
 ---
 
-## 🔒 Data Encryption at Rest
+## Data Encryption at Rest
 
 ### 1. ETCD 암호화 설정
 
@@ -521,6 +532,7 @@ scp admin.kubeconfig \
 ### 2. 암호화 Provider 이해
 
 **encryption-config.yaml**:
+
 ```yaml
 kind: EncryptionConfiguration
 apiVersion: apiserver.config.k8s.io/v1
@@ -533,9 +545,10 @@ resources:
             - name: key1  # 키 식별자 (etcd 데이터에 기록됨)
               secret: ${ENCRYPTION_KEY}
       - identity: {}  # 두 번째: 평문 (하위 호환성)
-```
 
+```
 **암호화 키 생성**:
+
 ```bash
 export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
 echo $ENCRYPTION_KEY
@@ -543,8 +556,8 @@ echo $ENCRYPTION_KEY
 
 # 환경 변수 치환하여 최종 파일 생성
 envsubst < configs/encryption-config.yaml > encryption-config.yaml
-```
 
+```
 **Provider 우선순위 전략**:
 1. **aescbc**: 새로운 Secret 저장 시 AES-CBC 방식으로 암호화
 2. **identity**: 기존에 평문으로 저장된 데이터도 읽을 수 있도록 하위 호환성 제공
@@ -555,8 +568,10 @@ envsubst < configs/encryption-config.yaml > encryption-config.yaml
 - "새로운 데이터는 무조건 암호화, 이전 평문 데이터도 읽기 가능" 전략
 
 **etcd에 저장되는 형식**:
+
 ```
 k8s:enc:aescbc:v1:key1:<ciphertext>
+
 ```
 - `k8s:enc`: Kubernetes 암호화 마커
 - `aescbc`: 암호화 알고리즘
@@ -576,28 +591,32 @@ k8s:enc:aescbc:v1:key1:<ciphertext>
 ### 3. 암호화 검증
 
 **Secret 생성**:
+
 ```bash
 kubectl create secret generic kubernetes-the-hard-way \
   --from-literal="mykey=mydata"
-```
 
+```
 **Kubernetes API를 통한 확인 (여전히 복호화되어 보임)**:
+
 ```bash
 kubectl get secret kubernetes-the-hard-way -o yaml
 # data:
-#   mykey: bXlkYXRh  (base64 인코딩)
+# mykey: bXlkYXRh (base64 인코딩)
 
 kubectl get secret kubernetes-the-hard-way -o jsonpath='{.data.mykey}' | base64 -d
 # mydata
-```
 
+```
 **etcd에서 직접 확인** (암호화 확인):
+
 ```bash
 ssh root@server \
   'etcdctl get /registry/secrets/default/kubernetes-the-hard-way | hexdump -C'
-```
 
+```
 **출력 예시** (암호화 적용됨):
+
 ```
 00000000  2f 72 65 67 69 73 74 72 79 2f 73 65 63 72 65 74  |/registry/secret|
 00000010  73 2f 64 65 66 61 75 6c 74 2f 6b 75 62 65 72 6e  |s/default/kubern|
@@ -605,13 +624,14 @@ ssh root@server \
 00000030  79 0a 6b 38 73 3a 65 6e 63 3a 61 65 73 63 62 63  |y.k8s:enc:aescbc|
 00000040  3a 76 31 3a 6b 65 79 31 3a 44 61 dc 08 37 97 eb  |:v1:key1:Da..7..|
 00000050  ...암호화된 데이터...
-```
 
+```
 **검증 포인트**:
-- ✅ `k8s:enc:aescbc:v1:key1:` 헤더 확인
-- ✅ 이후 데이터가 암호화되어 있음 확인 (읽을 수 없는 바이너리)
+- `k8s:enc:aescbc:v1:key1:` 헤더 확인
+- 이후 데이터가 암호화되어 있음 확인 (읽을 수 없는 바이너리)
 
 **Kind K8s와 비교** (기본 평문):
+
 ```bash
 # Kind K8s의 etcd 확인
 docker exec -i myk8s-control-plane etcdctl get \
@@ -621,17 +641,17 @@ docker exec -i myk8s-control-plane etcdctl get \
 00000030  79 0a 6b 38 73 00 0a 0c 0a 02 76 31 12 06 53 65  |y.k8s.....v1..Se|
 ...
 00000110  65 79 12 06 6d 79 64 61 74 61 1a 06 4f 70 61 71  |ey..mydata..Opaq|
-```
 
+```
 **프로덕션 권장사항**:
-- ✅ 암호화 설정 필수 적용
-- ✅ 키 로테이션 주기적 실행
-- ✅ KMS v2 사용 (AWS KMS, HashiCorp Vault 등)
-- ✅ 기존 Secret 재암호화: `kubectl get secrets --all-namespaces -o json | kubectl replace -f -`
+- 암호화 설정 필수 적용
+- 키 로테이션 주기적 실행
+- KMS v2 사용 (AWS KMS, HashiCorp Vault 등)
+- 기존 Secret 재암호화: `kubectl get secrets --all-namespaces -o json | kubectl replace -f -`
 
 ---
 
-## 🏗️ Control Plane 구성
+## Control Plane 구성
 
 ### 1. ETCD 클러스터 구축
 
@@ -647,9 +667,10 @@ chmod 700 /var/lib/etcd
 
 # 인증서 복사 (현재는 미사용, 향후 TLS 적용 시 사용)
 cp ca.crt kube-api-server.key kube-api-server.crt /etc/etcd/
-```
 
+```
 **Systemd 서비스 생성** (`/etc/systemd/system/etcd.service`):
+
 ```ini
 [Unit]
 Description=etcd
@@ -672,8 +693,8 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-```
 
+```
 | 플래그 | 설명 |
 |--------|------|
 | `--name` | etcd 멤버 이름 (클러스터 내 고유) |
@@ -682,9 +703,10 @@ WantedBy=multi-user.target
 | `--initial-cluster` | 초기 클러스터 구성원 목록 |
 | `--data-dir` | 데이터 저장 경로 |
 
-**⚠️ 주의**: 이 실습에서는 **HTTP 통신** 사용 (프로덕션에서는 HTTPS 필수!)
+****주의** 주의**: 이 실습에서는 **HTTP 통신** 사용 (프로덕션에서는 HTTPS 필수!)
 
 **서비스 시작 및 확인**:
+
 ```bash
 systemctl daemon-reload
 systemctl enable etcd
@@ -695,21 +717,22 @@ systemctl status etcd
 
 # 포트 확인
 ss -tnlp | grep etcd
-# LISTEN 127.0.0.1:2380  (peer)
-# LISTEN 127.0.0.1:2379  (client)
+# LISTEN 127.0.0.1:2380 (peer)
+# LISTEN 127.0.0.1:2379 (client)
 
 # 멤버 확인
 etcdctl member list -w table
 # +------------------+---------+--------+------------------------+------------------------+------------+
-# |        ID        | STATUS  |  NAME  |       PEER ADDRS       |      CLIENT ADDRS      | IS LEARNER |
+# | ID | STATUS | NAME | PEER ADDRS | CLIENT ADDRS | IS LEARNER |
 # +------------------+---------+--------+------------------------+------------------------+------------+
-# | 702b0a34e2cfd39  | started | server | http://127.0.0.1:2380 | http://127.0.0.1:2379 |      false |
+# | 702b0a34e2cfd39 | started | server | http://127.0.0.1:2380 | http://127.0.0.1:2379 | false |
 # +------------------+---------+--------+------------------------+------------------------+------------+
-```
 
+```
 ### 2. Kube-APIServer 설정
 
 **파일 준비**:
+
 ```bash
 # Binary 및 설정 파일 배치
 mkdir -p /var/lib/kubernetes/
@@ -720,9 +743,10 @@ mv ca.crt ca.key \
    service-accounts.key service-accounts.crt \
    encryption-config.yaml \
    /var/lib/kubernetes/
-```
 
+```
 **Systemd 서비스** (`/etc/systemd/system/kube-apiserver.service`):
+
 ```bash
 ExecStart=/usr/local/bin/kube-apiserver \
   --allow-privileged=true \
@@ -744,8 +768,8 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --tls-cert-file=/var/lib/kubernetes/kube-api-server.crt \
   --tls-private-key-file=/var/lib/kubernetes/kube-api-server.key \
   --v=2
-```
 
+```
 **핵심 플래그 설명**:
 
 | 플래그 | 설명 |
@@ -766,6 +790,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
 | `--tls-cert-file` | kube-apiserver HTTPS 서버 인증서 |
 
 **서비스 시작**:
+
 ```bash
 systemctl daemon-reload
 systemctl enable kube-apiserver
@@ -779,8 +804,8 @@ ss -tlp | grep kube
 # API 버전 확인
 curl -s -k --cacert /var/lib/kubernetes/ca.crt \
   https://server.kubernetes.local:6443/version | jq
-```
 
+```
 ### 3. Kube-Controller-Manager 설정
 
 **Kube-Controller-Manager 역할**:
@@ -788,12 +813,14 @@ curl -s -k --cacert /var/lib/kubernetes/ca.crt \
 - Node, ReplicaSet, ServiceAccount 토큰 등 관리
 
 **파일 준비**:
+
 ```bash
 mv kube-controller-manager /usr/local/bin/
 mv kube-controller-manager.kubeconfig /var/lib/kubernetes/
-```
 
+```
 **Systemd 서비스**:
+
 ```bash
 ExecStart=/usr/local/bin/kube-controller-manager \
   --bind-address=0.0.0.0 \
@@ -807,8 +834,8 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --service-cluster-ip-range=10.32.0.0/24 \
   --use-service-account-credentials=true \
   --v=2
-```
 
+```
 **핵심 플래그**:
 - `--cluster-cidr`: Pod CIDR 전체 대역 (각 노드에 쪼개서 할당)
 - `--service-account-private-key-file`: SA 토큰 서명용 개인키
@@ -818,23 +845,26 @@ ExecStart=/usr/local/bin/kube-controller-manager \
 - Smoke Test에서 Pod IP가 정상적으로 할당되지 않으면 `--allocate-node-cidrs=true` 추가
 
 **서비스 시작**:
+
 ```bash
 systemctl enable kube-controller-manager
 systemctl start kube-controller-manager
 systemctl status kube-controller-manager
-```
 
+```
 ### 4. Kube-Scheduler 설정
 
 **파일 준비**:
+
 ```bash
 mv kube-scheduler /usr/local/bin/
 mv kube-scheduler.kubeconfig /var/lib/kubernetes/
 mkdir -p /etc/kubernetes/config/
 mv kube-scheduler.yaml /etc/kubernetes/config/
-```
 
+```
 **kube-scheduler.yaml**:
+
 ```yaml
 apiVersion: kubescheduler.config.k8s.io/v1
 kind: KubeSchedulerConfiguration
@@ -842,22 +872,24 @@ clientConnection:
   kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
 leaderElection:
   leaderElect: false  # HA가 아니므로 비활성화
-```
 
+```
 **Systemd 서비스**:
+
 ```bash
 ExecStart=/usr/local/bin/kube-scheduler \
   --config=/etc/kubernetes/config/kube-scheduler.yaml \
   --v=2
-```
 
+```
 **서비스 시작**:
+
 ```bash
 systemctl enable kube-scheduler
 systemctl start kube-scheduler
 systemctl status kube-scheduler
-```
 
+```
 ### 5. RBAC for Kubelet Authorization
 
 **system:kube-apiserver-to-kubelet ClusterRole 생성**:
@@ -897,14 +929,15 @@ subjects:
   - apiGroup: rbac.authorization.k8s.io
     kind: User
     name: kubernetes  # kube-api-server.crt의 CN
-```
 
+```
 **적용**:
+
 ```bash
 kubectl apply -f kube-apiserver-to-kubelet.yaml \
   --kubeconfig admin.kubeconfig
-```
 
+```
 **API Server → Kubelet 호출 흐름**:
 
 ```mermaid
@@ -935,9 +968,10 @@ sequenceDiagram
     WebhookAuthz-->>Kubelet: 인가 성공
     Kubelet-->>API: 200 OK (로그 데이터)
     API-->>User: 로그 출력
-```
 
+```
 **검증**:
+
 ```bash
 # ClusterRole 확인
 kubectl describe clusterroles system:kube-apiserver-to-kubelet \
@@ -946,11 +980,11 @@ kubectl describe clusterroles system:kube-apiserver-to-kubelet \
 # ClusterRoleBinding 확인
 kubectl describe clusterrolebindings system:kube-apiserver \
   --kubeconfig admin.kubeconfig
-```
 
+```
 ---
 
-## ⚙️ Worker Node 구성
+## Worker Node 구성
 
 ### 1. Container Runtime 설치
 
@@ -963,6 +997,7 @@ kubectl describe clusterrolebindings system:kube-apiserver \
 - **kube-proxy**: Service 네트워크 구현
 
 **디렉토리 구조**:
+
 ```bash
 mkdir -p \
   /etc/cni/net.d \
@@ -971,9 +1006,10 @@ mkdir -p \
   /var/lib/kube-proxy \
   /var/lib/kubernetes \
   /var/run/kubernetes
-```
 
+```
 **Binary 설치**:
+
 ```bash
 # Worker 관련 바이너리
 mv crictl kubelet kube-proxy runc /usr/local/bin/
@@ -984,9 +1020,10 @@ tar -xvf containerd-2.1.0-linux-arm64.tar.gz -C /
 
 # CNI 플러그인
 tar -xvf cni-plugins-linux-arm64-v1.6.2.tgz -C /opt/cni/bin/
-```
 
+```
 **containerd 설정** (`/etc/containerd/config.toml`):
+
 ```toml
 version = 2
 
@@ -1000,9 +1037,10 @@ version = 2
         runtime_type = "io.containerd.runc.v2"
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
           SystemdCgroup = true  # kubelet cgroupDriver와 일치 필수
-```
 
+```
 **Systemd 서비스** (`/etc/systemd/system/containerd.service`):
+
 ```ini
 [Unit]
 Description=containerd container runtime
@@ -1019,9 +1057,10 @@ KillMode=process
 
 [Install]
 WantedBy=multi-user.target
-```
 
+```
 **서비스 시작**:
+
 ```bash
 systemctl daemon-reload
 systemctl enable containerd
@@ -1030,11 +1069,12 @@ systemctl start containerd
 # 확인
 systemctl status containerd
 crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock version
-```
 
+```
 ### 2. CNI 플러그인 구성
 
 **Bridge 플러그인 설정** (`/etc/cni/net.d/10-bridge.conf`):
+
 ```json
 {
   "cniVersion": "1.0.0",
@@ -1054,18 +1094,20 @@ crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock version
     ]
   }
 }
-```
 
+```
 **Loopback 플러그인 설정** (`/etc/cni/net.d/99-loopback.conf`):
+
 ```json
 {
   "cniVersion": "1.0.0",
   "name": "lo",
   "type": "loopback"
 }
-```
 
+```
 **CNI 동작 흐름**:
+
 ```
 1. kubelet이 Pod 생성 요청 받음
 2. containerd에 컨테이너 생성 요청
@@ -1077,22 +1119,24 @@ crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock version
    - 라우팅 설정
 4. /etc/cni/net.d/99-loopback.conf 실행
    - Pod 내부 loopback 인터페이스 설정
-```
 
+```
 **확인**:
+
 ```bash
 # Pod 생성 후
 brctl show
-# bridge name  bridge id        STP enabled  interfaces
-# cni0         8000.xxx         no           vethXXX
+# bridge name bridge id STP enabled interfaces
+# cni0 8000.xxx no vethXXX
 
 ip addr show cni0
 ip route
-```
 
+```
 ### 3. Kubelet 설정
 
 **kubelet-config.yaml 주요 설정** (`/var/lib/kubelet/kubelet-config.yaml`):
+
 ```yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -1117,22 +1161,24 @@ registerNode: true  # kubelet이 API 서버에 Node 객체 자동 등록
 runtimeRequestTimeout: "15m"  # CRI 요청 최대 대기 시간 (이미지 pull, container start 등)
 tlsCertFile: "/var/lib/kubelet/kubelet.crt"  # kubelet HTTPS 서버의 서버 인증서
 tlsPrivateKeyFile: "/var/lib/kubelet/kubelet.key"
-```
 
+```
 **Systemd 서비스** (`/etc/systemd/system/kubelet.service`):
+
 ```bash
 ExecStart=/usr/local/bin/kubelet \
   --config=/var/lib/kubelet/kubelet-config.yaml \
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
   --kubeconfig=/var/lib/kubelet/kubeconfig \
   --v=2
-```
 
+```
 - **Webhook 인증/인가**: kube-apiserver에 위임하여 SA 토큰, bootstrap 토큰 처리
 - **TLS 서버**: apiserver가 kubelet API에 접근하기 위해 필요 (포트 10250)
 - **cgroupDriver=systemd**: containerd와 일치시켜야 함 (불일치 시 Pod 생성 실패)
 
 **서비스 시작**:
+
 ```bash
 # Swap 비활성화 (Kubernetes 요구사항)
 swapoff -a
@@ -1145,11 +1191,12 @@ systemctl start kubelet
 # 확인
 systemctl status kubelet
 journalctl -u kubelet -f
-```
 
+```
 ### 4. Kube-Proxy 설정
 
 **kube-proxy-config.yaml** (`/var/lib/kube-proxy/kube-proxy-config.yaml`):
+
 ```yaml
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
@@ -1157,22 +1204,25 @@ clientConnection:
   kubeconfig: "/var/lib/kube-proxy/kubeconfig"
 mode: "iptables"  # iptables 모드 (다른 옵션: ipvs, userspace)
 clusterCIDR: "10.200.0.0/16"
-```
 
+```
 **Systemd 서비스**:
+
 ```bash
 ExecStart=/usr/local/bin/kube-proxy \
   --config=/var/lib/kube-proxy/kube-proxy-config.yaml
-```
 
+```
 **서비스 시작**:
+
 ```bash
 systemctl enable kube-proxy
 systemctl start kube-proxy
 systemctl status kube-proxy
-```
 
+```
 **확인**:
+
 ```bash
 # Kubelet API 포트 확인
 ss -tnlp | grep kubelet
@@ -1180,22 +1230,24 @@ ss -tnlp | grep kubelet
 
 # iptables 규칙 확인 (Service 생성 후)
 iptables -t nat -L KUBE-SERVICES
-```
 
+```
 ---
 
-## 🌐 Pod Network Routes
+## Pod Network Routes
 
 ### 1. Pod CIDR 구성
 
 **machines.txt 파일**:
+
 ```
 192.168.10.100 server.kubernetes.local  server
 192.168.10.101 node-0.kubernetes.local  node-0  10.200.0.0/24
 192.168.10.102 node-1.kubernetes.local  node-1  10.200.1.0/24
-```
 
+```
 **네트워크 구조**:
+
 ```
 Cluster CIDR: 10.200.0.0/16
 ├── node-0 Pod CIDR: 10.200.0.0/24
@@ -1207,8 +1259,8 @@ Cluster CIDR: 10.200.0.0/16
 
 Service CIDR: 10.32.0.0/24
 └── kubernetes: 10.32.0.1 (첫 번째 Service)
-```
 
+```
 ### 2. 수동 라우팅 설정
 
 **문제**: CNI가 없으므로 노드 간 Pod 통신을 위한 라우팅이 없음
@@ -1242,9 +1294,10 @@ EOF
 ssh root@node-1 <<EOF
 ip route add ${NODE_0_SUBNET} via ${NODE_0_IP}
 EOF
-```
 
+```
 **라우팅 테이블 확인**:
+
 ```bash
 ssh server ip route
 # default via 10.0.2.2 dev eth0
@@ -1258,16 +1311,17 @@ ssh node-0 ip route
 
 ssh node-1 ip route
 # 10.200.0.0/24 via 192.168.10.101 dev eth1
-```
 
+```
 ### 3. 네트워크 검증
 
 **Pod 생성 후 통신 테스트**:
+
 ```bash
 kubectl get pod -owide
-# NAME                     READY   STATUS    IP           NODE
-# nginx-xxx-aaa           1/1     Running   10.200.0.2   node-0
-# nginx-xxx-bbb           1/1     Running   10.200.1.2   node-1
+# NAME READY STATUS IP NODE
+# nginx-xxx-aaa 1/1 Running 10.200.0.2 node-0
+# nginx-xxx-bbb 1/1 Running 10.200.1.2 node-1
 
 # server 노드에서 Pod IP 접근 테스트
 ssh server curl -s 10.200.0.2 | grep title
@@ -1283,71 +1337,75 @@ ssh node-0 curl -s 10.200.1.2 | grep title
 # node-1에서 node-0 Pod 접근
 ssh node-1 curl -s 10.200.0.2 | grep title
 # <title>Welcome to nginx!</title>
-```
 
-**⚠️ 주의사항**:
+```
+****주의** 주의사항**:
 - 영구 설정이 아니므로 재부팅 시 라우팅 규칙 사라짐
 - 프로덕션에서는 CNI 플러그인 필수 (Calico, Cilium, Flannel 등)
 - BGP 기반 라우팅 또는 Overlay 네트워크 사용 권장
 
 ---
 
-## 🧪 Smoke Test
+## Smoke Test
 
 ### 1. Data Encryption 테스트
 
 **Secret 생성**:
+
 ```bash
 kubectl create secret generic kubernetes-the-hard-way \
   --from-literal="mykey=mydata"
 
 kubectl get secret kubernetes-the-hard-way
-# NAME                      TYPE     DATA   AGE
-# kubernetes-the-hard-way   Opaque   1      10s
-```
+# NAME TYPE DATA AGE
+# kubernetes-the-hard-way Opaque 1 10s
 
+```
 **Kubernetes API를 통한 확인** (복호화되어 보임):
+
 ```bash
 kubectl get secret kubernetes-the-hard-way -o yaml
 # apiVersion: v1
 # data:
-#   mykey: bXlkYXRh  # base64("mydata")
+# mykey: bXlkYXRh # base64("mydata")
 # kind: Secret
 # ...
 
 kubectl get secret kubernetes-the-hard-way -o jsonpath='{.data.mykey}' | base64 -d
 # mydata
-```
 
+```
 **etcd에서 암호화 확인**:
+
 ```bash
 ssh root@server \
   'etcdctl get /registry/secrets/default/kubernetes-the-hard-way | hexdump -C'
-```
 
+```
 **검증 포인트**:
-- ✅ `k8s:enc:aescbc:v1:key1:` 헤더 확인
-- ✅ 데이터가 암호화되어 있음 확인
+- `k8s:enc:aescbc:v1:key1:` 헤더 확인
+- 데이터가 암호화되어 있음 확인
 
 **결론**: Secret이 etcd에 암호화되어 저장됨! 🔒
 
 ### 2. Deployment 테스트
 
 **nginx Deployment 생성**:
+
 ```bash
 kubectl create deployment nginx --image=nginx:latest
 kubectl scale deployment nginx --replicas=2
 
 kubectl get deployments
-# NAME    READY   UP-TO-DATE   AVAILABLE   AGE
-# nginx   2/2     2            2           30s
+# NAME READY UP-TO-DATE AVAILABLE AGE
+# nginx 2/2 2 2 30s
 
 kubectl get pods -owide
-# NAME                     READY   STATUS    IP           NODE
-# nginx-54c98b4f84-pxp6c  1/1     Running   10.200.1.2   node-1
-# nginx-54c98b4f84-qxpbn  1/1     Running   10.200.0.2   node-0
-```
+# NAME READY STATUS IP NODE
+# nginx-54c98b4f84-pxp6c 1/1 Running 10.200.1.2 node-1
+# nginx-54c98b4f84-qxpbn 1/1 Running 10.200.0.2 node-0
 
+```
 **Pod 생성 흐름**:
 
 ```mermaid
@@ -1397,35 +1455,37 @@ sequenceDiagram
 
     Kubelet->>API: Update Pod Status (Running)
     API->>etcd: Pod Status 저장
-```
 
+```
 **Container Runtime 확인**:
+
 ```bash
 # node-0에서 crictl로 컨테이너 확인
 ssh node-0 crictl ps
-# CONTAINER ID  IMAGE               CREATED         STATE    NAME    POD ID
-# xxx           docker.io/nginx...  1 minute ago    Running  nginx   yyy
+# CONTAINER ID IMAGE CREATED STATE NAME POD ID
+# xxx docker.io/nginx... 1 minute ago Running nginx yyy
 
 # 프로세스 트리 확인
 ssh node-0 pstree -ap
 # systemd(1)
-#   ├─containerd(xxx)
-#   │   ├─containerd-shim-runc-v2(yyy)
-#   │   │   ├─pause(zzz)          # Pause 컨테이너
-#   │   │   └─nginx(aaa)          # 실제 nginx 프로세스
-#   │   │       └─nginx(bbb)      # nginx worker
+# ├─containerd(xxx)
+# │ ├─containerd-shim-runc-v2(yyy)
+# │ │ ├─pause(zzz) # Pause 컨테이너
+# │ │ └─nginx(aaa) # 실제 nginx 프로세스
+# │ │ └─nginx(bbb) # nginx worker
 
 # 브리지 인터페이스 확인
 ssh node-0 brctl show
-# bridge name  bridge id        STP enabled  interfaces
-# cni0         8000.xxx         no           vethXXX
+# bridge name bridge id STP enabled interfaces
+# cni0 8000.xxx no vethXXX
 
 # veth 인터페이스 확인
 ssh node-0 ip addr | grep veth
 # vethXXX@if3: <BROADCAST,MULTICAST,UP,LOWER_UP>
-```
 
+```
 **포트 포워딩 테스트**:
+
 ```bash
 POD_NAME=$(kubectl get pods -l app=nginx -o jsonpath="{.items[0].metadata.name}")
 echo $POD_NAME
@@ -1436,61 +1496,67 @@ kubectl port-forward $POD_NAME 8080:80 &
 curl --head http://127.0.0.1:8080
 # HTTP/1.1 200 OK
 # Server: nginx/1.25.3
-```
 
+```
 **로그 확인**:
+
 ```bash
 kubectl logs $POD_NAME
 # /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
 # ...
 # 127.0.0.1 - - [17/Jan/2026:...] "HEAD / HTTP/1.1" 200 0 ...
-```
 
+```
 **Exec 테스트**:
+
 ```bash
 kubectl exec -ti $POD_NAME -- nginx -v
 # nginx version: nginx/1.25.3
 
 kubectl exec -ti $POD_NAME -- cat /etc/os-release
 # PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
-```
 
+```
 **포트 포워딩 종료**:
+
 ```bash
 kill -9 $(pgrep kubectl)
-```
 
+```
 ### 3. Service 테스트
 
 **NodePort Service 생성**:
+
 ```bash
 kubectl expose deployment nginx --type=NodePort --port=80
 
 kubectl get service,ep nginx
-# NAME            TYPE       CLUSTER-IP    EXTERNAL-IP   PORT(S)
-# service/nginx   NodePort   10.32.0.149   <none>        80:31410/TCP
+# NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S)
+# service/nginx NodePort 10.32.0.149 <none> 80:31410/TCP
 #
-# NAME              ENDPOINTS
-# endpoints/nginx   10.200.0.2:80,10.200.1.2:80
-```
+# NAME ENDPOINTS
+# endpoints/nginx 10.200.0.2:80,10.200.1.2:80
 
+```
 **Service 상세 정보**:
+
 ```bash
 kubectl describe service nginx
-# Name:                     nginx
-# Namespace:                default
-# Selector:                 app=nginx
-# Type:                     NodePort
-# IP Family Policy:         SingleStack
-# IP Families:              IPv4
-# IP:                       10.32.0.149
-# Port:                     <unset>  80/TCP
-# TargetPort:               80/TCP
-# NodePort:                 <unset>  31410/TCP
-# Endpoints:                10.200.0.2:80,10.200.1.2:80
-```
+# Name: nginx
+# Namespace: default
+# Selector: app=nginx
+# Type: NodePort
+# IP Family Policy: SingleStack
+# IP Families: IPv4
+# IP: 10.32.0.149
+# Port: <unset> 80/TCP
+# TargetPort: 80/TCP
+# NodePort: <unset> 31410/TCP
+# Endpoints: 10.200.0.2:80,10.200.1.2:80
 
+```
 **NodePort 접근 테스트**:
+
 ```bash
 NODE_PORT=$(kubectl get svc nginx --output=jsonpath='{range .spec.ports[0]}{.nodePort}')
 echo $NODE_PORT
@@ -1508,19 +1574,20 @@ curl -s -I http://node-1:${NODE_PORT}
 # ClusterIP로 접근 (server 노드에서)
 ssh server curl -s -I http://10.32.0.149
 # HTTP/1.1 200 OK
-```
 
+```
 **kube-proxy iptables 규칙 확인**:
+
 ```bash
 ssh node-0 iptables -t nat -L KUBE-SERVICES | grep nginx
-# KUBE-SVC-XXX  tcp  --  anywhere  10.32.0.149  tcp dpt:80
-```
+# KUBE-SVC-XXX tcp -- anywhere 10.32.0.149 tcp dpt:80
 
+```
 **검증 완료**! 🎉
 
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. 인증(Authentication) vs 인가(Authorization)
 
@@ -1541,8 +1608,10 @@ ssh node-0 iptables -t nat -L KUBE-SERVICES | grep nginx
   - ABAC, Webhook
 
 **kube-apiserver 플래그**:
+
 ```bash
 --authorization-mode=Node,RBAC
+
 ```
 - 왼쪽부터 순서대로 평가
 - Node Authorizer가 먼저 평가되어 Kubelet 요청 처리
@@ -1567,11 +1636,7 @@ sequenceDiagram
     Auth-->>API: 인증 성공
 
     API->>NodeAuthz: 2. 인가 - Node Authorizer 평가
-    NodeAuthz->>NodeAuthz: User 패턴 확인<br/>"system:node:*" ✅
-    NodeAuthz->>NodeAuthz: Group 확인<br/>"system:nodes" ✅
-    NodeAuthz->>NodeAuthz: 자기 노드 리소스? ✅
-
-    alt Node Authorizer 허용
+    NodeAuthz->>NodeAuthz: User 패턴 확인<br/>"system:node:*" NodeAuthz->>NodeAuthz: Group 확인<br/>"system:nodes" NodeAuthz->>NodeAuthz: 자기 노드 리소스? alt Node Authorizer 허용
         NodeAuthz-->>API: 허용
         API-->>Kubelet: 200 OK
     else Node Authorizer 거부
@@ -1587,8 +1652,8 @@ sequenceDiagram
             API-->>Kubelet: 403 Forbidden
         end
     end
-```
 
+```
 ### 2. Node Authorizer 이해
 
 **Node Authorizer는 특수 목적 권한 부여 모드**:
@@ -1632,19 +1697,21 @@ sequenceDiagram
 - `node-restriction.kubernetes.io/` 접두사 label 보호
 
 **kube-apiserver 플래그**:
+
 ```bash
 --enable-admission-plugins=...,NodeRestriction,...
-```
 
+```
 **실습 예시**:
+
 ```bash
 # node-0의 kubelet이 자기 노드 정보 수정 (허용)
 # User: system:node:node-0, Group: system:nodes
 
 # node-0의 kubelet이 node-1 정보 수정 시도 (거부)
 # → NodeRestriction Admission Controller가 차단
-```
 
+```
 ### 3. Certificate Subject와 RBAC 관계
 
 **인증서 Subject 필드가 Kubernetes에 매핑되는 방식**:
@@ -1712,8 +1779,8 @@ graph LR
     CRB3 -->|RoleRef| CR3
 
 ```
-
 **예시 1: Admin**:
+
 ```
 인증서:
   Subject: CN=admin, O=system:masters
@@ -1732,9 +1799,10 @@ ClusterRole: cluster-admin
   Verbs: *
 
 결과: 인가 우회, 슈퍼유저 권한
-```
 
+```
 **예시 2: Kubelet**:
+
 ```
 인증서:
   Subject: CN=system:node:node-0, O=system:nodes
@@ -1748,9 +1816,10 @@ Kubernetes 매핑:
   2. (필요시) ClusterRole: system:node
 
 결과: 자기 노드 관련 리소스만 접근 가능
-```
 
+```
 **예시 3: Kube-Scheduler**:
+
 ```
 인증서:
   Subject: CN=system:kube-scheduler, O=system:kube-scheduler
@@ -1768,9 +1837,10 @@ ClusterRole: system:kube-scheduler
   - Pod 스케줄링 전용 권한 (Nodes, PVC binding 등)
 
 결과: Pod 스케줄링에 필요한 권한만
-```
 
+```
 **확인 방법**:
+
 ```bash
 # 인증서 Subject 확인
 openssl x509 -in admin.crt -text -noout | grep Subject
@@ -1779,15 +1849,15 @@ openssl x509 -in admin.crt -text -noout | grep Subject
 # RBAC 확인
 kubectl describe clusterrolebindings cluster-admin
 # Subjects:
-#   Kind   Name             Namespace
-#   ----   ----             ---------
-#   Group  system:masters
+# Kind Name Namespace
+# ---- ---- ---------
+# Group system:masters
 
 # 사용자 권한 확인 (krew 플러그인)
 kubectl rolesum -k User admin
 kubectl rbac-tool lookup system:masters
-```
 
+```
 **system:masters 그룹의 특별함**:
 - Kubernetes 내장 슈퍼유저 그룹
 - ClusterRole `cluster-admin`에 바인딩

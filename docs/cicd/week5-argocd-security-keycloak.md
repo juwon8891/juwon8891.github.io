@@ -5,7 +5,7 @@
 
 ---
 
-## 🚀 실습 환경 구성
+## 실습 환경 구성
 
 ### 1. kind Kubernetes 클러스터 배포
 
@@ -42,8 +42,8 @@ EOF
 # 클러스터 확인
 kubectl cluster-info
 kubectl get nodes
-```
 
+```
 **extraPortMappings의 역할**:
 - `containerPort: 80/443` → Ingress 트래픽
 - `containerPort: 30000-30003` → NodePort 서비스 접근
@@ -63,8 +63,8 @@ helm install kube-ops-view geek-cookbook/kube-ops-view \
 
 # 접속 URL 확인
 open "http://127.0.0.1:30001/#scale=1.5"
-```
 
+```
 ### 2. Ingress-Nginx 설치 및 설정
 
 #### Ingress-Nginx 배포
@@ -81,8 +81,8 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main
 # 배포 확인
 kubectl get deploy,svc,ep ingress-nginx-controller -n ingress-nginx
 kubectl describe -n ingress-nginx deployments/ingress-nginx-controller
-```
 
+```
 **kind 전용 매니페스트 특징**:
 - **hostPort 80/443 사용**: 호스트의 80, 443 포트를 직접 바인딩
 - **nodeSelector**: `ingress-ready: "true"` 라벨이 있는 노드에만 배포
@@ -102,8 +102,8 @@ KUBE_EDITOR="nano" kubectl edit -n ingress-nginx deployments/ingress-nginx-contr
 
 # args 섹션에 추가
 # - --enable-ssl-passthrough
-```
 
+```
 **SSL Passthrough가 필요한 이유**:
 - Ingress가 TLS를 종료하지 않고 **그대로 Pod에 전달**
 - ArgoCD Server가 자체 TLS 인증서로 end-to-end HTTPS 유지
@@ -121,8 +121,8 @@ sequenceDiagram
     I->>A: Forward HTTPS (Passthrough)
     A->>S: Load TLS certificate + key
     A->>C: HTTPS Response (Self-Signed Cert)
-```
 
+```
 #### IPTABLES 규칙 확인
 
 ```bash
@@ -134,8 +134,8 @@ exit
 # 출력 예시:
 # 0 0 DNAT tcp -- * * 0.0.0.0/0 0.0.0.0/0 tcp dpt:80 to:10.244.0.7:80
 # 0 0 DNAT tcp -- * * 0.0.0.0/0 0.0.0.0/0 tcp dpt:443 to:10.244.0.7:443
-```
 
+```
 ### 3. ArgoCD with TLS 설치
 
 #### TLS 인증서 생성
@@ -157,8 +157,8 @@ openssl x509 -noout -text -in argocd.example.com.crt
 # Issuer: CN=argocd.example.com, O=argocd
 # Validity: Not Before/After
 # Subject: CN=argocd.example.com, O=argocd
-```
 
+```
 #### ArgoCD TLS Secret 생성
 
 ```bash
@@ -172,10 +172,10 @@ kubectl -n argocd create secret tls argocd-server-tls \
 
 # Secret 확인
 kubectl get secret -n argocd argocd-server-tls
-# NAME                TYPE                DATA   AGE
-# argocd-server-tls   kubernetes.io/tls   2      7s
-```
+# NAME TYPE DATA AGE
+# argocd-server-tls kubernetes.io/tls 2 7s
 
+```
 #### ArgoCD Helm 설치
 
 ```bash
@@ -203,10 +203,10 @@ helm install argocd argo/argo-cd --version 9.0.5 \
 # 배포 확인
 kubectl get pod,ingress,svc,ep,secret,cm -n argocd
 kubectl get ingress -n argocd argocd-server
-# NAME            CLASS   HOSTS                  ADDRESS     PORTS     AGE
-# argocd-server   nginx   argocd.example.com     localhost   80, 443   6m42s
-```
+# NAME CLASS HOSTS ADDRESS PORTS AGE
+# argocd-server nginx argocd.example.com localhost 80, 443 6m42s
 
+```
 **ArgoCD TLS 동작 요약**:
 1. cert-manager 없이 OpenSSL로 self-signed 인증서 생성
 2. ArgoCD 서버는 `argocd-server-tls` Secret에서 TLS 인증서 로드
@@ -236,8 +236,8 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 # 웹 브라우저 접속
 open "https://argocd.example.com"
 # admin 계정 + 위에서 확인한 암호로 로그인
-```
 
+```
 #### ArgoCD CLI 로그인
 
 ```bash
@@ -252,11 +252,11 @@ argocd proj list
 argocd repo list
 argocd cluster list
 argocd app list
-```
 
+```
 ---
 
-## 🔐 ArgoCD 접근 제어
+## ArgoCD 접근 제어
 
 ### 1. 선언적 사용자 관리
 
@@ -275,11 +275,11 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-cm
 
 # ConfigMap 적용 후 계정 목록 확인
 argocd account list
-# NAME    ENABLED  CAPABILITIES
-# admin   false    login
-# alice   true     apiKey, login
-```
+# NAME ENABLED CAPABILITIES
+# admin false login
+# alice true apiKey, login
 
+```
 **사용자 암호 설정**:
 
 ```bash
@@ -292,8 +292,8 @@ argocd account update-password --account alice
 # alice로 로그인 테스트
 argocd logout
 argocd login argocd.example.com --username alice --insecure
-```
 
+```
 ### 2. RBAC 권한 부여
 
 #### RBAC 정책 구성
@@ -301,11 +301,12 @@ argocd login argocd.example.com --username alice --insecure
 ArgoCD의 RBAC는 **argocd-rbac-cm** ConfigMap에서 관리합니다.
 
 **정책 형식**:
+
 ```
 p, <주체>, <리소스>, <동작>, <객체>, <효과>
 g, <사용자/그룹>, <역할>
-```
 
+```
 **RBAC 리소스 종류**:
 - `applications`: Application 관리
 - `clusters`: 클러스터 관리
@@ -335,17 +336,17 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-rbac-cm
 # policy.default: role:readonly
 #
 # policy.csv: |
-#   # alice 사용자에게 모든 애플리케이션에 대한 읽기 권한
-#   p, alice, applications, get, */*, allow
-#   p, alice, applications, sync, */*, allow
+# # alice 사용자에게 모든 애플리케이션에 대한 읽기 권한
+# p, alice, applications, get, */*, allow
+# p, alice, applications, sync, */*, allow
 #
-#   # 특정 프로젝트에 대한 전체 권한
-#   p, alice, applications, *, default/*, allow
+# # 특정 프로젝트에 대한 전체 권한
+# p, alice, applications, *, default/*, allow
 
 # ArgoCD Server 재시작
 kubectl rollout restart deployment argocd-server -n argocd
-```
 
+```
 ### 3. 서비스 어카운트
 
 #### 서비스 어카운트란?
@@ -368,10 +369,10 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-cm
 
 # 계정 목록 확인
 argocd account list
-# NAME        ENABLED  CAPABILITIES
-# admin       false    login
-# alice       true     apiKey, login
-# gitops-ci   true     apiKey
+# NAME ENABLED CAPABILITIES
+# admin false login
+# alice true apiKey, login
+# gitops-ci true apiKey
 
 # API 키 생성
 argocd account generate-token -a gitops-ci
@@ -380,8 +381,8 @@ argocd account generate-token -a gitops-ci
 # 토큰 사용 예시
 export ARGOCD_AUTH_TOKEN=<생성된 토큰>
 argocd app list --auth-token $ARGOCD_AUTH_TOKEN
-```
 
+```
 #### 서비스 어카운트 RBAC
 
 ```bash
@@ -390,19 +391,19 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-rbac-cm
 
 # data 섹션에 추가
 # policy.csv: |
-#   # gitops-ci에게 특정 애플리케이션 sync 권한만 부여
-#   p, gitops-ci, applications, get, default/myapp, allow
-#   p, gitops-ci, applications, sync, default/myapp, allow
-#   p, gitops-ci, applications, create, */*, deny
-#   p, gitops-ci, applications, delete, */*, deny
+# # gitops-ci에게 특정 애플리케이션 sync 권한만 부여
+# p, gitops-ci, applications, get, default/myapp, allow
+# p, gitops-ci, applications, sync, default/myapp, allow
+# p, gitops-ci, applications, create, */*, deny
+# p, gitops-ci, applications, delete, */*, deny
 
 # ArgoCD Server 재시작
 kubectl rollout restart deployment argocd-server -n argocd
-```
 
+```
 ---
 
-## 🔑 Keycloak 소개
+## Keycloak 소개
 
 ### 1. Keycloak이
 
@@ -442,47 +443,46 @@ graph TB
     SSO --> APP3
 
 ```
-
 ### 2. 주요 기능 및 특징
 
 #### 강력한 인증 기능
 
-- ✅ 완전히 커스터마이징 가능한 로그인 페이지
-- ✅ 암호 복구, 주기적인 암호 업데이트
-- ✅ 이용 약관 동의, 2단계 인증
-- ✅ 애플리케이션에 추가 코딩 불필요
+- 완전히 커스터마이징 가능한 로그인 페이지
+- 암호 복구, 주기적인 암호 업데이트
+- 이용 약관 동의, 2단계 인증
+- 애플리케이션에 추가 코딩 불필요
 
 #### Single Sign-On (SSO)
 
-- ✅ 한 번의 인증으로 여러 애플리케이션 접근
-- ✅ 세션 관리 기능
-- ✅ 원격 세션 종료 가능
-- ✅ 사용자/관리자 모두 세션 추적 가능
+- 한 번의 인증으로 여러 애플리케이션 접근
+- 세션 관리 기능
+- 원격 세션 종료 가능
+- 사용자/관리자 모두 세션 추적 가능
 
 #### Identity Brokering
 
-- ✅ 소셜 네트워크 로그인 (Google, GitHub, Facebook 등)
-- ✅ 다른 엔터프라이즈 ID 공급자 연동
-- ✅ 기존 사용자 데이터 통합
+- 소셜 네트워크 로그인 (Google, GitHub, Facebook 등)
+- 다른 엔터프라이즈 ID 공급자 연동
+- 기존 사용자 데이터 통합
 
 #### User Federation
 
-- ✅ Active Directory 통합
-- ✅ LDAP 서버 연동
-- ✅ 기존 사용자 디렉터리 활용
+- Active Directory 통합
+- LDAP 서버 연동
+- 기존 사용자 디렉터리 활용
 
 #### 고가용성
 
-- ✅ 가볍고 설치가 쉬운 솔루션
-- ✅ 클러스터링 기능
-- ✅ 여러 데이터 센터 지원
+- 가볍고 설치가 쉬운 솔루션
+- 클러스터링 기능
+- 여러 데이터 센터 지원
 
 #### 확장성
 
-- ✅ Custom 인증 메커니즘
-- ✅ Custom 사용자 저장소
-- ✅ Custom 토큰 연동
-- ✅ Custom 로그인 프로토콜
+- Custom 인증 메커니즘
+- Custom 사용자 저장소
+- Custom 토큰 연동
+- Custom 로그인 프로토콜
 
 ### 3. 표준 프로토콜 지원
 
@@ -501,7 +501,7 @@ Keycloak은 업계 표준 프로토콜을 지원합니다:
 
 ---
 
-## ⚙️ Keycloak 설치 및 구성
+## Keycloak 설치 및 구성
 
 ### 1. Keycloak Docker 배포
 
@@ -519,16 +519,16 @@ docker run -d \
 
 # 컨테이너 확인
 docker ps
-# CONTAINER ID   IMAGE                                COMMAND                  PORTS
-# db56c9925eff   quay.io/keycloak/keycloak:22.0.0    "/opt/keycloak/bin/k…"   0.0.0.0:8080->8080/tcp
+# CONTAINER ID IMAGE COMMAND PORTS
+# db56c9925eff quay.io/keycloak/keycloak:22.0.0 "/opt/keycloak/bin/k…" 0.0.0.0:8080->8080/tcp
 
 # 로그 확인
 docker logs dev-keycloak
 # INFO [org.keycloak.services] KC-SERVICES0050: Initializing master realm
 # INFO [io.quarkus] Keycloak 22.0.0 on JVM (powered by Quarkus 3.2.0.Final) started in 4.856s
 # INFO [org.keycloak.services] KC-SERVICES0009: Added user 'admin' to realm 'master'
-```
 
+```
 #### Keycloak 접속
 
 ```bash
@@ -538,8 +538,8 @@ open http://localhost:8080/admin
 
 # 로그 모니터링
 docker logs dev-keycloak -f
-```
 
+```
 ### 2. Realm 생성 및 설정
 
 #### Realm이란?
@@ -561,7 +561,6 @@ docker logs dev-keycloak -f
    ```html
    <div style="color: #007bff; font-weight: bold;">My Awesome Realm</div>
    ```
-
 **Endpoint 확인**:
 - OpenID Endpoint: `http://localhost:8080/realms/myrealm/.well-known/openid-configuration`
 - SAML 2.0: `http://localhost:8080/realms/myrealm/protocol/saml/descriptor`
@@ -634,15 +633,16 @@ docker logs dev-keycloak -f
 - 현재 세션 보기 및 원격 로그아웃
 
 **접속**:
+
 ```bash
 # Account Console 접속
 open http://localhost:8080/realms/myrealm/account
 # 로그인: keycloak / <설정한 암호>
-```
 
+```
 ---
 
-## 🔗 ArgoCD와 Keycloak SSO 연동
+## ArgoCD와 Keycloak SSO 연동
 
 ### 1. Client 생성
 
@@ -695,8 +695,8 @@ sequenceDiagram
     A->>K: 8. Token 요청 (Code 교환)
     K->>A: 9. ID Token + Access Token
     A->>U: 10. 인증 완료, 세션 생성
-```
 
+```
 **흐름 설명**:
 1. 사용자가 ArgoCD에 로그인 요청
 2. ArgoCD는 인증 요청을 준비하고 Keycloak으로 리디렉션
@@ -717,8 +717,8 @@ kubectl -n argocd patch secret argocd-secret --patch='{"stringData": {
 # 확인
 kubectl get secret -n argocd argocd-secret -o jsonpath='{.data}' | jq
 # "oidc.keycloak.clientSecret": "bVYzSVpPM25tSG9acjNCQkMzN1VwZHJNU01rRjlVbXQ="
-```
 
+```
 #### OIDC Config 추가
 
 **중요**: `192.168.254.110`은 **자신의 로컬 IP**로 변경해야 합니다.
@@ -735,13 +735,13 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-cm
 # url: https://argocd.example.com
 #
 # oidc.config: |
-#   name: Keycloak
-#   issuer: http://192.168.254.110:8080/realms/master
-#   clientID: argocd
-#   clientSecret: $oidc.keycloak.clientSecret
-#   requestedScopes: ["openid", "profile", "email"]
-```
+# name: Keycloak
+# issuer: http://192.168.254.110:8080/realms/master
+# clientID: argocd
+# clientSecret: $oidc.keycloak.clientSecret
+# requestedScopes: ["openid", "profile", "email"]
 
+```
 **설정 값 설명**:
 - `name`: UI에 표시될 SSO 제공자 이름
 - `issuer`: Keycloak Realm의 OIDC Discovery URL
@@ -757,8 +757,8 @@ kubectl rollout restart deploy argocd-server -n argocd
 
 # 재시작 확인
 kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server
-```
 
+```
 ### 3. Keycloak 인증 테스트
 
 #### 웹 UI 로그인
@@ -766,8 +766,8 @@ kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server
 ```bash
 # ArgoCD 웹 접속
 open "https://argocd.example.com"
-```
 
+```
 1. **로그인 페이지**에서 `LOG IN VIA KEYCLOAK` 버튼 클릭
 2. Keycloak 로그인 페이지로 리디렉션
 3. Keycloak 사용자 (`keycloak` / 암호) 입력
@@ -779,8 +779,8 @@ open "https://argocd.example.com"
 # Keycloak Admin Console에서 사용자 추가
 # Username: tom
 # Password: tom123
-```
 
+```
 1. Keycloak Admin Console → Users → Add user
 2. Username: `tom`, Email: `tom@example.com`
 3. Credentials → Set password: `tom123`, Temporary: `Off`
@@ -788,7 +788,7 @@ open "https://argocd.example.com"
 
 ---
 
-## 🎯 OAuth 2.0과 OIDC 이해
+## OAuth 2.0과 OIDC 이해
 
 ### 1. OAuth 2.0 Authorization Code Flow
 
@@ -811,13 +811,13 @@ sequenceDiagram
     C->>RS: 8. API 요청 (Access Token)
     RS->>C: 9. 게임 목록 반환
     C->>RO: 10. 게임 목록 표시
-```
 
+```
 **OAuth 2.0의 핵심**:
-- ✅ **인증은 유저가 직접 수행**
-- ✅ **권한은 클라이언트가 받는다**
-- ✅ 사용자 자격증명을 애플리케이션에 노출하지 않음
-- ✅ Access Token으로 제한된 권한만 부여
+- **인증은 유저가 직접 수행**
+- **권한은 클라이언트가 받는다**
+- 사용자 자격증명을 애플리케이션에 노출하지 않음
+- Access Token으로 제한된 권한만 부여
 
 ### 2. OIDC와 OAuth 2.0의 관계
 
@@ -831,9 +831,9 @@ sequenceDiagram
 | **표준** | RFC 6749 | OpenID Connect Core 1.0 |
 
 **OIDC의 추가 기능**:
-- ✅ **ID Token**: 사용자 신원 정보를 담은 JWT
-- ✅ **UserInfo Endpoint**: 사용자 프로필 정보 조회
-- ✅ **Standard Claims**: 표준화된 사용자 정보 (name, email 등)
+- **ID Token**: 사용자 신원 정보를 담은 JWT
+- **UserInfo Endpoint**: 사용자 프로필 정보 조회
+- **Standard Claims**: 표준화된 사용자 정보 (name, email 등)
 
 ### 3. 토큰 종류와 역할
 
@@ -843,8 +843,8 @@ sequenceDiagram
 
 ```
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
+```
 **특징**:
 - 짧은 수명 (예: 5-15분)
 - 리소스 서버가 검증
@@ -866,8 +866,8 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
   "preferred_username": "keycloak",
   "groups": ["mygroup"]
 }
-```
 
+```
 **Claims 설명**:
 - `iss` (Issuer): 토큰 발급자
 - `sub` (Subject): 사용자 고유 ID

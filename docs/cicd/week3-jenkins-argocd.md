@@ -5,7 +5,7 @@
 
 ---
 
-## 🛠️ 실습 환경 구성
+## 실습 환경 구성
 
 ### 1. Jenkins와 Gogs 컨테이너 구성
 
@@ -39,7 +39,6 @@ graph TB
     K8S_MASTER --> K8S_WORKER2
 
 ```
-
 #### Docker Compose로 Jenkins와 Gogs 실행
 
 ```bash
@@ -88,8 +87,8 @@ docker compose up -d
 
 # 상태 확인
 docker compose ps
-```
 
+```
 #### Docker-out-of-Docker 설정
 
 Jenkins 컨테이너 내부에서 호스트의 Docker 데몬을 사용하도록 설정합니다.
@@ -123,8 +122,8 @@ docker compose restart jenkins
 # jenkins 사용자로 docker 명령 실행 확인
 docker compose exec jenkins docker ps
 docker compose exec jenkins docker info
-```
 
+```
 **Windows 사용자 참고**: WSL2 환경에서는 모든 docker compose 명령 앞에 `sudo`를 붙여야 합니다.
 
 ### 2. Kind 로컬 쿠버네티스 클러스터
@@ -153,7 +152,6 @@ graph TB
     CP -->|Manages| W2
 
 ```
-
 **Kind의 주요 특징**:
 - Docker 컨테이너를 쿠버네티스 노드로 사용
 - 멀티 노드 클러스터 지원
@@ -189,8 +187,8 @@ echo "compdef kubecolor=kubectl" >> ~/.zshrc
 
 # krew 플러그인 설치
 kubectl krew install neat stern
-```
 
+```
 #### 3노드 Kind 클러스터 배포
 
 ```bash
@@ -238,8 +236,8 @@ docker network inspect kind
 
 # 컨테이너 확인
 docker ps | grep myk8s
-```
 
+```
 #### kube-ops-view 설치
 
 클러스터 상태를 시각적으로 확인할 수 있는 도구를 설치합니다.
@@ -261,8 +259,8 @@ kubectl get deploy,pod,svc,ep -n kube-system -l app.kubernetes.io/instance=kube-
 # 웹 브라우저로 접속
 open "http://127.0.0.1:30001/#scale=2"  # macOS
 # Windows: http://127.0.0.1:30001/#scale=2
-```
 
+```
 ### 3. Jenkins 초기 설정
 
 #### Jenkins 웹 접속 및 초기 설정
@@ -275,8 +273,8 @@ docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 # Jenkins 웹 접속
 open "http://127.0.0.1:8080"  # macOS
 # Windows: http://127.0.0.1:8080
-```
 
+```
 **초기 설정 과정**:
 1. 초기 암호 입력
 2. "Install suggested plugins" 선택
@@ -299,28 +297,31 @@ open "http://127.0.0.1:8080"  # macOS
 **Jenkins 관리 → Credentials → Global → Add Credentials**
 
 **1. Gogs 저장소 자격증명** (`gogs-crd`)
+
 ```
 Kind: Username with password
 Username: devops
 Password: <Gogs 토큰>
 ID: gogs-crd
-```
 
+```
 **2. Docker Hub 자격증명** (`dockerhub-crd`)
+
 ```
 Kind: Username with password
 Username: <도커 계정명>
 Password: <도커 계정 암호 또는 토큰>
 ID: dockerhub-crd
-```
 
+```
 **3. Kubernetes 자격증명** (`k8s-crd`)
+
 ```
 Kind: Secret file
 File: <kubeconfig 파일 업로드>
 ID: k8s-crd
-```
 
+```
 **Windows 사용자**: WSL2에서 `cat ~/.kube/config` 내용을 메모장으로 복사하여 파일로 저장 후 업로드
 
 ### 4. Gogs Git 서버 설정
@@ -331,8 +332,8 @@ ID: k8s-crd
 # Gogs 웹 접속
 open "http://127.0.0.1:3000/install"  # macOS
 # Windows: http://127.0.0.1:3000/install
-```
 
+```
 **초기 설정**:
 - 데이터베이스 유형: **SQLite3**
 - 애플리케이션 URL: `http://<자신의 PC IP>:3000/`
@@ -354,23 +355,25 @@ open "http://127.0.0.1:3000/install"  # macOS
 #### Gogs 저장소 생성
 
 **저장소 1: dev-app** (개발팀용)
+
 ```
 Repository Name: dev-app
 Visibility: Private
 .gitignore: Python
 Readme: Default
 Initialize this repository with selected files and template: ✓
-```
 
+```
 **저장소 2: ops-deploy** (데브옵스팀용)
+
 ```
 Repository Name: ops-deploy
 Visibility: Private
 .gitignore: Python
 Readme: Default
 Initialize this repository with selected files and template: ✓
-```
 
+```
 #### dev-app 저장소 초기 코드 작성
 
 ```bash
@@ -435,11 +438,11 @@ echo "0.0.1" > VERSION
 git add .
 git commit -m "Add dev-app"
 git push -u origin main
-```
 
+```
 ---
 
-## 🔧 Jenkins CI + K8S
+## Jenkins CI + K8S
 
 ### 1. Jenkins와 Kubernetes 통합
 
@@ -465,8 +468,8 @@ exit
 # 설치 확인
 docker compose exec jenkins kubectl version --client --output=yaml
 docker compose exec jenkins helm version
-```
 
+```
 #### Jenkins Pipeline으로 Kubernetes 제어
 
 **Jenkins Item 생성**: `k8s-cmd` (Pipeline)
@@ -487,8 +490,8 @@ pipeline {
         }
     }
 }
-```
 
+```
 ### 2. 애플리케이션 배포 및 관리
 
 #### Kubernetes 선언적 배포
@@ -513,8 +516,8 @@ sequenceDiagram
     Controller->>Controller: 6. 원하는 상태(2개)와 비교
     Controller->>Pod: 7. 새 Pod 1개 생성
     Pod->>Controller: 8. 상태 보고 (2개)
-```
 
+```
 #### 애플리케이션 Deployment 배포
 
 ```bash
@@ -545,8 +548,8 @@ EOF
 # 배포 상태 확인
 kubectl get deploy,rs,pod -o wide
 watch -d kubectl get deploy,pod -o wide
-```
 
+```
 #### 이미지 Pull 에러 해결
 
 Private 이미지 저장소를 사용하는 경우 인증이 필요합니다.
@@ -555,8 +558,8 @@ Private 이미지 저장소를 사용하는 경우 인증이 필요합니다.
 # 에러 확인
 kubectl describe pod <pod-name>
 # Events:
-#   Warning  Failed     Error: ImagePullBackOff
-#   pull access denied, repository does not exist or may require authorization
+# Warning Failed Error: ImagePullBackOff
+# pull access denied, repository does not exist or may require authorization
 
 # Docker Hub 자격증명 Secret 생성
 export DHUSER=gasida       # 도커 계정
@@ -596,8 +599,8 @@ EOF
 
 # 배포 확인
 kubectl get deploy,rs,pod -o wide
-```
 
+```
 ### 3. Service와 Load Balancing
 
 #### Service의 필요성
@@ -625,7 +628,6 @@ graph TB
     NEW[New Pod<br/>10.244.1.5] -.자동 추가.-> SVC
 
 ```
-
 **Service 주요 기능**:
 - **고정 진입점**: ClusterIP, NodePort, LoadBalancer
 - **로드 밸런싱**: Pod 간 트래픽 분산
@@ -665,8 +667,8 @@ curl http://127.0.0.1:30000
 
 # 부하분산 확인
 for i in {1..100}; do curl -s http://127.0.0.1:30000 | grep hostname; done | sort | uniq -c | sort -nr
-```
 
+```
 #### 애플리케이션 업데이트 (Rolling Update)
 
 ```bash
@@ -694,13 +696,13 @@ watch "kubectl get deploy,ep timeserver; echo; kubectl get rs,pod"
 
 # 업데이트 결과 확인
 kubectl get deploy timeserver
-# NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-# timeserver   2/2     2            2           10m
+# NAME READY UP-TO-DATE AVAILABLE AGE
+# timeserver 2/2 2 2 10m
 
 curl http://127.0.0.1:30000
 # VERSION 0.0.2 확인
-```
 
+```
 **Rolling Update의 동작 원리**:
 1. 새 ReplicaSet 생성
 2. 새 Pod 하나씩 생성
@@ -733,8 +735,8 @@ exit
 
 # Gogs 재시작
 docker compose restart gogs
-```
 
+```
 **Webhook 추가** (Gogs 웹):
 1. dev-app 저장소 → Settings → Webhooks → Add Webhook → Gogs
 2. **Payload URL**: `http://192.168.254.124:8080/gogs-webhook/?job=SCM-Pipeline`
@@ -808,8 +810,8 @@ pipeline {
         }
     }
 }
-```
 
+```
 **테스트**:
 
 ```bash
@@ -825,11 +827,11 @@ git push
 # Gogs Webhook 기록 확인
 # Jenkins 빌드 자동 트리거 확인
 # Docker Hub에 이미지 업로드 확인
-```
 
+```
 ---
 
-## 🚀 Jenkins CI/CD + Blue-Green 배포
+## Jenkins CI/CD + Blue-Green 배포
 
 ### 1. Blue-Green 배포 전략
 
@@ -860,18 +862,18 @@ graph TB
         BLUE3[Blue<br/>Deployment<br/>v1.0]
 
     end
-```
 
+```
 **Blue-Green 배포 장점**:
-- ✅ **무중단 배포**: 서비스 다운타임 없음
-- ✅ **빠른 롤백**: Service selector만 변경하면 즉시 롤백
-- ✅ **안전한 테스트**: 프로덕션 트래픽 전환 전 테스트 가능
-- ✅ **위험 최소화**: 문제 발생 시 즉시 이전 버전으로 복구
+- **무중단 배포**: 서비스 다운타임 없음
+- **빠른 롤백**: Service selector만 변경하면 즉시 롤백
+- **안전한 테스트**: 프로덕션 트래픽 전환 전 테스트 가능
+- **위험 최소화**: 문제 발생 시 즉시 이전 버전으로 복구
 
 **Blue-Green 배포 단점**:
-- ❌ **리소스 2배**: 동일한 환경 2개 유지 필요
-- ❌ **데이터베이스 호환성**: DB 스키마 변경 시 양쪽 호환 필요
-- ❌ **복잡성**: 환경 관리 복잡도 증가
+- **리소스 2배**: 동일한 환경 2개 유지 필요
+- **데이터베이스 호환성**: DB 스키마 변경 시 양쪽 호환 필요
+- **복잡성**: 환경 관리 복잡도 증가
 
 ### 2. Jenkins Pipeline으로 Blue-Green 구현
 
@@ -958,8 +960,8 @@ EOF
 git add deploy/
 git commit -m "Add echo server yaml"
 git push
-```
 
+```
 #### Blue-Green Pipeline 생성
 
 **Jenkins Item**: `k8s-bluegreen` (Pipeline)
@@ -1025,8 +1027,8 @@ pipeline {
         }
     }
 }
-```
 
+```
 #### Blue-Green 배포 테스트
 
 ```bash
@@ -1041,11 +1043,11 @@ watch -d 'kubectl get deploy -o wide; echo; kubectl get svc,ep echo-server-servi
 # 2. Green 버전 배포 승인
 # 3. Green으로 전환 승인 → Hello from Green 확인
 # 4. Blue 제거 또는 롤백 선택
-```
 
+```
 ---
 
-## 🎯 ArgoCD GitOps 배포
+## ArgoCD GitOps 배포
 
 ### 1. ArgoCD 소개 및 아키텍처
 
@@ -1090,7 +1092,6 @@ graph TB
     USER[개발자/운영자] -->|웹 UI/CLI| API
 
 ```
-
 **ArgoCD 주요 컴포넌트**:
 
 | 컴포넌트 | 역할 |
@@ -1121,7 +1122,6 @@ flowchart TB
     ACTION --> DEPLOY
 
 ```
-
 **GitOps 루프 상세 설명**:
 
 1. **Deploy**: Git 저장소에 정의된 Manifest를 쿠버네티스 클러스터에 배포
@@ -1175,8 +1175,8 @@ helm install argocd argo/argo-cd \
 # 설치 확인
 kubectl get pod,svc,ep -n argocd
 kubectl get crd | grep argo
-```
 
+```
 #### ArgoCD 초기 암호 확인 및 접속
 
 ```bash
@@ -1191,8 +1191,8 @@ open "https://127.0.0.1:30002"  # macOS
 # 로그인
 # Username: admin
 # Password: PCdOlwZT8c4naBWK
-```
 
+```
 **초기 설정**:
 1. User Info → **UPDATE PASSWORD**로 암호 변경 (`qwe12345`)
 2. Settings → Repositories → **CONNECT REPO** 클릭
@@ -1200,6 +1200,7 @@ open "https://127.0.0.1:30002"  # macOS
 #### ops-deploy Repository 등록
 
 **Repository 설정**:
+
 ```
 Connection method: VIA HTTPS
 Type: git
@@ -1207,8 +1208,8 @@ Project: default
 Repo URL: http://192.168.254.124:3000/devops/ops-deploy
 Username: devops
 Password: <Gogs 토큰>
-```
 
+```
 ### 3. Helm Chart를 통한 배포
 
 #### nginx-chart 준비 (ops-deploy 저장소)
@@ -1347,8 +1348,8 @@ EOF
 git add nginx-chart/
 git commit -m "Add nginx helm chart"
 git push
-```
 
+```
 #### ArgoCD Application 생성 (선언적 방식)
 
 ```bash
@@ -1387,8 +1388,8 @@ kubectl describe applications -n argocd dev-nginx
 # 배포 확인
 kubectl get all -n dev-nginx -o wide
 curl http://127.0.0.1:30000
-```
 
+```
 #### 자동 동기화 동작 확인
 
 ```bash
@@ -1432,8 +1433,8 @@ git push
 # ArgoCD 웹에서 REFRESH 클릭으로 즉시 확인 가능
 kubectl get all -n dev-nginx -o wide
 curl http://127.0.0.1:30000
-```
 
+```
 **ArgoCD 동기화 주기 설정**:
 
 ArgoCD는 기본적으로 **3분마다** Git 저장소를 확인합니다.
@@ -1444,8 +1445,8 @@ kubectl get cm argocd-cm -n argocd -o yaml | grep timeout.reconciliation
 # timeout.reconciliation: 180s
 
 # 즉시 동기화: ArgoCD 웹에서 REFRESH 클릭
-```
 
+```
 ### 4. Full CI/CD 파이프라인 구축
 
 #### 전체 CI/CD 플로우
@@ -1470,8 +1471,8 @@ sequenceDiagram
     K8s->>Dev: 8. 배포 완료 확인
 
     Note over Dev,K8s: 개발자는 dev-app만 관리,<br/>나머지는 자동화
-```
 
+```
 **Full CI/CD 특징**:
 - **개발팀**: `dev-app` 저장소만 관리 (코드, Dockerfile, VERSION)
 - **Jenkins**: 이미지 빌드 후 `ops-deploy` 저장소 자동 업데이트
@@ -1535,8 +1536,8 @@ EOF
 git add dev-app/
 git commit -m "Add dev-app deployment yaml"
 git push
-```
 
+```
 #### ArgoCD Application 생성 (timeserver)
 
 ```bash
@@ -1569,8 +1570,8 @@ kubectl get applications -n argocd timeserver
 kubectl get deploy,rs,pod
 kubectl get svc,ep timeserver
 curl http://127.0.0.1:30000
-```
 
+```
 #### Jenkinsfile 수정 (ops-deploy 자동 업데이트)
 
 ```bash
@@ -1659,8 +1660,8 @@ EOF
 git add Jenkinsfile
 git commit -m "Update Jenkinsfile for ops-deploy automation"
 git push
-```
 
+```
 #### Full CI/CD 테스트
 
 ```bash
@@ -1682,30 +1683,30 @@ git push
 # ops-deploy 저장소 자동 업데이트 확인
 # ArgoCD 자동 배포 확인 (3분 이내)
 curl http://127.0.0.1:30000
-```
 
+```
 ---
 
-## 🎨 Argo Rollouts - 고급 배포 전략
+## Argo Rollouts - 고급 배포 전략
 
 ### 1. Argo Rollouts 소개
 
 **Argo Rollouts**는 쿠버네티스를 위한 **Progressive Delivery Controller**입니다.
 
 **기본 RollingUpdate의 한계**:
-- ❌ 롤아웃 속도 제어 부족
-- ❌ 새 버전으로의 트래픽 제어 불가
-- ❌ 외부 메트릭 기반 자동 롤백 불가
-- ❌ 심층 테스트 및 분석 기능 부족
+- 롤아웃 속도 제어 부족
+- 새 버전으로의 트래픽 제어 불가
+- 외부 메트릭 기반 자동 롤백 불가
+- 심층 테스트 및 분석 기능 부족
 
 **Argo Rollouts가 제공하는 기능**:
-- ✅ **Blue-Green** 배포 전략
-- ✅ **Canary** 배포 전략 (세밀한 가중치 트래픽 분배)
-- ✅ **자동 롤백 및 프로모션**
-- ✅ **수동 승인(Manual Judgement)**
-- ✅ **메트릭 기반 분석** (Prometheus, Datadog 등)
-- ✅ **Ingress 컨트롤러 통합** (NGINX, ALB 등)
-- ✅ **Service Mesh 통합** (Istio, Linkerd 등)
+- **Blue-Green** 배포 전략
+- **Canary** 배포 전략 (세밀한 가중치 트래픽 분배)
+- **자동 롤백 및 프로모션**
+- **수동 승인(Manual Judgement)**
+- **메트릭 기반 분석** (Prometheus, Datadog 등)
+- **Ingress 컨트롤러 통합** (NGINX, ALB 등)
+- **Service Mesh 통합** (Istio, Linkerd 등)
 
 #### Argo Rollouts 아키텍처
 
@@ -1743,7 +1744,6 @@ graph TB
     ANALYSIS -->|성공/실패| ROLLOUT
 
 ```
-
 ### 2. Canary 배포 전략
 
 #### Canary 배포란?
@@ -1771,13 +1771,13 @@ graph TB
         SVC3 -->|100%| NEW[New Stable<br/>v2.0]
 
     end
-```
 
+```
 **Canary 배포 장점**:
-- ✅ **위험 최소화**: 소수 사용자에게 먼저 배포
-- ✅ **점진적 확대**: 문제 없으면 트래픽 증가
-- ✅ **빠른 롤백**: 문제 발견 시 즉시 중단
-- ✅ **실제 사용자 테스트**: A/B 테스트 가능
+- **위험 최소화**: 소수 사용자에게 먼저 배포
+- **점진적 확대**: 문제 없으면 트래픽 증가
+- **빠른 롤백**: 문제 발견 시 즉시 중단
+- **실제 사용자 테스트**: A/B 테스트 가능
 
 #### Argo Rollouts 설치
 
@@ -1806,8 +1806,8 @@ kubectl get all -n argo-rollouts
 # 대시보드 접속
 echo "http://127.0.0.1:30003"
 open "http://127.0.0.1:30003"
-```
 
+```
 #### Canary Rollout 예제
 
 ```bash
@@ -1826,8 +1826,8 @@ kubectl get svc,ep rollouts-demo
 # 현재 이미지 확인
 kubectl get rollouts rollouts-demo -o json | grep -A 2 "image"
 # "image": "argoproj/rollouts-demo:blue"
-```
 
+```
 **Rollout Spec 분석**:
 
 ```yaml
@@ -1849,8 +1849,8 @@ spec:
       - setWeight: 80    # 80% 트래픽
       - pause: {duration: 10s}
   # ... (나머지 생략)
-```
 
+```
 #### Rollout 업데이트 및 진행 제어
 
 ```bash
@@ -1869,8 +1869,8 @@ kubectl argo rollouts undo rollouts-demo
 
 # 전체 롤백
 kubectl argo rollouts abort rollouts-demo
-```
 
+```
 **Argo Rollouts 대시보드**에서 시각적으로 Canary 배포 진행 상황을 확인할 수 있습니다:
 - 각 ReplicaSet의 Pod 수
 - 트래픽 가중치
@@ -1878,33 +1878,33 @@ kubectl argo rollouts abort rollouts-demo
 
 ---
 
-## 📊 3주차 학습 정리
+## 3주차 학습 정리
 
 ### 1. 핵심 성취 목표
 
 **Jenkins CI/CD 마스터**
-- ✅ Jenkins와 Kubernetes 통합
-- ✅ Docker-out-of-Docker 설정
-- ✅ Pipeline as Code (Jenkinsfile)
-- ✅ Gogs Webhook 연동
-- ✅ Blue-Green 배포 구현
+- Jenkins와 Kubernetes 통합
+- Docker-out-of-Docker 설정
+- Pipeline as Code (Jenkinsfile)
+- Gogs Webhook 연동
+- Blue-Green 배포 구현
 
 **ArgoCD GitOps 배포**
-- ✅ GitOps 철학 이해 및 실습
-- ✅ ArgoCD 아키텍처 이해
-- ✅ Helm Chart 기반 배포
-- ✅ 선언적 Application 관리
-- ✅ 자동 동기화 및 Drift 감지
+- GitOps 철학 이해 및 실습
+- ArgoCD 아키텍처 이해
+- Helm Chart 기반 배포
+- 선언적 Application 관리
+- 자동 동기화 및 Drift 감지
 
 **Argo Rollouts**
-- ✅ Progressive Delivery 개념 이해
-- ✅ Canary 배포 전략 실습
-- ✅ 수동 승인 및 자동 프로모션
+- Progressive Delivery 개념 이해
+- Canary 배포 전략 실습
+- 수동 승인 및 자동 프로모션
 
 **Full CI/CD 파이프라인**
-- ✅ 개발 저장소(dev-app)와 운영 저장소(ops-deploy) 분리
-- ✅ Jenkins CI → ArgoCD CD 통합
-- ✅ 완전 자동화된 배포 플로우 구축
+- 개발 저장소(dev-app)와 운영 저장소(ops-deploy) 분리
+- Jenkins CI → ArgoCD CD 통합
+- 완전 자동화된 배포 플로우 구축
 
 ### 2. 실무 적용 포인트
 
@@ -1932,7 +1932,6 @@ graph LR
     ARGOCD -->|배포| K8S[Kubernetes]
 
 ```
-
 **저장소 분리의 이점**:
 - **책임 분리**: 개발팀은 코드, 데브옵스팀은 인프라
 - **보안**: 개발팀은 프로덕션 클러스터 접근 불필요
@@ -1965,8 +1964,8 @@ spec:
   syncPolicy:
     automated:
       prune: true
-```
 
+```
 **2. ApplicationSet으로 멀티 클러스터 관리**
 
 동일한 애플리케이션을 여러 클러스터에 배포:
@@ -1986,8 +1985,8 @@ spec:
         url: https://prod-cluster
   template:
     # Application 템플릿
-```
 
+```
 **3. Webhook으로 즉시 동기화**
 
 ArgoCD Webhook 설정으로 Git push 시 즉시 동기화:
@@ -1996,8 +1995,8 @@ ArgoCD Webhook 설정으로 Git push 시 즉시 동기화:
 # Gogs에서 Webhook 추가
 # Payload URL: https://<argocd-server>/api/webhook
 # Secret: <argocd-webhook-secret>
-```
 
+```
 ### 3. 다음 단계 학습 방향
 
 **Jenkins 심화**
@@ -2035,8 +2034,8 @@ kind get clusters
 
 # 이미지 로드 (로컬 이미지를 Kind 클러스터로)
 kind load docker-image myapp:latest --name myk8s
-```
 
+```
 #### ArgoCD CLI
 
 ```bash
@@ -2054,8 +2053,8 @@ argocd app rollback timeserver <revision>
 # Repository 관리
 argocd repo list
 argocd repo add <repo-url>
-```
 
+```
 #### Argo Rollouts CLI
 
 ```bash
@@ -2072,8 +2071,8 @@ kubectl argo rollouts restart rollouts-demo
 
 # 대시보드
 kubectl argo rollouts dashboard
-```
 
+```
 ---
 
 **🎉 3주차 학습 완료!**

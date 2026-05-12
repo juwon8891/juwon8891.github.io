@@ -6,7 +6,7 @@
 
 ---
 
-## 🔐 RKE2 소개
+## RKE2 소개
 
 ### 1. RKE2
 
@@ -31,13 +31,14 @@
 ### 3. 주요 특징
 
 #### 3.1 Security First
+
 ```bash
 # FIPS 140-2 준수 암호화 모듈 사용
 # - TLS 1.2+ 강제
 # - 승인된 암호화 알고리즘만 사용
 # - NIST 표준 준수
-```
 
+```
 #### 3.2 내장 컴포넌트
 - **CNI**: Canal (Calico + Flannel) 기본, Cilium/Calico/Multus 선택 가능
 - **Ingress Controller**: Nginx Ingress Controller
@@ -46,6 +47,7 @@
 - **CoreDNS**: DNS 서버
 
 #### 3.3 간편한 설치
+
 ```bash
 # Server 노드 설치 (단일 명령)
 curl -sfL https://get.rke2.io | sh -
@@ -56,11 +58,12 @@ systemctl start rke2-server.service
 curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="agent" sh -
 systemctl enable rke2-agent.service
 systemctl start rke2-agent.service
-```
 
+```
 ### 4. 보안 강화 기능
 
 #### 4.1 CIS Hardened
+
 ```yaml
 # /etc/rancher/rke2/config.yaml
 # CIS Profile 자동 적용
@@ -71,9 +74,10 @@ profile: cis-1.23
 # - Network Policies 활성화
 # - Audit Logging 활성화
 # - 안전한 kubelet 설정
-```
 
+```
 #### 4.2 SELinux/AppArmor 지원
+
 ```bash
 # SELinux (RHEL/CentOS)
 setenforce 1
@@ -81,9 +85,10 @@ setenforce 1
 
 # AppArmor (Ubuntu/Debian)
 # RKE2가 자동으로 AppArmor 프로필 로드
-```
 
+```
 #### 4.3 FIPS 140-2 모드
+
 ```bash
 # FIPS 모드 활성화
 export INSTALL_RKE2_FIPS=true
@@ -92,11 +97,11 @@ curl -sfL https://get.rke2.io | sh -
 # 검증
 rke2 --version
 # rke2 version v1.28.x+rke2r1-fips
-```
 
+```
 ---
 
-## 🏗️ RKE2 아키텍처
+## RKE2 아키텍처
 
 ### 1. Server 노드 구성
 
@@ -144,8 +149,8 @@ graph TB
     KUBELET --> NGINX
     KUBELET --> METRICS
     KUBELET --> COREDNS
-```
 
+```
 ```bash
 /var/lib/rancher/rke2/
 ├── agent/              # kubelet, containerd 데이터
@@ -155,8 +160,8 @@ graph TB
 │   ├── tls/            # 인증서
 │   └── token           # Node Join Token
 └── etc/                # 설정 파일
-```
 
+```
 ### 2. Agent 노드 구성
 
 **Agent 노드** = Worker 노드
@@ -191,8 +196,8 @@ graph TB
     KUBELET --> POD1
     KUBELET --> POD2
     KUBELET --> POD3
-```
 
+```
 ### 3. 내장 컴포넌트
 
 #### 3.1 CNI 옵션
@@ -214,8 +219,8 @@ cni: multus,canal
 
 # 옵션 5: CNI 없음 (수동 설치)
 cni: none
-```
 
+```
 #### 3.2 Ingress Controller
 
 ```yaml
@@ -225,8 +230,8 @@ cni: none
 
 # 비활성화
 disable: rke2-ingress-nginx
-```
 
+```
 #### 3.3 Service LoadBalancer
 
 ```yaml
@@ -236,8 +241,8 @@ disable: rke2-ingress-nginx
 
 # 비활성화 (MetalLB 등 사용 시)
 disable: rke2-servicelb
-```
 
+```
 ### 4. 고가용성(HA) 구성
 
 #### 4.1 Embedded etcd (권장)
@@ -276,9 +281,10 @@ graph TB
 
     A1 -->|Join| LB
     A2 -->|Join| LB
-```
 
+```
 **설정**:
+
 ```yaml
 # Server 1 (First Node)
 # /etc/rancher/rke2/config.yaml
@@ -296,8 +302,8 @@ tls-san:
   - rke2-server2  # 각 노드명
   - 192.168.56.12  # 각 노드 IP
   - 192.168.56.10  # 공통 VIP/LB
-```
 
+```
 #### 4.2 외부 Datastore (PostgreSQL/MySQL)
 
 ```yaml
@@ -305,11 +311,11 @@ tls-san:
 datastore-endpoint: "postgres://user:pass@host:5432/dbname"
 # 또는
 datastore-endpoint: "mysql://user:pass@tcp(host:3306)/dbname"
-```
 
+```
 ---
 
-## ⚙️ RKE2 설치 및 구성
+## RKE2 설치 및 구성
 
 ### 1. Server 노드 설치
 
@@ -330,8 +336,8 @@ sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 # Swap 비활성화
 swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab
-```
 
+```
 #### 1.2 RKE2 설치
 
 ```bash
@@ -341,8 +347,8 @@ curl -sfL https://get.rke2.io | sh -
 # 설치 확인
 ls -l /usr/local/bin/rke2
 rke2 --version
-```
 
+```
 #### 1.3 설정 파일 작성
 
 ```bash
@@ -363,8 +369,8 @@ profile: cis-1.23
 
 # Add-on 비활성화 (선택)
 # disable:
-#   - rke2-ingress-nginx
-#   - rke2-servicelb
+# - rke2-ingress-nginx
+# - rke2-servicelb
 
 # Node 설정
 node-label:
@@ -372,8 +378,8 @@ node-label:
 node-taint:
   - "node-role.kubernetes.io/control-plane=true:NoSchedule"
 EOF
-```
 
+```
 #### 1.4 RKE2 시작
 
 ```bash
@@ -386,8 +392,8 @@ journalctl -u rke2-server -f
 
 # 상태 확인
 systemctl status rke2-server.service
-```
 
+```
 #### 1.5 kubectl 설정
 
 ```bash
@@ -401,8 +407,8 @@ ln -s /var/lib/rancher/rke2/bin/kubectl /usr/local/bin/kubectl
 # 확인
 kubectl get nodes
 kubectl get pods -A
-```
 
+```
 #### 1.6 Node Token 확인
 
 ```bash
@@ -412,8 +418,8 @@ cat /var/lib/rancher/rke2/server/node-token
 
 # 또는
 cat /var/lib/rancher/rke2/server/token
-```
 
+```
 ### 2. Agent 노드 설치
 
 #### 2.1 RKE2 Agent 설치
@@ -424,8 +430,8 @@ curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="agent" sh -
 
 # 설치 확인
 ls -l /usr/local/bin/rke2
-```
 
+```
 #### 2.2 설정 파일 작성
 
 ```bash
@@ -442,8 +448,8 @@ token: K10xxx::server:yyy
 node-label:
   - "node-role=worker"
 EOF
-```
 
+```
 #### 2.3 RKE2 Agent 시작
 
 ```bash
@@ -456,17 +462,17 @@ journalctl -u rke2-agent -f
 
 # 상태 확인
 systemctl status rke2-agent.service
-```
 
+```
 #### 2.4 노드 확인 (Server에서)
 
 ```bash
 kubectl get nodes
-# NAME           STATUS   ROLES                       AGE   VERSION
-# rke2-server1   Ready    control-plane,etcd,master   10m   v1.28.x+rke2r1
-# rke2-agent1    Ready    <none>                      2m    v1.28.x+rke2r1
-```
+# NAME STATUS ROLES AGE VERSION
+# rke2-server1 Ready control-plane,etcd,master 10m v1.28.x+rke2r1
+# rke2-agent1 Ready <none> 2m v1.28.x+rke2r1
 
+```
 ### 3. 설정 파일 구조
 
 #### 3.1 주요 설정 옵션
@@ -525,8 +531,8 @@ kube-apiserver-arg:
 disable:
   - rke2-ingress-nginx
   - rke2-metrics-server
-```
 
+```
 ### 4. CNI 선택 (Cilium)
 
 #### 4.1 Cilium 설정
@@ -534,8 +540,8 @@ disable:
 ```yaml
 # /etc/rancher/rke2/config.yaml
 cni: cilium
-```
 
+```
 #### 4.2 Cilium 확인
 
 ```bash
@@ -551,11 +557,11 @@ sudo mv cilium /usr/local/bin/
 # Cilium 상태 확인
 cilium status
 cilium connectivity test
-```
 
+```
 ---
 
-## 🔄 RKE2 업그레이드
+## RKE2 업그레이드
 
 ### 1. 수동 업그레이드
 
@@ -569,8 +575,8 @@ graph LR
     D --> E[Agent 1<br/>Upgrade]
     E --> F[Agent 2<br/>Upgrade]
     F --> G[완료<br/>v1.28.8]
-```
 
+```
 #### 1.2 Server 노드 업그레이드
 
 ```bash
@@ -588,8 +594,8 @@ kubectl get nodes
 journalctl -u rke2-server -f
 
 # 4. Server 2, 3도 동일하게 순차 업그레이드
-```
 
+```
 #### 1.3 Agent 노드 업그레이드
 
 ```bash
@@ -600,8 +606,8 @@ systemctl start rke2-agent
 
 # 확인
 kubectl get nodes
-```
 
+```
 ### 2. Automated 업그레이드 (System Upgrade Controller)
 
 #### 2.1 System Upgrade Controller 설치
@@ -612,8 +618,8 @@ kubectl apply -f https://github.com/rancher/system-upgrade-controller/releases/l
 
 # 확인
 kubectl get pods -n system-upgrade
-```
 
+```
 #### 2.2 Server 업그레이드 Plan
 
 ```yaml
@@ -648,8 +654,8 @@ spec:
   # 업그레이드 스크립트
   upgrade:
     image: rancher/rke2-upgrade
-```
 
+```
 #### 2.3 Agent 업그레이드 Plan
 
 ```yaml
@@ -684,8 +690,8 @@ spec:
 
   upgrade:
     image: rancher/rke2-upgrade
-```
 
+```
 #### 2.4 업그레이드 실행
 
 ```bash
@@ -700,8 +706,8 @@ kubectl logs -n system-upgrade -l upgrade.cattle.io/plan=server-plan -f
 
 # 노드 상태 확인
 kubectl get nodes -w
-```
 
+```
 ### 3. 업그레이드 순서
 
 ```mermaid
@@ -718,8 +724,8 @@ graph TB
     S3C -->|Yes| AGENT[Agent 업그레이드<br/>동시 1-2개]
     S3C -->|No| ROLLBACK
     AGENT --> VERIFY[검증 및 완료]
-```
 
+```
 **업그레이드 Best Practices**:
 1. **etcd 백업 필수**
 2. **Server 노드 먼저**, 한 번에 1개씩
@@ -729,7 +735,7 @@ graph TB
 
 ---
 
-## 📜 RKE2 인증서 관리
+## RKE2 인증서 관리
 
 ### 1. 인증서 위치
 
@@ -749,8 +755,8 @@ graph TB
 ├── client-kube-apiserver.crt   # API Server 클라이언트
 ├── client-admin.crt            # Admin 클라이언트
 └── ...
-```
 
+```
 ### 2. 인증서 갱신
 
 #### 2.1 자동 갱신
@@ -762,8 +768,8 @@ graph TB
 
 # 수동 갱신 트리거 (재시작)
 systemctl restart rke2-server
-```
 
+```
 #### 2.2 인증서 확인
 
 ```bash
@@ -776,8 +782,8 @@ for cert in /var/lib/rancher/rke2/server/tls/*.crt; do
   echo "=== $cert ==="
   openssl x509 -in $cert -noout -enddate
 done
-```
 
+```
 ### 3. Custom CA 사용
 
 #### 3.1 기존 CA로 서명된 인증서 사용
@@ -794,11 +800,11 @@ cp custom-ca.key /var/lib/rancher/rke2/server/tls/server-ca.key
 
 # 2. RKE2 시작 (기존 CA 사용)
 systemctl start rke2-server
-```
 
+```
 ---
 
-## 🌐 Cluster API (CAPI) 소개
+## Cluster API (CAPI) 소개
 
 ### 1. Cluster API
 
@@ -832,8 +838,8 @@ graph TB
     CAPI -->|Create/Manage| WC2
     CAPA -->|Provision| WC1
     CAPA -->|Provision| WC2
-```
 
+```
 - **Management Cluster**: Cluster API 컨트롤러가 실행되는 클러스터
 - **Workload Cluster**: 관리 대상 클러스터 (실제 워크로드 실행)
 
@@ -892,8 +898,8 @@ graph TB
     INFRA -->|Provision| VM2
     BOOT -->|cloud-init| VM1
     BOOT -->|cloud-init| VM2
-```
 
+```
 ### 4. Provider 종류
 
 #### 4.1 Infrastructure Providers
@@ -921,7 +927,7 @@ graph TB
 
 ---
 
-## 🔧 Cluster API 실습
+## Cluster API 실습
 
 ### 1. Management Cluster 구성
 
@@ -939,8 +945,8 @@ kind create cluster --name capi-mgmt
 # 확인
 kubectl cluster-info
 kubectl get nodes
-```
 
+```
 ### 2. clusterctl 설치
 
 ```bash
@@ -952,8 +958,8 @@ sudo mv ./clusterctl /usr/local/bin/clusterctl
 # 확인
 clusterctl version
 # clusterctl version: &version.Info{Major:"1", Minor:"6", GitVersion:"v1.6.0"}
-```
 
+```
 ### 3. Provider 초기화
 
 #### 3.1 Docker Provider 초기화 (로컬 테스트용)
@@ -968,8 +974,8 @@ kubectl get pods -n capi-system
 kubectl get pods -n capi-kubeadm-bootstrap-system
 kubectl get pods -n capi-kubeadm-control-plane-system
 kubectl get pods -n capd-system
-```
 
+```
 #### 3.2 AWS Provider 초기화 (프로덕션 예시)
 
 ```bash
@@ -984,8 +990,8 @@ clusterctl init --infrastructure aws
 
 # 확인
 kubectl get pods -n capa-system
-```
 
+```
 ### 4. Workload Cluster 생성
 
 #### 4.1 클러스터 템플릿 생성 (Docker Provider)
@@ -1000,8 +1006,8 @@ clusterctl generate cluster ${CLUSTER_NAME} \
   --control-plane-machine-count=1 \
   --worker-machine-count=2 \
   > capi-quickstart.yaml
-```
 
+```
 #### 4.2 생성된 YAML 확인
 
 ```yaml
@@ -1066,8 +1072,8 @@ spec:
         kind: DockerMachineTemplate
         name: capi-quickstart-md-0
       version: v1.28.0
-```
 
+```
 #### 4.3 Workload Cluster 생성
 
 ```bash
@@ -1083,8 +1089,8 @@ kubectl get machines
 
 # 상세 로그
 kubectl get events --sort-by='.lastTimestamp' -A
-```
 
+```
 #### 4.4 Workload Cluster 접속
 
 ```bash
@@ -1097,12 +1103,12 @@ kubectl --kubeconfig=./capi-quickstart.kubeconfig \
 
 # Workload Cluster 노드 확인
 kubectl --kubeconfig=./capi-quickstart.kubeconfig get nodes
-# NAME                                             STATUS   ROLES           AGE   VERSION
-# capi-quickstart-control-plane-xxxxx              Ready    control-plane   5m    v1.28.0
-# capi-quickstart-md-0-xxxxx-yyyyy                 Ready    <none>          3m    v1.28.0
-# capi-quickstart-md-0-xxxxx-zzzzz                 Ready    <none>          3m    v1.28.0
-```
+# NAME STATUS ROLES AGE VERSION
+# capi-quickstart-control-plane-xxxxx Ready control-plane 5m v1.28.0
+# capi-quickstart-md-0-xxxxx-yyyyy Ready <none> 3m v1.28.0
+# capi-quickstart-md-0-xxxxx-zzzzz Ready <none> 3m v1.28.0
 
+```
 ### 5. Cluster 관리
 
 #### 5.1 Worker 노드 스케일링
@@ -1114,8 +1120,8 @@ kubectl scale machinedeployment capi-quickstart-md-0 --replicas=5
 # 확인
 kubectl get machines
 clusterctl describe cluster capi-quickstart
-```
 
+```
 #### 5.2 Control Plane 스케일링 (HA)
 
 ```bash
@@ -1126,8 +1132,8 @@ kubectl patch kubeadmcontrolplane capi-quickstart-control-plane \
 # 확인
 kubectl get kubeadmcontrolplane
 kubectl get machines -l cluster.x-k8s.io/control-plane
-```
 
+```
 #### 5.3 Kubernetes 버전 업그레이드
 
 ```bash
@@ -1142,8 +1148,8 @@ kubectl patch machinedeployment capi-quickstart-md-0 \
 # 진행 상황 모니터링
 kubectl get machines -w
 clusterctl describe cluster capi-quickstart
-```
 
+```
 #### 5.4 Cluster 삭제
 
 ```bash
@@ -1153,11 +1159,11 @@ kubectl delete cluster capi-quickstart
 # 확인 (모든 리소스 자동 삭제)
 kubectl get machines
 kubectl get cluster
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. RKE2의 보안 강화 포인트
 
@@ -1172,13 +1178,13 @@ graph LR
     C --> F[RKE2<br/>인증된 바이너리]
     D --> F
     E --> F
-```
 
+```
 **준수 항목**:
-- ✅ NIST 승인 암호화 알고리즘만 사용
-- ✅ FIPS 140-2 인증 암호화 라이브러리 (BoringCrypto)
-- ✅ TLS 1.2 이상 강제
-- ✅ 안전하지 않은 암호화 비활성화
+- NIST 승인 암호화 알고리즘만 사용
+- FIPS 140-2 인증 암호화 라이브러리 (BoringCrypto)
+- TLS 1.2 이상 강제
+- 안전하지 않은 암호화 비활성화
 
 #### 1.2 CIS Benchmark 기본 준수
 
@@ -1204,8 +1210,8 @@ PodSecurityStandard: restricted
 # - Anonymous auth 비활성화
 # - Authorization mode: Webhook
 # - Read-only port 비활성화
-```
 
+```
 #### 1.3 SELinux/AppArmor 통합
 
 ```bash
@@ -1213,8 +1219,8 @@ PodSecurityStandard: restricted
 # - Container별 격리
 # - Host 파일시스템 접근 제한
 # - Capabilities 최소화
-```
 
+```
 ### 2. Cluster API의 장점
 
 #### 2.1 선언적 인프라 관리
@@ -1232,13 +1238,13 @@ metadata:
   name: prod-cluster
 spec:
   # 모든 것이 하나의 YAML로!
-```
 
+```
 **장점**:
-- ✅ GitOps 친화적 (Git = Single Source of Truth)
-- ✅ 재현 가능 (동일한 YAML = 동일한 클러스터)
-- ✅ 버전 관리 (Git History)
-- ✅ 자동화 (CI/CD 통합)
+- GitOps 친화적 (Git = Single Source of Truth)
+- 재현 가능 (동일한 YAML = 동일한 클러스터)
+- 버전 관리 (Git History)
+- 자동화 (CI/CD 통합)
 
 #### 2.2 멀티 클라우드 일관성
 
@@ -1252,12 +1258,12 @@ graph TB
     YAML -->|Provider: Azure| AZURE[Azure AKS]
     YAML -->|Provider: GCP| GCP[GCP GKE]
     YAML -->|Provider: vSphere| VSPHERE[vSphere]
-```
 
+```
 **장점**:
-- ✅ 동일한 API로 모든 클라우드 관리
-- ✅ 멀티 클라우드 전략 용이
-- ✅ Vendor Lock-in 회피
+- 동일한 API로 모든 클라우드 관리
+- 멀티 클라우드 전략 용이
+- Vendor Lock-in 회피
 
 #### 2.3 Self-Healing
 
@@ -1278,12 +1284,12 @@ spec:
     - type: Ready
       status: "False"
       timeout: 5m
-```
 
+```
 **자동 복구**:
-- ✅ Unhealthy 노드 자동 감지
-- ✅ 새 노드로 자동 교체
-- ✅ Workload 자동 재스케줄링
+- Unhealthy 노드 자동 감지
+- 새 노드로 자동 교체
+- Workload 자동 재스케줄링
 
 ### 3. RKE2 vs K3s vs kubeadm
 

@@ -6,7 +6,7 @@
 
 ---
 
-## ☁️ Amazon EKS 소개
+## Amazon EKS 소개
 
 ### 1. Amazon EKS
 
@@ -59,8 +59,8 @@ graph TB
     E --> I
     E --> J
     F --> K
-```
 
+```
 ### 2. EKS vs Vanilla Kubernetes
 
 | 항목 | Vanilla Kubernetes (k8s) | Amazon EKS |
@@ -165,7 +165,7 @@ graph TB
 
 ---
 
-## 🏗️ EKS 아키텍처
+## EKS 아키텍처
 
 ### 1. Control Plane 관리
 
@@ -214,8 +214,8 @@ graph TB
 
     WN1 --> LB
     WN2 --> LB
-```
 
+```
 **Control Plane 특징**:
 
 - **Multi-AZ HA**: 3개 AZ에 분산 배치
@@ -254,9 +254,9 @@ graph TB
 |------|--------------|---------------------|---------|
 | **관리 복잡도** | 높음 | 중간 | 낮음 |
 | **제어권** | 완전 제어 | 부분 제어 | 제한적 |
-| **자동 업데이트** | ❌ | ✅ | ✅ |
-| **Spot 지원** | ✅ | ✅ | ❌ |
-| **DaemonSet** | ✅ | ✅ | ❌ |
+| **자동 업데이트** | | | |
+| **Spot 지원** | | | |
+| **DaemonSet** | | | |
 | **비용** | EC2 요금 | EC2 요금 | vCPU/메모리 요금 |
 
 ### 3. 네트워킹 구성
@@ -299,8 +299,8 @@ graph TB
     WN2 --> POD2
     WN1 -.Internet Access.-> NAT1
     WN2 -.Internet Access.-> NAT2
-```
 
+```
 **네트워크 주요 개념**:
 
 - **VPC**: Kubernetes 클러스터가 실행되는 격리된 네트워크
@@ -357,7 +357,7 @@ graph TB
 
 ---
 
-## ⚙️ EKS 배포 방법
+## EKS 배포 방법
 
 ### 1. eksctl을 이용한 배포
 
@@ -380,8 +380,8 @@ eksctl create cluster \
 # 클러스터 생성 확인
 kubectl get nodes
 kubectl get pods -A
-```
 
+```
 **기본 생성 내용**:
 - VPC 자동 생성 (192.168.0.0/16)
 - Public/Private 서브넷 (각 3개 AZ)
@@ -441,8 +441,8 @@ managedNodeGroups:
 cloudWatch:
   clusterLogging:
     enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-```
 
+```
 ```bash
 # YAML 파일로 클러스터 생성
 eksctl create cluster -f cluster.yaml
@@ -450,15 +450,15 @@ eksctl create cluster -f cluster.yaml
 # 클러스터 정보 확인
 eksctl get cluster
 eksctl utils describe-stacks --region ap-northeast-2 --cluster myeks
-```
 
+```
 #### 1.3 클러스터 삭제
 
 ```bash
 # 클러스터 삭제 (VPC, Node Group 모두 삭제)
 eksctl delete cluster --name myeks --region ap-northeast-2
-```
 
+```
 ### 2. Terraform을 이용한 배포
 
 **Terraform**은 Infrastructure as Code 도구로 **재현 가능한** 클러스터 배포가 가능합니다.
@@ -569,8 +569,8 @@ output "cluster_name" {
   description = "Kubernetes Cluster Name"
   value       = module.eks.cluster_name
 }
-```
 
+```
 #### 2.2 Terraform 실행
 
 ```bash
@@ -592,8 +592,8 @@ kubectl get pods -A
 
 # 클러스터 삭제
 terraform destroy -auto-approve
-```
 
+```
 ### 3. CloudFormation을 이용한 배포
 
 **AWS CloudFormation**은 AWS 네이티브 IaC 도구입니다.
@@ -687,8 +687,8 @@ Outputs:
   ClusterEndpoint:
     Description: EKS Cluster Endpoint
     Value: !GetAtt EKSCluster.Endpoint
-```
 
+```
 #### 3.2 CloudFormation 배포
 
 ```bash
@@ -711,8 +711,8 @@ aws eks update-kubeconfig --region ap-northeast-2 --name myeks
 aws cloudformation delete-stack \
   --stack-name myeks-stack \
   --region ap-northeast-2
-```
 
+```
 ### 4. AWS Management Console 배포
 
 **AWS 콘솔**을 통한 GUI 배포도 가능합니다.
@@ -740,7 +740,7 @@ aws cloudformation delete-stack \
 
 ---
 
-## 🔐 EKS Cluster Endpoint Access
+## EKS Cluster Endpoint Access
 
 **EKS Cluster Endpoint Access**는 API Server에 접근하는 방식을 제어합니다.
 
@@ -768,13 +768,13 @@ graph TB
         FP2 --> FP3[Control Plane]
         FP4[Worker Nodes] --> FP2
     end
-```
 
+```
 | 모드 | Public Access | Private Access | kubectl 위치 | Worker 노드 통신 |
 |------|---------------|----------------|--------------|------------------|
-| **Public** | ✅ | ❌ | 어디서나 | Public Endpoint |
-| **Public + Private** | ✅ (CIDR 제한 가능) | ✅ | 어디서나 / VPC 내부 | Private Endpoint (VPC 내부) |
-| **Fully Private** | ❌ | ✅ | VPC 내부만 | Private Endpoint |
+| **Public** | | | 어디서나 | Public Endpoint |
+| **Public + Private** | (CIDR 제한 가능) | | 어디서나 / VPC 내부 | Private Endpoint (VPC 내부) |
+| **Fully Private** | | | VPC 내부만 | Private Endpoint |
 
 ### 2. Public Cluster Endpoint Access
 
@@ -805,8 +805,8 @@ eksctl create cluster \
 cluster_endpoint_public_access  = true
 cluster_endpoint_private_access = false
 cluster_endpoint_public_access_cidrs = ["1.2.3.4/32"]  # IP 제한
-```
 
+```
 ### 3. Public & Private Cluster Endpoint Access (권장)
 
 **특징**:
@@ -837,8 +837,8 @@ eksctl utils update-cluster-endpoint-access \
 cluster_endpoint_public_access  = true
 cluster_endpoint_private_access = true
 cluster_endpoint_public_access_cidrs = ["203.0.113.0/24"]
-```
 
+```
 ### 4. Fully Private Cluster Endpoint Access
 
 **특징**:
@@ -874,8 +874,8 @@ eksctl utils update-cluster-endpoint-access \
 # Terraform
 cluster_endpoint_public_access  = false
 cluster_endpoint_private_access = true
-```
 
+```
 **Fully Private 클러스터 아키텍처**:
 
 ```mermaid
@@ -913,11 +913,11 @@ graph TB
     WN1 --> EP
     EP --> ECR
     EP --> CW
-```
 
+```
 ---
 
-## 🌐 EKS Best Practices 아키텍처
+## EKS Best Practices 아키텍처
 
 ### 1. VPC 구성 권장사항
 
@@ -959,8 +959,8 @@ graph TB
     PRIV1 --> CP
     PRIV2 --> CP
     PRIV3 --> CP
-```
 
+```
 **VPC 설계 권장사항**:
 
 1. **최소 2개 AZ** (권장: 3개 AZ)
@@ -978,7 +978,6 @@ graph TB
    # Cluster 소유권
    kubernetes.io/cluster/<cluster-name> = shared
    ```
-
 ### 2. 서브넷 구성
 
 **서브넷 크기 권장사항**:
@@ -1012,8 +1011,8 @@ graph LR
 
     WN --> ENI
     ENI -.Private Link.-> CP
-```
 
+```
 ### 4. 보안 그룹 설정
 
 **EKS 보안 그룹 구성**:
@@ -1045,11 +1044,11 @@ Inbound:
 
 Outbound:
   - All Traffic: 허용 (인터넷, AWS 서비스 접근)
-```
 
+```
 ---
 
-## 🚀 EKS Auto Mode
+## EKS Auto Mode
 
 ### 1. Auto Mode 개요
 
@@ -1077,8 +1076,8 @@ graph TB
         AM3[Add-ons<br/>자동 설치]
         AM4[Scaling<br/>자동 구성]
     end
-```
 
+```
 ### 2. Managed Capabilities
 
 **Auto Mode가 자동으로 관리하는 항목**:
@@ -1127,8 +1126,8 @@ aws eks create-cluster \
   --compute-config enabled=true \
   --storage-config enabled=true \
   --load-balancing-config enabled=true
-```
 
+```
 ---
 
 ## 🆕 EKS 최신 기능
@@ -1149,8 +1148,8 @@ aws eks create-cluster \
 aws eks list-insights \
   --region ap-northeast-2 \
   --cluster-name myeks
-```
 
+```
 ### 2. Upgrade Insights
 
 **Upgrade Insights**는 **클러스터 업그레이드 시 발생할 수 있는 문제를 사전에 감지**합니다.
@@ -1179,7 +1178,7 @@ aws eks list-insights \
 
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. EKS의 장점
 

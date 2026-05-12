@@ -87,6 +87,7 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 5. Deployment/ReplicaSet의 replicas 필드 업데이트
 
 **설정 예시**:
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -106,8 +107,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-```
 
+```
 **사용 사례**:
 - 웹 애플리케이션 트래픽 변동 대응
 - API 서버 부하 분산
@@ -128,6 +129,7 @@ spec:
 - `Auto`: Recreate와 동일
 
 **설정 예시**:
+
 ```yaml
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
@@ -149,8 +151,8 @@ spec:
       maxAllowed:
         cpu: 1
         memory: 500Mi
-```
 
+```
 **주의 사항**:
 - HPA와 동일 리소스 메트릭 대상 시 충돌 (함께 사용 지양)
 - Pod 재시작 발생 (Recreate/Auto 모드)
@@ -172,6 +174,7 @@ spec:
 - MySQL, PostgreSQL
 
 **설정 예시** (SQS):
+
 ```yaml
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -189,8 +192,8 @@ spec:
       queueLength: "5"
       awsRegion: "ap-northeast-2"
       identityOwner: operator
-```
 
+```
 **차별점**:
 - **Scale to Zero 지원**: 이벤트 없을 시 Pod 완전 제거
 - 외부 이벤트 소스 직접 통합
@@ -238,6 +241,7 @@ spec:
 - **EC2NodeClass**: AWS 인프라 설정 (AMI, UserData, Security Group 등)
 
 **NodePool 예시**:
+
 ```yaml
 apiVersion: karpenter.sh/v1
 kind: NodePool
@@ -263,8 +267,8 @@ spec:
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 1m
-```
 
+```
 **Disruption 메커니즘**:
 - **Consolidation**: 노드 통합으로 비용 절감
 - **Drift**: NodePool/EC2NodeClass 변경 시 노드 교체
@@ -309,7 +313,6 @@ graph TD
     H -->|Pod 생성/제거| I[Pod]
 
 ```
-
 ### 2. KEDA 아키텍처
 
 ```mermaid
@@ -326,7 +329,6 @@ graph LR
     F -->|Scale to Zero<br/>가능| H[0 Replicas]
 
 ```
-
 ### 3. Cluster Autoscaler vs Karpenter
 
 ```mermaid
@@ -348,7 +350,6 @@ graph TB
     end
 
 ```
-
 ### 4. Karpenter Provisioning 워크플로우
 
 ```mermaid
@@ -370,8 +371,8 @@ sequenceDiagram
     N->>K: 노드 등록
     K->>P: Pod 바인딩
     P->>N: Pod 실행
-```
 
+```
 ### 5. Karpenter Disruption 메커니즘
 
 ```mermaid
@@ -394,7 +395,6 @@ graph TD
     K --> F
 
 ```
-
 ### 6. VPA 컴포넌트 상호작용
 
 ```mermaid
@@ -415,7 +415,6 @@ graph TD
     E -->|updateMode: Off| K[권장 값만 표시]
 
 ```
-
 ### 7. EKS Auto Scaling 전체 구조
 
 ```mermaid
@@ -442,7 +441,6 @@ graph TB
     Pod_Level -.->|노드 부족 시| Node_Level
 
 ```
-
 ---
 
 ## 주요 실습 절차
@@ -469,8 +467,8 @@ ssh -i ~/.ssh/mykey.pem ec2-user@$BASTION_IP
 # kubeconfig 설정
 aws eks update-kubeconfig --region ap-northeast-2 --name myeks
 kubectl get nodes
-```
 
+```
 ### 2. Metrics Server 설치
 
 ```bash
@@ -480,8 +478,8 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 kubectl get deployment metrics-server -n kube-system
 kubectl top nodes
 kubectl top pods -A
-```
 
+```
 ### 3. HPA 실습
 
 ```bash
@@ -497,8 +495,8 @@ kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never --
 
 # 모니터링
 kubectl get hpa -w
-```
 
+```
 ### 4. KEDA 설치 및 SQS 스케일링
 
 ```bash
@@ -547,8 +545,8 @@ done
 
 # Pod 스케일링 확인
 kubectl get pods -w
-```
 
+```
 ### 5. VPA 설치
 
 ```bash
@@ -566,8 +564,8 @@ kubectl describe vpa hamster-vpa
 
 # 권장 값 확인
 kubectl get vpa hamster-vpa -o jsonpath='{.status.recommendation.containerRecommendations[0]}'
-```
 
+```
 ### 6. Karpenter 설치
 
 ```bash
@@ -655,8 +653,8 @@ EOF
 # 테스트
 kubectl scale deployment inflate --replicas=5
 kubectl logs -f -n kube-system -l app.kubernetes.io/name=karpenter
-```
 
+```
 ### 7. Fargate Profile 생성
 
 ```bash
@@ -688,8 +686,8 @@ EOF
 # Fargate 노드 확인
 kubectl get nodes -l eks.amazonaws.com/compute-type=fargate
 kubectl get pod fargate-pod -o wide
-```
 
+```
 ---
 
 ## 트러블슈팅
@@ -697,35 +695,38 @@ kubectl get pod fargate-pod -o wide
 ### 1. HPA CPU 메트릭 `<unknown>` 표시
 
 **증상**:
+
 ```bash
 kubectl get hpa
 # TARGETS: <unknown>/50%
-```
 
+```
 **원인**:
 - Metrics Server 미설치
 - Pod의 CPU requests 미설정
 
 **해결**:
+
 ```bash
 # Metrics Server 설치 확인
 kubectl get deployment metrics-server -n kube-system
 
 # Deployment에 CPU requests 추가
 kubectl set resources deployment <deployment-name> --requests=cpu=200m
-```
 
+```
 ### 2. KEDA Scale to Zero 안 됨
 
 **원인**: `minReplicaCount` 설정이 0이 아님
 
 **해결**:
+
 ```yaml
 spec:
   minReplicaCount: 0  # 0으로 설정
   maxReplicaCount: 10
-```
 
+```
 ### 3. Cluster Autoscaler 노드 추가 안 됨
 
 **원인**:
@@ -734,6 +735,7 @@ spec:
 - ASG Max Capacity 초과
 
 **해결**:
+
 ```bash
 # ASG 태그 확인
 aws autoscaling describe-auto-scaling-groups \
@@ -742,8 +744,8 @@ aws autoscaling describe-auto-scaling-groups \
 
 # Cluster Autoscaler 로그 확인
 kubectl logs -f -n kube-system deployment/cluster-autoscaler
-```
 
+```
 ### 4. Karpenter 노드 프로비저닝 실패
 
 **원인**:
@@ -752,6 +754,7 @@ kubectl logs -f -n kube-system deployment/cluster-autoscaler
 - Instance Profile 미연결
 
 **해결**:
+
 ```bash
 # Subnet 태그 확인
 aws ec2 describe-subnets \
@@ -760,8 +763,8 @@ aws ec2 describe-subnets \
 
 # EC2NodeClass 확인
 kubectl get ec2nodeclass default -o yaml
-```
 
+```
 ### 5. Fargate Pod Pending 상태
 
 **원인**:
@@ -769,6 +772,7 @@ kubectl get ec2nodeclass default -o yaml
 - Subnet 가용 IP 부족
 
 **해결**:
+
 ```bash
 # Fargate Profile 확인
 eksctl get fargateprofile --cluster myeks
@@ -778,8 +782,8 @@ kubectl label pod fargate-pod env=fargate
 
 # Pod Events 확인
 kubectl describe pod fargate-pod
-```
 
+```
 ---
 
 ## 참고 자료

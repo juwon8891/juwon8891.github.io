@@ -5,7 +5,7 @@
 
 ---
 
-## 🔨 CUDA 컴파일 과정
+## CUDA 컴파일 과정
 
 ```mermaid
 graph LR
@@ -17,7 +17,6 @@ graph LR
     F --> G[실행 파일]
 
 ```
-
 ### 1. nvcc (NVIDIA CUDA Compiler)
 
 nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버
@@ -30,6 +29,7 @@ nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버
 3. **아키텍처 타겟팅**: `-arch=sm_XX` 플래그로 특정 GPU 타겟
 
 **컴파일 예시**:
+
 ```bash
 # 단일 아키텍처 컴파일 (Ampere - SM 8.0)
 nvcc -arch=sm_80 -o myapp myapp.cu
@@ -42,8 +42,8 @@ nvcc -gencode arch=compute_70,code=sm_70 \
 
 # PTX만 생성 (JIT 컴파일용)
 nvcc -arch=compute_80 -code=compute_80 -ptx myapp.cu
-```
 
+```
 **nvcc 옵션 정리**:
 
 | 옵션 | 설명 |
@@ -73,6 +73,7 @@ PTX는 CUDA의 **중간 표현(IR, Intermediate Representation)**
    - CUDA 커널에서 `asm()` 구문으로 PTX 직접 작성 가능
 
 **PTX 예시**:
+
 ```ptx
 // C++ CUDA 코드:
 // __global__ void add(int *a, int *b, int *c) {
@@ -112,8 +113,8 @@ PTX는 CUDA의 **중간 표현(IR, Intermediate Representation)**
 
     ret;
 }
-```
 
+```
 **PTX vs SASS 비교**:
 
 | 항목 | PTX | SASS |
@@ -141,6 +142,7 @@ SASS는 GPU의 **실제 기계어 코드** (native machine code)
    - 16진수 인코딩, 공식 문서 없음 (역공학 필요)
 
 **SASS 예시** (cuobjdump로 추출):
+
 ```sass
 // PTX와 동일한 add 커널의 SASS
   /* 0x001c4400c0001c04 */  MOV R1, c[0x0][0x28]         // threadIdx.x 로드
@@ -150,17 +152,18 @@ SASS는 GPU의 **실제 기계어 코드** (native machine code)
   /* 0x001c5c00c0029c03 */  IADD3 R6, R4, R5, RZ         // 덧셈
   /* 0x001c6400c0031c04 */  STG.E [R12], R6              // c[i] 저장
   /* 0x001c6c00c0039de7 */  EXIT                         // 종료
-```
 
+```
 **SASS 분석 방법**:
+
 ```bash
 # cuobjdump로 SASS 추출
 cuobjdump -sass myapp
 
 # Nsight Compute로 SASS 프로파일링
 ncu --set full --target-processes all myapp
-```
 
+```
 ---
 
 ### 4. fatbin (Fat Binary)
@@ -169,6 +172,7 @@ fatbin이는 **다중 아키텍처** SASS + PTX를 하나의 바이너리에 포
 - 런타임에 현재 GPU에 맞는 코드 선택 실행
 
 **fatbin 구조**:
+
 ```
 ┌─────────────────────────────────┐
 │       Fat Binary (.fatbin)      │
@@ -182,9 +186,10 @@ fatbin이는 **다중 아키텍처** SASS + PTX를 하나의 바이너리에 포
     현재 GPU: SM 8.6 (RTX 3090)
          ↓
     SM 8.0 SASS 실행
-```
 
+```
 **fatbin 생성 예시**:
+
 ```bash
 # 3개 아키텍처 + PTX fallback
 nvcc -gencode arch=compute_70,code=sm_70 \    # Volta
@@ -192,29 +197,30 @@ nvcc -gencode arch=compute_70,code=sm_70 \    # Volta
      -gencode arch=compute_90,code=sm_90 \    # Hopper
      -gencode arch=compute_90,code=compute_90 \ # PTX fallback
      -o myapp myapp.cu
-```
 
+```
 **fatbin 분석**:
+
 ```bash
 # fatbin 내용 확인
 cuobjdump -lelf myapp
 # 출력 예시:
-# ELF file    1: sm_70
-# ELF file    2: sm_80
-# ELF file    3: sm_90
-# PTX file    1: compute_90
+# ELF file 1: sm_70
+# ELF file 2: sm_80
+# ELF file 3: sm_90
+# PTX file 1: compute_90
 
 # 특정 아키텍처 SASS 추출
 cuobjdump -arch sm_80 -sass myapp
-```
 
+```
 **fatbin 장단점**:
 
 | 장점 | 단점 |
 |------|------|
-| ✅ 다양한 GPU 지원 (하나의 바이너리) | ❌ 파일 크기 증가 (각 아키텍처별 중복) |
-| ✅ 배포 편의성 (사용자 GPU 모름) | ❌ 컴파일 시간 증가 |
-| ✅ PTX fallback으로 미래 호환성 | ❌ 최신 GPU에서는 JIT 오버헤드 |
+| 다양한 GPU 지원 (하나의 바이너리) | 파일 크기 증가 (각 아키텍처별 중복) |
+| 배포 편의성 (사용자 GPU 모름) | 컴파일 시간 증가 |
+| PTX fallback으로 미래 호환성 | 최신 GPU에서는 JIT 오버헤드 |
 
 ---
 
@@ -228,8 +234,8 @@ cuobjdump는 CUDA 바이너리 분석 도구 (objdump의 CUDA 버전)
 # 1. fatbin 아키텍처 목록 확인
 cuobjdump -lelf myapp
 # 출력:
-# ELF file    1: sm_70
-# ELF file    2: sm_80
+# ELF file 1: sm_70
+# ELF file 2: sm_80
 
 # 2. PTX 추출
 cuobjdump -ptx myapp > kernel.ptx
@@ -244,11 +250,11 @@ cuobjdump -symbols myapp
 cuobjdump -res-usage myapp
 # 출력:
 # Function : _Z3addPiS_S_
-# .text    : 0x180 bytes
-# .reg     : 24 registers
-# .shared  : 0 bytes
-```
+# .text : 0x180 bytes
+# .reg : 24 registers
+# .shared : 0 bytes
 
+```
 **cuobjdump 활용 예시**:
 
 ```bash
@@ -261,11 +267,11 @@ for arch in sm_70 sm_80 sm_90; do
     echo "=== $arch ==="
     cuobjdump -arch $arch -sass myapp | wc -l
 done
-```
 
+```
 ---
 
-## 🏗️ GPU 아키텍처
+## GPU 아키텍처
 
 ```mermaid
 graph TD
@@ -286,7 +292,6 @@ graph TD
     D1 --> E5[L1 Cache<br/>128KB]
 
 ```
-
 ### 1. SM (Streaming Multiprocessor)
 
 SM이는 GPU의 **핵심 연산 유닛** (CPU의 코어와 유사)
@@ -345,13 +350,13 @@ nvidia-smi --query-gpu=name --format=csv,noheader
 # 2. CUDA 샘플로 확인
 /usr/local/cuda/samples/1_Utilities/deviceQuery/deviceQuery
 # 출력:
-# CUDA Capability Major/Minor version number:    8.0
+# CUDA Capability Major/Minor version number: 8.0
 
 # 3. Python으로 확인
 python3 -c "import torch; print(torch.cuda.get_device_capability())"
 # 출력: (8, 0)
-```
 
+```
 **Compute Capability와 nvcc 플래그**:
 
 ```bash
@@ -363,8 +368,8 @@ nvcc -arch=sm_86 myapp.cu
 
 # PTX만 생성 (compute_XX)
 nvcc -arch=compute_80 -code=compute_80 myapp.cu
-```
 
+```
 ---
 
 ### 3. 아키텍처 세대별 특징
@@ -390,8 +395,8 @@ nvcc -arch=compute_80 -code=compute_80 myapp.cu
 import torch
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
-```
 
+```
 #### Hopper (SM 9.0) - 2022년
 - **Transformer Engine**: FP8 지원 (8bit 학습)
 - **Tensor Core 4세대**: FP8, FP16, BF16, TF32, FP64
@@ -406,11 +411,11 @@ import transformer_engine.pytorch as te
 # FP8 학습
 with te.fp8_autocast(enabled=True):
     output = model(input)
-```
 
+```
 ---
 
-## 🌐 NCCL (NVIDIA Collective Communications Library)
+## NCCL (NVIDIA Collective Communications Library)
 
 ```mermaid
 graph TD
@@ -427,7 +432,6 @@ graph TD
     F --> J[NVLink<br/>PCIe<br/>InfiniBand]
 
 ```
-
 ### 1. NCCL 개요
 
 NCCL이는 **다중 GPU 통신 최적화 라이브러리**
@@ -455,6 +459,7 @@ libnccl.so는 NCCL의 **공유 라이브러리 파일** (Shared Object)
 - PyTorch/TensorFlow가 런타임에 로드
 
 **libnccl.so 위치 확인**:
+
 ```bash
 # 1. 시스템 라이브러리 경로
 ls /usr/lib/x86_64-linux-gnu/libnccl*
@@ -470,17 +475,18 @@ ls $CONDA_PREFIX/lib/libnccl*
 # 4. PyTorch가 사용 중인 NCCL 확인
 python3 -c "import torch; print(torch.cuda.nccl.version())"
 # 출력: (2, 18, 5)
-```
 
+```
 **libnccl.so 링킹**:
+
 ```bash
 # 컴파일 시 NCCL 링크
 nvcc -o myapp myapp.cu -lnccl
 
 # 런타임 경로 설정
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
-```
 
+```
 **NCCL 버전 호환성**:
 
 | NCCL 버전 | CUDA 버전 | 주요 기능 |
@@ -495,6 +501,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 
 #### AllReduce
+
 ```python
 # PyTorch DDP (Distributed Data Parallel)
 import torch.distributed as dist
@@ -502,22 +509,25 @@ import torch.distributed as dist
 # 모든 GPU에서 그래디언트 합산 → 평균
 dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
 tensor /= world_size
-```
 
+```
 #### Broadcast
+
 ```python
 # GPU 0의 모델 가중치를 모든 GPU에 복사
 dist.broadcast(tensor, src=0)
-```
 
+```
 #### AllGather
+
 ```python
 # 각 GPU의 배치를 전체 GPU에 수집
 output_tensors = [torch.zeros_like(tensor) for _ in range(world_size)]
 dist.all_gather(output_tensors, tensor)
-```
 
+```
 **NCCL 성능 측정**:
+
 ```bash
 # NCCL Tests (공식 벤치마크)
 git clone https://github.com/NVIDIA/nccl-tests.git
@@ -527,13 +537,13 @@ make MPI=1
 # 4 GPU AllReduce 성능 테스트
 mpirun -np 4 ./build/all_reduce_perf -b 8 -e 1G -f 2
 # 출력 예시:
-# Size(B)   Time(us)  AlgBW(GB/s)  BusBW(GB/s)
-# 1GB       2500      400          600
-```
+# Size(B) Time(us) AlgBW(GB/s) BusBW(GB/s)
+# 1GB 2500 400 600
 
+```
 ---
 
-## 🚀 Ray와 CUDA 통합
+## Ray와 CUDA 통합
 
 Ray는 **분산 컴퓨팅 프레임워크** (병렬 처리, Actor 모델)
 - GPU 리소스 스케줄링 지원
@@ -558,9 +568,10 @@ def train_model(data):
 # 4개 GPU에 병렬 실행
 futures = [train_model.remote(data) for _ in range(4)]
 results = ray.get(futures)
-```
 
+```
 **Ray + NCCL 통합**:
+
 ```python
 # Ray Train (분산 학습)
 from ray.train.torch import TorchTrainer
@@ -574,11 +585,11 @@ trainer = TorchTrainer(
         backend="nccl"  # NCCL 백엔드 사용
     )
 )
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. CUDA 컴파일 흐름 요약
 
@@ -592,7 +603,6 @@ graph LR
     B -.->|JIT| E
 
 ```
-
 | 단계 | 형식 | 호환성 | 용도 |
 |------|------|--------|------|
 | **PTX** | 텍스트 (어셈블리) | 아키텍처 독립 | JIT 컴파일, 포팅 |
@@ -613,8 +623,8 @@ GPU
              ├─ Registers (64KB)
              ├─ Shared Memory (100KB)
              └─ L1 Cache (128KB)
-```
 
+```
 **예시: A100 (SM 8.0)**
 - 108 SM × 64 CUDA Cores = **6,912 CUDA Cores**
 - 108 SM × 4 Tensor Cores = **432 Tensor Cores**
@@ -637,8 +647,8 @@ nvcc -gencode arch=compute_70,code=sm_70 \
 nvcc -gencode arch=compute_80,code=sm_80 \
      -gencode arch=compute_90,code=compute_90 \  # PTX
      app.cu
-```
 
+```
 ---
 
 ### 4. NCCL 통신 패턴

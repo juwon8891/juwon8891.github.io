@@ -28,7 +28,6 @@ graph TD
     E --> E1["Actual State → Desired State<br/>Drift 발생 시 자동 복구"]
 
 ```
-
 **핵심**:
 - **Declarative (선언적)**: 시스템의 원하는 상태(Desired State)를 선언적으로 정의
 - **Versioned and Immutable (버전 관리 및 불변성)**: Git에 저장되어 버전 히스토리 유지, Rollback 가능
@@ -54,7 +53,6 @@ graph LR
     D --> D3[Efficiency<br/>효율성]
 
 ```
-
 **Platform Engineering 3대 가치**:
 1. **Velocity (속도)**: 빠른 서비스 배포 기능 제공
 2. **Governance (거버넌스)**: 정의, 인정, 확정 등의 요구 사항을 플랫폼 차원에서 자동화
@@ -110,7 +108,6 @@ graph TB
     AW -->|Trigger| GR
 
 ```
-
 **핵심 구성 요소**:
 - **Flux v2**: Git 저장소를 Watch하여 Kubernetes 리소스 자동 동기화
 - **Tofu 컨트롤러**: Terraform 코드를 GitOps 방식으로 실행 (AWS 리소스 프로비저닝)
@@ -158,8 +155,8 @@ $ kubectl cluster-info
 
 Kubernetes control plane is running at https://XXXXXXXXX.gr7.ap-northeast-2.eks.amazonaws.com
 CoreDNS is running at https://XXXXXXXXX.gr7.ap-northeast-2.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-```
 
+```
 #### Namespace 확인
 
 GitOps 컨트롤러와 테넌트가 사용할 Namespace를 확인합니다:
@@ -177,8 +174,8 @@ kube-system       Active   42m
 gitea             Active   35m
 argo-workflows    Active   30m
 argo-events       Active   30m
-```
 
+```
 **핵심 Namespace**:
 - **flux-system**: Flux v2 컨트롤러 및 GitOps 리소스
 - **gitea**: Git 저장소 (Gitea)
@@ -205,16 +202,16 @@ $ kubectl get gitrepository -n flux-system
 
 NAME              URL                                        AGE   READY   STATUS
 terraform-v0-0-1  http://admin:***@gitea:3000/admin/...      29m   True    stored artifact
-```
 
+```
 ```bash
 # HelmRepository 리소스 확인
 $ kubectl get helmrepository -n flux-system
 
 NAME                URL                                                      AGE   READY   STATUS
 helm-tenant-chart   oci://ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com   25m   True    Helm repository is ready
-```
 
+```
 ```bash
 # Kustomization 리소스 확인
 $ kubectl get kustomization -n flux-system
@@ -222,8 +219,8 @@ $ kubectl get kustomization -n flux-system
 NAME                    AGE   READY   STATUS
 flux-system             38m   True    Applied revision: main@sha1:abc123
 terraform-v0-0-1        29m   True    Applied revision: v0.0.1@sha1:def456
-```
 
+```
 **핵심 동작**:
 - **flux-system** 네임스페이스에 **terraform-v0-0-1** GitRepository가 생성되어 있음
 - Flux가 주기적으로 Git 저장소를 감시하며, 변경 사항 발생 시 Kubernetes 리소스 업데이트
@@ -246,9 +243,10 @@ $ kubectl get svc -n gitea
 NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 gitea        ClusterIP   10.100.50.100   <none>        3000/TCP         35m
 gitea-ssh    ClusterIP   10.100.50.101   <none>        22/TCP           35m
-```
 
+```
 **Gitea 저장소 구조**:
+
 ```
 gitops-gitea-repo/
 ├── terraform/                    # Terraform 모듈 (AWS 리소스)
@@ -263,8 +261,8 @@ gitops-gitea-repo/
 └── helm-charts/                  # Helm 차트 템플릿
     ├── helm-tenant-chart/
     └── application-chart/
-```
 
+```
 ---
 
 ### 1.2 Terraform 및 OpenTofu 컨트롤러
@@ -300,7 +298,6 @@ graph LR
     TR -.->|tfplan Secret| K8S
 
 ```
-
 **동작 흐름**:
 1. Git 저장소에 Terraform 코드 Push (Git 커밋)
 2. Flux가 변경 감지 → Tofu 컨트롤러가 **Terraform CRD** 생성
@@ -318,9 +315,10 @@ terraform/tenant-apps/
 ├── variables.tf              # 입력 변수 정의
 ├── outputs.tf                # 출력 값 정의
 └── versions.tf               # Provider 버전 관리
-```
 
+```
 **main.tf 예시**:
+
 ```hcl
 # SQS Queue (Producer → Consumer 메시지 전달)
 resource "aws_sqs_queue" "tenant_queue" {
@@ -380,9 +378,10 @@ resource "aws_iam_role" "tenant_role" {
     }]
   })
 }
-```
 
+```
 **variables.tf 예시**:
+
 ```hcl
 variable "tenant_id" {
   description = "Tenant ID"
@@ -415,8 +414,8 @@ variable "oidc_provider" {
   description = "EKS OIDC Provider URL (without https://)"
   type        = string
 }
-```
 
+```
 #### Terraform CRD 생성
 
 Flux가 Git 저장소를 감지하면 자동으로 Terraform CRD를 생성합니다:
@@ -450,8 +449,8 @@ spec:
     name: tenant-example-outputs
   storeReadablePlan: human
   approvePlan: auto
-```
 
+```
 **핵심 설정**:
 - `sourceRef`: GitRepository 이름 (`terraform-v0-0-1`)
 - `path`: Terraform 모듈 경로 (`./terraform/tenant-apps`)
@@ -468,9 +467,10 @@ Terraform CRD가 생성되면 **tf-runner Pod**가 실행됩니다:
 $ kubectl get pod -n flux-system | grep tf-runner
 
 tf-runner-tenant-example-xxxxxxx   0/1     Completed   0          2m
-```
 
+```
 **Pod 로그 확인**:
+
 ```bash
 $ kubectl logs -n flux-system tf-runner-tenant-example-xxxxxxx
 
@@ -497,8 +497,8 @@ Terraform used the selected providers to generate the following execution plan:
 Plan: 3 to add, 0 to change, 0 to destroy.
 
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-```
 
+```
 #### Terraform State 저장
 
 Terraform State는 Kubernetes Secret에 저장됩니다:
@@ -524,8 +524,8 @@ $ kubectl get secret -n flux-system tfstate-default-tenant-example -o jsonpath='
   "type": "aws_iam_role",
   "name": "tenant_role"
 }
-```
 
+```
 **중요**: `enable_producer`와 `enable_consumer` 옵션
 - `enable_producer = false`: Producer 리소스(SQS, DynamoDB, IAM) 생성하지 않음
 - `enable_consumer = false`: Consumer 리소스 생성하지 않음
@@ -556,8 +556,8 @@ helm-charts/
 └── application-chart/          # Onboarding Service 동작
     ├── Chart.yaml
     └── templates/
-```
 
+```
 **두 차트의 역할**:
 - **helm-tenant-chart**: 테넌트별 배포 (Producer + Consumer 마이크로서비스)
 - **application-chart**: 개발 애플리케이션을 배포 (Onboarding Service 등)
@@ -565,6 +565,7 @@ helm-charts/
 #### helm-tenant-chart 상세
 
 **Chart.yaml**:
+
 ```yaml
 apiVersion: v2
 name: helm-tenant-chart
@@ -572,9 +573,10 @@ description: Multi-Tenant SaaS Application Chart
 type: application
 version: 0.0.1
 appVersion: "1.0.0"
-```
 
+```
 **values.yaml**:
+
 ```yaml
 # Tenant 정보
 tenantId: "default-tenant"
@@ -644,8 +646,8 @@ hpa:
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
-```
 
+```
 #### ECR에 Helm 차트 업로드
 
 Helm 차트를 Amazon ECR에 OCI 형식으로 업로드합니다:
@@ -670,9 +672,10 @@ $ helm push helm-tenant-chart-0.0.1.tgz oci://ACCOUNT_ID.dkr.ecr.ap-northeast-2.
 
 Pushed: ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/helm-tenant-chart:0.0.1
 Digest: sha256:abc123def456...
-```
 
+```
 **ECR에서 Helm 차트 확인**:
+
 ```bash
 $ aws ecr describe-images \
   --repository-name helm-tenant-chart \
@@ -688,8 +691,8 @@ $ aws ecr describe-images \
     }
   ]
 }
-```
 
+```
 **Helm 차트 활용법**:
 - `values.yaml` 파일 내 `values.yaml.template`의 필요 기본 값을 **Override**하여 설정
 - 테스트 값은 **test-values.yaml** 파일을 만들고 Override 설정
@@ -731,7 +734,6 @@ graph TB
     HC -->|Install/Upgrade| ING
 
 ```
-
 **동작 흐름**:
 1. **Flux v2**가 GitRepository를 Watch
 2. Git에서 **HelmRelease YAML** 파일 감지 (`.spec.chart.spec.sourceRef` 참조)
@@ -753,19 +755,20 @@ spec:
   interval: 1m
   type: oci
   url: oci://ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com
-```
 
+```
 ```bash
 # HelmRepository 확인
 $ kubectl get helmrepository -n flux-system
 
 NAME                URL                                                      AGE   READY   STATUS
 helm-tenant-chart   oci://ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com   10m   True    Helm repository is ready
-```
 
+```
 #### HelmRelease 생성 (Premium Tier)
 
 **example-tenant-premium.yaml**:
+
 ```yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -850,8 +853,8 @@ spec:
       minReplicas: 2
       maxReplicas: 10
       targetCPUUtilizationPercentage: 70
-```
 
+```
 #### Git에 Push 및 Flux Reconciliation
 
 ```bash
@@ -878,8 +881,8 @@ $ helm list -n example-tenant
 
 NAME                       NAMESPACE         REVISION   UPDATED                                 STATUS     CHART                  APP VERSION
 example-tenant-premium     example-tenant    1          2026-04-15 10:45:00.123456789 +0900 KST deployed   helm-tenant-chart-0.0.1 1.0.0
-```
 
+```
 #### 배포된 리소스 확인
 
 ```bash
@@ -928,8 +931,8 @@ metadata:
     eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/example-tenant-role
   name: example-tenant-sa
   namespace: example-tenant
-```
 
+```
 #### kustomization.yaml을 통한 배포
 
 여러 HelmRelease를 한 번에 관리하려면 `kustomization.yaml`을 사용합니다:
@@ -947,16 +950,16 @@ spec:
   sourceRef:
     kind: GitRepository
     name: terraform-v0-0-1
-```
 
+```
 ```bash
 # Kustomization 확인
 $ kubectl get kustomization -n flux-system
 
 NAME                    AGE   READY   STATUS
 tenant-releases         5m    True    Applied revision: main@sha1:abc123
-```
 
+```
 ---
 
 ## 실습 2: SaaS 티어 전략
@@ -1003,7 +1006,6 @@ graph TB
     P --> P1
 
 ```
-
 **SaaS 티어별 특징**:
 - **Silo (Premium Tier)**: 테넌트별 독립 환경, 전용 리소스, 높은 격리성, 높은 비용
 - **Hybrid (Advanced Tier)**: 일부 공유 + 일부 전용, 중간 격리성, 중간 비용
@@ -1022,6 +1024,7 @@ graph TB
 ### 티어별 HelmRelease 생성
 
 **Basic Tier 예시**:
+
 ```yaml
 spec:
   values:
@@ -1035,9 +1038,10 @@ spec:
             value: "https://sqs.../pool-1-queue"  # 공유 Queue
       consumer:
         enabled: false  # pool-1 공유 사용
-```
 
+```
 **Advanced Tier 예시**:
+
 ```yaml
 spec:
   values:
@@ -1056,9 +1060,10 @@ spec:
         env:
           - name: ENVIRONMENT
             value: "tenant-3"
-```
 
+```
 **Premium Tier 예시**:
+
 ```yaml
 spec:
   values:
@@ -1077,8 +1082,8 @@ spec:
         env:
           - name: ENVIRONMENT
             value: "tenant-premium"
-```
 
+```
 ### 티어별 배포 확인
 
 ```bash
@@ -1099,8 +1104,8 @@ tenant-advanced-consumer-xxx    1/1     Running   0          2m
 $ kubectl get pod -n tenant-basic
 
 No resources found in tenant-basic namespace.
-```
 
+```
 ---
 
 ## 실습 3: 자동화된 테넌트 온보딩/오프보딩
@@ -1148,7 +1153,6 @@ graph LR
     HR -->|Deploy| DEPLOY
 
 ```
-
 **온보딩 워크플로우 동작**:
 1. **SQS 메시지 전송**: `{"tenant_id": "tenant-3", "tenant_tier": "advanced", "release_version": "0.0.1"}`
 2. **Argo Events Sensor**가 SQS 메시지 감지 → **Argo Workflow** 실행
@@ -1178,8 +1182,8 @@ $ echo http://$ARGO_WORKFLOW_URL:2746/workflows
 # Gitea에서 HelmRelease 커밋 확인
 # - 브랜치: tier-advanced
 # - 파일: helm-releases/tier-advanced/tenant-tldbc.yaml
-```
 
+```
 ### 오프보딩 실행
 
 ```bash
@@ -1198,8 +1202,8 @@ tenant-offboarding-gptkz           Running   9s
 # Gitea에서 HelmRelease 삭제 커밋 확인 (destroyResourcesOnDeletion: true)
 # - 브랜치: tier-advanced
 # - 커밋 메시지: "Removing tenant: tenant-tldbc in tier: advanced"
-```
 
+```
 ### 전체 자동화 흐름 요약
 
 | 구성 요소 | 역할 |
@@ -1211,13 +1215,14 @@ tenant-offboarding-gptkz           Running   9s
 | **Tofu 컨트롤러** | Terraform CRD 기반 AWS 인프라 프로비저닝 |
 
 **핵심 흐름**:
+
 ```
 SQS 메시지 1개 전송 
   → Argo Events → Argo Workflows → Git 커밋 
   → Flux → EKS 배포 
   → Tofu Controller → AWS 리소스 생성
-```
 
+```
 ---
 
 ## 실습 4: 리소스 확인 및 테스트
@@ -1242,8 +1247,8 @@ $ kubectl get deployment -n tenant-advanced
 
 NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
 tenant-advanced-consumer        2/2     2            2           5m
-```
 
+```
 ### 환경 변수 확인 (티어별 차이)
 
 ```bash
@@ -1262,8 +1267,8 @@ $ aws dynamodb scan --table-name tenant-premium-table --region ap-northeast-2 | 
 
 # SQS 메시지 확인
 $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --region ap-northeast-2
-```
 
+```
 ---
 
 ## 참고 자료
@@ -1288,14 +1293,15 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 **App-of-Apps 패턴**: Root Application이 Child Applications을 관리하는 구조로, 여러 애플리케이션을 계층적으로 배포합니다.
 
 **구조**:
+
 ```
 apps (Root Application)
 ├── helm-guestbook (Child Application)
 ├── helm-hooks (Child Application)
 ├── kustomize-guestbook (Child Application)
 └── sync-waves (Child Application)
-```
 
+```
 **장점**:
 - 중앙 집중식 애플리케이션 관리
 - 클러스터 부트스트랩핑 간소화
@@ -1325,9 +1331,9 @@ apps (Root Application)
 |------|---------|---------|
 | **핵심 기능** | CLI 중심, Tofu/Helm 컨트롤러 통합 | GUI 중심, 웹 UI 강력 |
 | **아키텍처** | Kubernetes CRD 및 컨트롤러 | 멀티클러스터 지원 강력 |
-| **Helm 지원** | ✅ (HelmRelease CRD) | ✅ (네이티브 RBAC 통합) |
-| **커스터마이징** | ✅ | ✅ |
-| **통합 GUI** | ❌ (CLI 위주) | ✅ (강력한 웹 UI) |
+| **Helm 지원** | (HelmRelease CRD) | (네이티브 RBAC 통합) |
+| **커스터마이징** | | |
+| **통합 GUI** | (CLI 위주) | (강력한 웹 UI) |
 | **커뮤니티** | CNCF 졸업 프로젝트 | CNCF 졸업 프로젝트 |
 
 **실무 선택 기준**:
@@ -1340,7 +1346,7 @@ apps (Root Application)
 |------|----------------|-----------|
 | **실행 환경** | Kubernetes Native (Pod 단위 Step) | Kubernetes 기반 Jenkins 통합 |
 | **워크플로우 정의** | YAML (Kubernetes CRD) | Jenkinsfile (Groovy) |
-| **GitOps 통합** | ✅ (Argo Events + Git 커밋) | ✅ (Lighthouse, Tekton) |
+| **GitOps 통합** | (Argo Events + Git 커밋) | (Lighthouse, Tekton) |
 | **확장성** | 높음 (Kubernetes 스케일링) | 높음 (Jenkins 에이전트 확장) |
 | **사용 사례** | 이벤트 드리븐 자동화, 배치 작업 | 기존 Jenkins 워크플로우 이관 |
 
@@ -1371,8 +1377,8 @@ Argo Events → Argo Workflows → Git 커밋
 Flux → EKS 배포 (HelmRelease)
   ↓
 Tofu Controller → AWS 리소스 생성 (SQS, DynamoDB, IAM)
-```
 
+```
 **핵심**: 모든 티어가 동일한 Helm 차트를 사용하되, **values** 설정만으로 배포 방식이 결정됩니다. 새로운 티어 추가 시 기존 구조 수정 없이 새 템플릿만 추가하면 됩니다 (확장성).
 
 GitOps 방식으로 **Git = Single Source of Truth**를 유지하며, 변경 사항은 모두 Git 커밋으로 추적 가능하고 Rollback도 간단합니다 (Declarative + Versioned).

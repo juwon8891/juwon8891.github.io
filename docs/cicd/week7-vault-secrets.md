@@ -5,7 +5,7 @@
 
 ---
 
-## 🔏 Vault 개요와 시크릿 관리의 필요성
+## Vault 개요와 시크릿 관리의 필요성
 
 ### 1. 정보보안의 3요소 (CIA Triad)
 
@@ -13,9 +13,9 @@
 
 | 요소 | 영문 | 설명 | Vault 지원 |
 |-----|------|------|-----------|
-| **기밀성** | Confidentiality | 인가된 사용자만 정보에 접근 | ✅ 암호화, 접근 제어 |
-| **무결성** | Integrity | 정보가 무단으로 변경되지 않음 | ✅ 감사 로그, 버전 관리 |
-| **가용성** | Availability | 필요할 때 정보에 접근 가능 | ✅ HA 구성, 복제 |
+| **기밀성** | Confidentiality | 인가된 사용자만 정보에 접근 | 암호화, 접근 제어 |
+| **무결성** | Integrity | 정보가 무단으로 변경되지 않음 | 감사 로그, 버전 관리 |
+| **가용성** | Availability | 필요할 때 정보에 접근 가능 | HA 구성, 복제 |
 
 **액세스 제어의 3단계 (AAA)**:
 - **인증 (Authentication)**: 누구인가? (Who?)
@@ -24,7 +24,7 @@
 
 ### 2. 시크릿의 종류
 
-#### A. 👤 사용자 및 시스템 접근 자격 증명
+#### A. 사용자 및 시스템 접근 자격 증명
 
 | 종류 | 설명 | 노출 시 위험 |
 |-----|------|-------------|
@@ -32,7 +32,7 @@
 | **SSH Key** | 서버에 안전하게 접속하기 위한 암호화된 키 쌍 | 서버 장악, 중요 데이터 탈취, 악성코드 배포 |
 | **Database Credentials** | DB 접속을 위한 사용자 ID 및 암호 | 모든 데이터의 유출 및 변조 |
 
-#### B. ☁️ 서비스 연동 및 자동화 키
+#### B. 서비스 연동 및 자동화 키
 
 | 종류 | 설명 | 노출 시 위험 |
 |-----|------|-------------|
@@ -43,7 +43,7 @@
 - **Vibe Coding 열풍**으로 AI 개발을 위한 API Key 관리 중요성 강화
 - OpenAI, Anthropic, Gemini 등 AI API Key 유출 사고 증가
 
-#### C. 🛡️ 보안 통신 및 암호화 자산
+#### C. 보안 통신 및 암호화 자산
 
 | 종류 | 설명 | 노출 시 위험 |
 |-----|------|-------------|
@@ -99,7 +99,6 @@ graph TB
     end
 
 ```
-
 #### 제로 트러스트(Zero Trust) 보안 모델의 대두
 
 **과거의 보안 모델**:
@@ -138,7 +137,6 @@ graph LR
     end
 
 ```
-
 #### HashiCorp Vault가 해결하는 문제
 
 **1. 시크릿 스프롤(분산) 문제 → 시크릿 중앙 저장소**
@@ -161,17 +159,17 @@ graph LR
 
 | 특징 | HashiCorp Vault | GitHub Secrets |
 |-----|----------------|----------------|
-| **중앙 집중식 관리** | ✅ 조직 전체 시크릿 통합 관리 | ❌ Repository 종속적 |
-| **동적 시크릿 생성** | ✅ DB, 클라우드 자격 증명 동적 생성 | ❌ 정적 시크릿만 지원 |
-| **Secret Rotation** | ✅ 자동 갱신 및 Rotation 지원 | ❌ 수동 갱신 필요 |
-| **접근 제어** | ✅ 세분화된 RBAC 및 정책 | ⚠️ Repository 수준만 가능 |
-| **멀티 환경 지원** | ✅ 클라우드, 온프레미스, 하이브리드 | ❌ GitHub Actions만 지원 |
-| **감사 로깅** | ✅ 상세한 접근 로그 및 추적 | ❌ 제한적 |
-| **암호화** | ✅ 고급 암호화 표준 (Transit, Transform) | ⚠️ GitHub 보안 표준 |
+| **중앙 집중식 관리** | 조직 전체 시크릿 통합 관리 | Repository 종속적 |
+| **동적 시크릿 생성** | DB, 클라우드 자격 증명 동적 생성 | 정적 시크릿만 지원 |
+| **Secret Rotation** | 자동 갱신 및 Rotation 지원 | 수동 갱신 필요 |
+| **접근 제어** | 세분화된 RBAC 및 정책 | **주의** Repository 수준만 가능 |
+| **멀티 환경 지원** | 클라우드, 온프레미스, 하이브리드 | GitHub Actions만 지원 |
+| **감사 로깅** | 상세한 접근 로그 및 추적 | 제한적 |
+| **암호화** | 고급 암호화 표준 (Transit, Transform) | **주의** GitHub 보안 표준 |
 
 ---
 
-## 🏗️ Vault 기본 구조와 동작 방식
+## Vault 기본 구조와 동작 방식
 
 ### 1. Vault의 핵심 워크플로우
 
@@ -190,8 +188,8 @@ sequenceDiagram
     V->>C: 5. 토큰 발급 (Token + Policy)
     C->>V: 6. 접근 (Access) - 토큰으로 시크릿 요청
     V->>C: 7. 시크릿 반환
-```
 
+```
 **4단계 워크플로우**:
 
 1. **인증 (Authenticate)**: 클라이언트가 Vault에 자신이 누구인지 증명
@@ -252,7 +250,7 @@ Vault가 액세스를 제어하는 핵심 요소:
 
 ---
 
-## ☸️ Kubernetes에 Vault 설치
+## Kubernetes에 Vault 설치
 
 ### 1. Helm을 사용한 Vault 배포
 
@@ -276,8 +274,8 @@ EOF
 # 확인
 kubectl cluster-info
 kubectl get nodes
-```
 
+```
 #### Dev Mode 설치
 
 **Dev Mode 특징**:
@@ -306,17 +304,17 @@ helm install vault hashicorp/vault \
 kubectl get pod,svc -n vault
 
 # 출력 예시:
-# NAME                                        READY   STATUS    RESTARTS   AGE
-# pod/vault-0                                 1/1     Running   0          1m
-# pod/vault-agent-injector-xxx                1/1     Running   0          1m
+# NAME READY STATUS RESTARTS AGE
+# pod/vault-0 1/1 Running 0 1m
+# pod/vault-agent-injector-xxx 1/1 Running 0 1m
 #
-# NAME                               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)
-# service/vault                      ClusterIP   10.96.100.10    <none>        8200/TCP,8201/TCP
-# service/vault-ui                   NodePort    10.96.100.11    <none>        8200:30000/TCP
-# service/vault-internal             ClusterIP   None            <none>        8200/TCP,8201/TCP
-# service/vault-agent-injector-svc   ClusterIP   10.96.100.12    <none>        443/TCP
-```
+# NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S)
+# service/vault ClusterIP 10.96.100.10 <none> 8200/TCP,8201/TCP
+# service/vault-ui NodePort 10.96.100.11 <none> 8200:30000/TCP
+# service/vault-internal ClusterIP None <none> 8200/TCP,8201/TCP
+# service/vault-agent-injector-svc ClusterIP 10.96.100.12 <none> 443/TCP
 
+```
 ### 2. Vault 초기화 및 Unseal
 
 **프로덕션 환경에서는 Vault가 봉인(Sealed) 상태로 시작**됩니다.
@@ -337,9 +335,9 @@ vault operator init -key-shares=5 -key-threshold=3
 #
 # Initial Root Token: s.xyz789...
 
-# ⚠️ 중요: Unseal Key와 Root Token을 안전한 곳에 보관!
-```
+# 중요: Unseal Key와 Root Token을 안전한 곳에 보관!
 
+```
 **Unseal 과정**:
 
 ```bash
@@ -352,11 +350,11 @@ vault operator unseal <Unseal Key 3>
 vault status
 
 # 출력 예시:
-# Sealed: false  # ← Unsealed 상태!
+# Sealed: false # ← Unsealed 상태!
 # Key Shares: 5
 # Key Threshold: 3
-```
 
+```
 ### 3. Shamir Secret Sharing (SSS) 방식
 
 **SSS(Shamir Secret Sharing)란?**
@@ -383,18 +381,18 @@ graph TB
     end
 
 ```
-
 **SSS의 장점**:
-- ✅ **보안성**: 단일 실패 지점(Single Point of Failure) 제거
-- ✅ **유연성**: Key Shares와 Threshold를 조정 가능
-- ✅ **책임 분산**: 여러 관리자가 Key를 분산 보관
+- **보안성**: 단일 실패 지점(Single Point of Failure) 제거
+- **유연성**: Key Shares와 Threshold를 조정 가능
+- **책임 분산**: 여러 관리자가 Key를 분산 보관
 
 **프로덕션 권장 설정**:
+
 ```bash
 # 7개의 Key Shares, 4개의 Threshold
 vault operator init -key-shares=7 -key-threshold=4
-```
 
+```
 **자동 Unseal 방법** (프로덕션):
 - AWS KMS Auto-Unseal
 - GCP Cloud KMS Auto-Unseal
@@ -423,8 +421,8 @@ vault login $VAULT_TOKEN
 
 # 버전 확인
 vault version
-```
 
+```
 #### CLI 설정 (WSL 2 Ubuntu)
 
 ```bash
@@ -439,8 +437,8 @@ export VAULT_TOKEN='root'
 
 # 로그인
 vault login $VAULT_TOKEN
-```
 
+```
 #### UI 접속 확인
 
 ```bash
@@ -449,15 +447,15 @@ open http://127.0.0.1:30000
 
 # Windows/Linux
 # 브라우저에서 http://127.0.0.1:30000 접속
-```
 
+```
 **UI 로그인**:
 - Method: Token
 - Token: `root`
 
 ---
 
-## 🤖 Vault Agent와 Sidecar 패턴
+## Vault Agent와 Sidecar 패턴
 
 ### 1. 왜 Vault Agent가 필요한가?
 
@@ -484,12 +482,11 @@ graph LR
     end
 
 ```
-
 **개발자의 부담**:
-- ❌ 비즈니스 로직 외에 보안 인프라 로직 구현
-- ❌ 언어마다 구현 방식이 다름 (Java, Python, Go, Node.js 등)
-- ❌ Token 갱신, Lease 관리, 에러 처리 등 복잡한 로직
-- ❌ 보안 전문가가 아닌 개발자가 보안 코드 작성
+- 비즈니스 로직 외에 보안 인프라 로직 구현
+- 언어마다 구현 방식이 다름 (Java, Python, Go, Node.js 등)
+- Token 갱신, Lease 관리, 에러 처리 등 복잡한 로직
+- 보안 전문가가 아닌 개발자가 보안 코드 작성
 
 ### 2. Vault Agent 동작 방식
 
@@ -514,7 +511,6 @@ graph LR
     end
 
 ```
-
 **Vault Agent가 제공하는 기능**:
 
 1. **자동 인증 (Auto-Auth)**
@@ -564,8 +560,8 @@ sequenceDiagram
 
     Note over POD: Sidecar Container 실행
     POD->>V: 10. Token/Lease 자동 갱신
-```
 
+```
 #### 실습: Vault Agent Injector 사용
 
 **1. Kubernetes Auth Method 활성화**:
@@ -587,8 +583,8 @@ vault write auth/kubernetes/role/myapp \
     bound_service_account_namespaces=default \
     policies=myapp-policy \
     ttl=1h
-```
 
+```
 **2. Policy 생성**:
 
 ```bash
@@ -598,8 +594,8 @@ path "secret/data/myapp/*" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 **3. 시크릿 저장**:
 
 ```bash
@@ -610,8 +606,8 @@ vault secrets enable -path=secret kv-v2
 vault kv put secret/myapp/config \
     username='admin' \
     password='secret123'
-```
 
+```
 **4. Deployment with Vault Agent Annotations**:
 
 ```yaml
@@ -659,8 +655,8 @@ spec:
           echo "Reading secrets from /vault/secrets/config.txt"
           cat /vault/secrets/config.txt
           sleep 3600
-```
 
+```
 **5. 배포 및 확인**:
 
 ```bash
@@ -676,8 +672,8 @@ kubectl exec -it <POD_NAME> -c myapp -- cat /vault/secrets/config.txt
 # 출력:
 # USERNAME=admin
 # PASSWORD=secret123
-```
 
+```
 **Vault Agent Injector가 주입하는 Container**:
 
 | Container | 역할 | 실행 시점 |
@@ -687,7 +683,7 @@ kubectl exec -it <POD_NAME> -c myapp -- cat /vault/secrets/config.txt
 
 ---
 
-## 🔨 Jenkins + Vault (CI 파이프라인)
+## Jenkins + Vault (CI 파이프라인)
 
 ### 1. CI/CD 파이프라인 보안 고려사항
 
@@ -696,20 +692,20 @@ kubectl exec -it <POD_NAME> -c myapp -- cat /vault/secrets/config.txt
 **CWE-259: Use of Hard-coded Password**
 
 ```python
-# ❌ 잘못된 예시
+# 잘못된 예시
 db_pass = "admin123"
 connection = mysql.connect(password=db_pass)
-```
 
+```
 **CWE-798: Use of Hard-coded Credentials**
 
 ```bash
-# ❌ 잘못된 예시
+# 잘못된 예시
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=XXXX
 slack_bot_token=xoxb-123...
-```
 
+```
 **최근 공격 사례**:
 - **CVE-2025-30066**: GitHub Actions `tj-actions/changed-files` 취약점
 - 하드코딩된 GitHub Token 유출로 인한 공급망 공격
@@ -756,8 +752,8 @@ vault write -f auth/approle/role/jenkins/secret-id
 # 출력:
 # role_id: 82f3322e-3909-9786-d650-8ef5211aae00
 # secret_id: 52b3a1e9-c868-24d8-ce2b-e26ebd35239b
-```
 
+```
 **3. Jenkins Vault 설정**:
 - Jenkins 관리 → Configure System → Vault
 - Vault URL: `http://vault.vault:8200`
@@ -825,8 +821,8 @@ pipeline {
         }
     }
 }
-```
 
+```
 ### 3. 동적(Dynamic) DB 시크릿
 
 #### 동적 시크릿의 장점
@@ -859,8 +855,8 @@ sequenceDiagram
     Note over V: 10분 후
     V->>DB: 7. DROP USER 'vault-xxx'@'%'
     DB->>V: 8. User 삭제 완료
-```
 
+```
 #### 실습: Vault Database Secrets Engine
 
 **1. MySQL 배포**:
@@ -908,8 +904,8 @@ spec:
         ports:
         - containerPort: 3306
 EOF
-```
 
+```
 **2. Vault Database Secrets Engine 설정**:
 
 ```bash
@@ -937,8 +933,8 @@ path "database/creds/jenkins-role" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 **3. Jenkins Pipeline에서 동적 DB Credential 사용**:
 
 ```groovy
@@ -971,8 +967,8 @@ pipeline {
         }
     }
 }
-```
 
+```
 **4. 동적 Credential 확인**:
 
 ```bash
@@ -980,23 +976,23 @@ pipeline {
 vault read database/creds/jenkins-role
 
 # 출력:
-# Key                Value
-# ---                -----
-# lease_id           database/creds/jenkins-role/abc123
-# lease_duration     10m
-# lease_renewable    true
-# username           v-approle-jenkins-role-xyz789
-# password           A1b2C3d4E5f6
+# Key Value
+# --- -----
+# lease_id database/creds/jenkins-role/abc123
+# lease_duration 10m
+# lease_renewable true
+# username v-approle-jenkins-role-xyz789
+# password A1b2C3d4E5f6
 
 # MySQL에서 사용자 확인
 kubectl exec -it <mysql-pod> -- mysql -u root -prootpassword -e "SELECT user FROM mysql.user WHERE user LIKE 'v-approle%';"
 
 # 10분 후 자동으로 삭제됨
-```
 
+```
 ---
 
-## 🔐 암호화와 Vault Transit 엔진
+## 암호화와 Vault Transit 엔진
 
 ### 1. 암호화 기본 개념
 
@@ -1050,10 +1046,10 @@ kubectl exec -it <mysql-pod> -- mysql -u root -prootpassword -e "SELECT user FRO
 | **확장성** | 리전별로 키가 분리되어 관리 복잡 | 복제(Replication) 기능으로 글로벌 클러스터 간 키 공유 |
 
 **Vault Transit 사용이 적합한 경우**:
-- ✅ 멀티 클라우드 환경 (AWS + GCP + Azure)
-- ✅ 온프레미스 + 클라우드 하이브리드
-- ✅ 대용량 암호화 트래픽 (API 호출 과금 회피)
-- ✅ 키에 대한 완전한 통제권 필요
+- 멀티 클라우드 환경 (AWS + GCP + Azure)
+- 온프레미스 + 클라우드 하이브리드
+- 대용량 암호화 트래픽 (API 호출 과금 회피)
+- 키에 대한 완전한 통제권 필요
 
 ### 3. Transit 엔진 실습
 
@@ -1078,8 +1074,8 @@ sequenceDiagram
     TRANSIT->>APP: 10. plaintext: base64("Alice")
     APP->>APP: 11. base64 decode
     APP->>User: 12. { "name": "Alice" }
-```
 
+```
 #### 실습: Transit 엔진 활성화 및 암호화/복호화
 
 **1. Transit Engine 활성화**:
@@ -1095,12 +1091,12 @@ vault write -f transit/keys/my-key
 vault read transit/keys/my-key
 
 # 출력:
-# latest_version    1
-# type              aes256-gcm96
-# supports_encryption    true
-# supports_decryption    true
-```
+# latest_version 1
+# type aes256-gcm96
+# supports_encryption true
+# supports_decryption true
 
+```
 **2. 데이터 암호화**:
 
 ```bash
@@ -1112,12 +1108,12 @@ echo -n "my secret data" | base64
 vault write transit/encrypt/my-key plaintext="bXkgc2VjcmV0IGRhdGE="
 
 # 출력:
-# ciphertext    vault:v1:8SDd3WHDOjf7mq69CyCqYjBXAiQQAVZRkFM96bKP4oOPxT0NjYHH
+# ciphertext vault:v1:8SDd3WHDOjf7mq69CyCqYjBXAiQQAVZRkFM96bKP4oOPxT0NjYHH
 
 # 암호문 저장
 CIPHERTEXT="vault:v1:8SDd3WHDOjf7mq69CyCqYjBXAiQQAVZRkFM96bKP4oOPxT0NjYHH"
-```
 
+```
 **3. 데이터 복호화**:
 
 ```bash
@@ -1125,13 +1121,13 @@ CIPHERTEXT="vault:v1:8SDd3WHDOjf7mq69CyCqYjBXAiQQAVZRkFM96bKP4oOPxT0NjYHH"
 vault write transit/decrypt/my-key ciphertext="$CIPHERTEXT"
 
 # 출력:
-# plaintext    bXkgc2VjcmV0IGRhdGE=
+# plaintext bXkgc2VjcmV0IGRhdGE=
 
 # Base64 디코딩
 echo "bXkgc2VjcmV0IGRhdGE=" | base64 -d
 # my secret data
-```
 
+```
 **4. 키 Rotation**:
 
 ```bash
@@ -1142,18 +1138,18 @@ vault write -f transit/keys/my-key/rotate
 vault read transit/keys/my-key
 
 # 출력:
-# latest_version    2  # ← 버전 증가
+# latest_version 2 # ← 버전 증가
 
 # 새 버전으로 암호화
 vault write transit/encrypt/my-key plaintext="bXkgc2VjcmV0IGRhdGE="
 
 # 출력:
-# ciphertext    vault:v2:xyz789...  # ← v2로 암호화
+# ciphertext vault:v2:xyz789... # ← v2로 암호화
 
 # 이전 버전(v1)으로 암호화된 데이터도 복호화 가능
 vault write transit/decrypt/my-key ciphertext="$CIPHERTEXT"
-```
 
+```
 **5. Batch 암호화**:
 
 ```bash
@@ -1162,9 +1158,9 @@ vault write transit/encrypt/my-key \
     batch_input='[{"plaintext":"Zm9v"},{"plaintext":"YmFy"}]'
 
 # 출력:
-# batch_results    [{"ciphertext":"vault:v2:abc..."},{"ciphertext":"vault:v2:def..."}]
-```
+# batch_results [{"ciphertext":"vault:v2:abc..."},{"ciphertext":"vault:v2:def..."}]
 
+```
 #### MySQL 컬럼 암호화 예시
 
 **1. MySQL 테이블 생성**:
@@ -1176,8 +1172,8 @@ CREATE TABLE users (
     email_encrypted TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
+```
 **2. Spring Boot 애플리케이션에서 암호화**:
 
 ```java
@@ -1211,8 +1207,8 @@ public class VaultTransitService {
         return new String(Base64.getDecoder().decode(plaintext.getPlaintext()));
     }
 }
-```
 
+```
 **3. Controller에서 사용**:
 
 ```java
@@ -1247,19 +1243,19 @@ public class UserController {
         return new UserResponse(user.getId(), user.getName(), decryptedEmail);
     }
 }
-```
 
+```
 ---
 
-## 🚀 ArgoCD + Vault Plugin (CD 파이프라인)
+## ArgoCD + Vault Plugin (CD 파이프라인)
 
 ### 1. ArgoCD Vault Plugin 소개
 
 #### 왜 ArgoCD Vault Plugin이 필요한가?
 
 **GitOps의 딜레마**:
-- ✅ 모든 설정을 Git에 저장 (Infrastructure as Code)
-- ❌ 시크릿은 Git에 평문으로 저장할 수 없음
+- 모든 설정을 Git에 저장 (Infrastructure as Code)
+- 시크릿은 Git에 평문으로 저장할 수 없음
 
 **기존 해결 방법의 한계**:
 - **Sealed Secrets**: 클러스터별로 암호화 키 관리 복잡
@@ -1267,9 +1263,9 @@ public class UserController {
 - **Kustomize Secret Generator**: 빌드 타임 시크릿 주입 어려움
 
 **ArgoCD Vault Plugin의 장점**:
-- ✅ CRD/Operator 없이 Vault와 통합
-- ✅ Secret뿐만 아니라 Deployment, ConfigMap 등 모든 리소스에 사용 가능
-- ✅ 기존 ArgoCD 워크플로우에 자연스럽게 통합
+- CRD/Operator 없이 Vault와 통합
+- Secret뿐만 아니라 Deployment, ConfigMap 등 모든 리소스에 사용 가능
+- 기존 ArgoCD 워크플로우에 자연스럽게 통합
 
 ```mermaid
 graph TB
@@ -1288,7 +1284,6 @@ graph TB
     end
 
 ```
-
 #### ArgoCD Vault Plugin 동작 방식
 
 **Placeholder 문법**:
@@ -1312,15 +1307,16 @@ spec:
           value: <path:secret/data/myapp/config#password>
         - name: API_KEY
           value: <path:secret/data/myapp/api#key>
-```
 
+```
 **Placeholder 해석**:
+
 ```
 <path:secret/data/myapp/config#username>
       ↑                         ↑
    Vault 경로                 필드명
-```
 
+```
 ### 2. AppRole 인증 설정
 
 #### AppRole 생성 및 설정
@@ -1329,8 +1325,8 @@ spec:
 
 ```bash
 vault auth enable approle
-```
 
+```
 **2. Policy 생성**:
 
 ```bash
@@ -1340,8 +1336,8 @@ path "secret/data/myapp/*" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 **3. AppRole 생성**:
 
 ```bash
@@ -1349,8 +1345,8 @@ vault write auth/approle/role/argocd \
     token_policies="argocd-policy" \
     token_ttl=1h \
     token_max_ttl=4h
-```
 
+```
 **4. RoleID 및 SecretID 확인**:
 
 ```bash
@@ -1358,15 +1354,15 @@ vault write auth/approle/role/argocd \
 vault read auth/approle/role/argocd/role-id
 
 # 출력:
-# role_id    82f3322e-3909-9786-d650-8ef5211aae00
+# role_id 82f3322e-3909-9786-d650-8ef5211aae00
 
 # SecretID 생성
 vault write -f auth/approle/role/argocd/secret-id
 
 # 출력:
-# secret_id    52b3a1e9-c868-24d8-ce2b-e26ebd35239b
-```
+# secret_id 52b3a1e9-c868-24d8-ce2b-e26ebd35239b
 
+```
 #### ArgoCD Vault Plugin 설치
 
 **1. Vault Plugin Credentials Secret 생성**:
@@ -1386,8 +1382,8 @@ stringData:
   AVP_ROLE_ID: "82f3322e-3909-9786-d650-8ef5211aae00"
   AVP_SECRET_ID: "52b3a1e9-c868-24d8-ce2b-e26ebd35239b"
 EOF
-```
 
+```
 **2. ArgoCD Repo Server에 Sidecar 추가**:
 
 ```bash
@@ -1443,8 +1439,8 @@ EOF
 helm upgrade argocd argo/argo-cd \
   -f argocd-values-with-vault.yaml \
   --namespace argocd
-```
 
+```
 ### 3. 샘플 애플리케이션 배포
 
 #### Git Repository 구조
@@ -1454,8 +1450,8 @@ myapp-gitops/
 ├── deployment.yaml
 ├── service.yaml
 └── secret.yaml (Vault placeholders 포함)
-```
 
+```
 **deployment.yaml**:
 
 ```yaml
@@ -1486,8 +1482,8 @@ spec:
           value: <path:secret/data/myapp/api#key>
         ports:
         - containerPort: 80
-```
 
+```
 **Vault에 시크릿 저장**:
 
 ```bash
@@ -1503,8 +1499,8 @@ vault kv put secret/myapp/api \
 # 확인
 vault kv get secret/myapp/config
 vault kv get secret/myapp/api
-```
 
+```
 **ArgoCD Application 생성**:
 
 ```yaml
@@ -1531,8 +1527,8 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-```
 
+```
 ```bash
 # Application 배포
 kubectl apply -f myapp-application.yaml
@@ -1549,11 +1545,11 @@ kubectl exec -it <myapp-pod> -- env | grep DB_
 # 출력:
 # DB_USERNAME=dbuser
 # DB_PASSWORD=dbpassword123
-```
 
+```
 ---
 
-## ⚙️ Vault Secrets Operator (VSO)
+## Vault Secrets Operator (VSO)
 
 ### 1. VSO란 무엇인가?
 
@@ -1591,7 +1587,6 @@ graph TB
     K8SSECRET -.->|10. Mount| POD
 
 ```
-
 ### 2. VSO 구성 요소
 
 **VSO의 주요 CRD**:
@@ -1620,8 +1615,8 @@ helm install vault-secrets-operator hashicorp/vault-secrets-operator \
 
 # 확인
 kubectl get pod -n vault-secrets-operator-system
-```
 
+```
 **2. VaultConnection 생성**:
 
 ```yaml
@@ -1633,8 +1628,8 @@ metadata:
 spec:
   address: http://vault.vault:8200
   skipTLSVerify: true
-```
 
+```
 **3. VaultAuth 생성 (Kubernetes Auth)**:
 
 ```bash
@@ -1661,8 +1656,8 @@ path "database/creds/readonly" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 ```yaml
 # VaultAuth CRD
 apiVersion: secrets.hashicorp.com/v1beta1
@@ -1677,13 +1672,13 @@ spec:
   kubernetes:
     role: vso
     serviceAccount: vso
-```
 
+```
 ```bash
 # ServiceAccount 생성
 kubectl create serviceaccount vso -n default
-```
 
+```
 ### 3. Static Secrets와 Dynamic Secrets
 
 #### Static Secrets (KV v2)
@@ -1709,8 +1704,8 @@ spec:
 
   # 갱신 주기
   refreshAfter: 30s
-```
 
+```
 ```bash
 # Vault에 시크릿 저장
 vault kv put secret/myapp/config \
@@ -1728,13 +1723,13 @@ kubectl get secret myapp-config-secret -o yaml
 # apiVersion: v1
 # kind: Secret
 # metadata:
-#   name: myapp-config-secret
+# name: myapp-config-secret
 # data:
-#   username: YWRtaW4=        # base64("admin")
-#   password: c2VjcmV0MTIz    # base64("secret123")
-#   api_key: c2stMTIzNDU2Nzg5MA==  # base64("sk-1234567890")
-```
+# username: YWRtaW4= # base64("admin")
+# password: c2VjcmV0MTIz # base64("secret123")
+# api_key: c2stMTIzNDU2Nzg5MA== # base64("sk-1234567890")
 
+```
 **Pod에서 Secret 사용**:
 
 ```yaml
@@ -1767,8 +1762,8 @@ spec:
   - name: secrets
     secret:
       secretName: myapp-config-secret
-```
 
+```
 #### Dynamic Secrets (Database)
 
 **VaultDynamicSecret CRD**:
@@ -1791,8 +1786,8 @@ spec:
   # 갱신 설정
   renewalPercent: 67  # TTL의 67% 시점에 갱신
   revoke: true        # Secret 삭제 시 Vault에서도 Revoke
-```
 
+```
 ```bash
 # Vault Database Secrets Engine 설정 (이미 설정했다면 생략)
 vault secrets enable database
@@ -1820,12 +1815,12 @@ kubectl get secret myapp-db-secret -o yaml
 # apiVersion: v1
 # kind: Secret
 # metadata:
-#   name: myapp-db-secret
+# name: myapp-db-secret
 # data:
-#   username: di1hcHByb2xlLXJlYWRvbmx5LXh5ejc4OQ==  # 동적 생성된 username
-#   password: QTFiMkMzZDRFNWY2                      # 동적 생성된 password
-```
+# username: di1hcHByb2xlLXJlYWRvbmx5LXh5ejc4OQ== # 동적 생성된 username
+# password: QTFiMkMzZDRFNWY2 # 동적 생성된 password
 
+```
 **동작 흐름**:
 
 ```mermaid
@@ -1852,8 +1847,8 @@ sequenceDiagram
     Note over VSO: Pod 삭제됨
     VSO->>VAULT: 11. Revoke Lease (revoke: true)
     VAULT->>DB: 12. DROP USER 'v-k8s-readonly-xyz'
-```
 
+```
 ---
 
 **🎉 7주차 학습 완료!**

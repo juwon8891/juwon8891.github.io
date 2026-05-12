@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Kubespray 소개
+## Kubespray 소개
 
 ### 1. Kubespray
 
@@ -15,24 +15,25 @@
 **공식 저장소**: [kubernetes-sigs/kubespray](https://github.com/kubernetes-sigs/kubespray)
 
 **핵심 특징**:
-- ✅ **프로덕션급 클러스터 배포**: Best Practice 기반 설정
-- ✅ **멀티 플랫폼 지원**: AWS, GCP, Azure, On-Premise, Bare-Metal
-- ✅ **다양한 CNI 지원**: Calico, Flannel, Cilium, Weave 등
-- ✅ **HA 구성 지원**: Control Plane과 etcd HA 자동 구성
-- ✅ **폐쇄망 지원**: Air-Gap 환경에서도 배포 가능
-- ✅ **클러스터 라이프사이클 관리**: 배포, 업그레이드, 스케일링, 백업/복구
+- **프로덕션급 클러스터 배포**: Best Practice 기반 설정
+- **멀티 플랫폼 지원**: AWS, GCP, Azure, On-Premise, Bare-Metal
+- **다양한 CNI 지원**: Calico, Flannel, Cilium, Weave 등
+- **HA 구성 지원**: Control Plane과 etcd HA 자동 구성
+- **폐쇄망 지원**: Air-Gap 환경에서도 배포 가능
+- **클러스터 라이프사이클 관리**: 배포, 업그레이드, 스케일링, 백업/복구
 
 ### 2. 주요 특징
 
 #### (1) 퍼블릭/폐쇄망 환경 지원
 
 **퍼블릭 환경**:
+
 ```bash
 # IaC(Terraform) + Kubespray 조합
 terraform apply  # 인프라 프로비저닝
 ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
-```
 
+```
 **폐쇄망(Air-Gap) 환경**:
 - 오프라인 설치 지원
 - 필요한 바이너리/이미지 사전 다운로드
@@ -109,7 +110,7 @@ Kubespray는 Kubernetes 최신 3개 버전(N, N-1, N-2)을 지원합니다.
 
 ---
 
-## 🏗️ Kubespray 아키텍처
+## Kubespray 아키텍처
 
 ### 1. 전체 실행 흐름
 
@@ -155,8 +156,8 @@ graph TD
     Y --> Z[CoreDNS, Metrics Server, Helm 등]
 
     Z --> END[Complete: Cluster Ready]
-```
 
+```
 
 1. **Check Ansible version** - Ansible 버전 검증
 2. **Inventory setup and validation** - 인벤토리 검증
@@ -200,8 +201,8 @@ graph LR
     D --> D2[mycluster/]
     D2 --> D2A[inventory.ini]
     D2 --> D2B[group_vars/]
-```
 
+```
 
 - **`playbooks/`**: 메인 Playbook 파일들
   - `cluster.yml`: 클러스터 전체 배포
@@ -263,8 +264,8 @@ graph TD
     O --> O1[coredns]
     O --> O2[metrics-server]
     O --> O3[helm-apps]
-```
 
+```
 **Role 실행 순서**:
 
 1. **kubespray_defaults**: 기본 변수 로드
@@ -282,7 +283,7 @@ graph TD
 
 ---
 
-## 📦 Container Engine 설치
+## Container Engine 설치
 
 ### 1. Containerd 설치 과정
 
@@ -322,8 +323,8 @@ flowchart TD
     G --> G2[nerdctl 설치]
 
     G2 --> End[Container Engine 준비 완료]
-```
 
+```
 **설치 단계**:
 
 1. **커널 모듈 로드**:
@@ -331,32 +332,27 @@ flowchart TD
    modprobe overlay      # OverlayFS 지원
    modprobe br_netfilter # 브릿지 네트워크 필터링
    ```
-
 2. **Runc 설치**:
    ```bash
    wget https://github.com/opencontainers/runc/releases/download/v1.3.4/runc.amd64
    install -m 755 runc.amd64 /usr/local/bin/runc
    ```
-
 3. **CNI Plugins 설치**:
    ```bash
    wget https://github.com/containernetworking/plugins/releases/download/v1.6.2/cni-plugins-linux-amd64-v1.6.2.tgz
    mkdir -p /opt/cni/bin
    tar -C /opt/cni/bin -xzf cni-plugins-linux-amd64-v1.6.2.tgz
    ```
-
 4. **Containerd 설치**:
    ```bash
    wget https://github.com/containerd/containerd/releases/download/v2.1.5/containerd-2.1.5-linux-amd64.tar.gz
    tar -C /usr/local -xzf containerd-2.1.5-linux-amd64.tar.gz
    ```
-
 5. **Config 파일 생성**:
    ```bash
    mkdir -p /etc/containerd
    containerd config default > /etc/containerd/config.toml
    ```
-
 ### 2. Registry 미러 설정
 
 Kubespray는 Containerd의 Registry 미러 기능을 활용하여 Private Registry 사용을 지원합니다.
@@ -384,8 +380,8 @@ graph TD
 
     D -->|No| N[기본 동작: Docker Hub 직접 접속]
     N --> I
-```
 
+```
 **Registry 미러 설정 예시**:
 
 ```toml
@@ -398,8 +394,8 @@ server = "https://docker.io"
 
 [host."https://registry-1.docker.io"]
   capabilities = ["pull", "resolve"]
-```
 
+```
 **설정 파일 구조**:
 
 ```
@@ -413,8 +409,8 @@ server = "https://docker.io"
     │   └── hosts.toml
     └── quay.io/
         └── hosts.toml
-```
 
+```
 **config.toml 핵심 설정**:
 
 ```toml
@@ -423,8 +419,8 @@ server = "https://docker.io"
 
 [plugins."io.containerd.cri.v1.images"]
   sandbox_image = "registry.k8s.io/pause:3.10"
-```
 
+```
 ### 3. Systemd Cgroup 설정
 
 **Systemd Cgroup 활성화**:
@@ -433,8 +429,8 @@ server = "https://docker.io"
 # /etc/containerd/config.toml
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
   SystemdCgroup = true
-```
 
+```
 **중요성**:
 - kubelet과 containerd가 동일한 cgroup driver 사용 필수
 - cgroup v2 사용 시 systemd cgroup 권장
@@ -448,11 +444,11 @@ crictl info | jq '.config.containerd.runtimes.runc.options.SystemdCgroup'
 
 # Kubelet cgroup driver 확인
 kubectl get cm kubelet-config -n kube-system -o yaml | grep cgroupDriver
-```
 
+```
 ---
 
-## 🗄️ etcd 설치 및 구성
+## etcd 설치 및 구성
 
 ### 1. etcd Deployment Type
 
@@ -468,8 +464,8 @@ Kubespray는 두 가지 etcd 배포 방식을 지원합니다.
 ```yaml
 # inventory/mycluster/group_vars/all/etcd.yml
 etcd_deployment_type: host  # systemd unit으로 실행
-```
 
+```
 ### 2. 인증서 구성
 
 ```mermaid
@@ -502,8 +498,8 @@ flowchart TD
 
     B6B --> End[etcd 설치 완료]
     C1A --> End
-```
 
+```
 **etcd 인증서 목록**:
 
 ```
@@ -516,8 +512,8 @@ flowchart TD
 ├── admin-k8s-ctr-key.pem
 ├── node-k8s-ctr.pem          # Node 인증서 (API Server → etcd)
 └── node-k8s-ctr-key.pem
-```
 
+```
 **인증서 용도**:
 
 | 인증서 | 용도 | 사용처 |
@@ -549,8 +545,8 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
-```
 
+```
 **etcd.env 설정**:
 
 ```bash
@@ -574,8 +570,8 @@ ETCD_PEER_CERT_FILE=/etc/ssl/etcd/ssl/member-k8s-ctr.pem
 ETCD_PEER_KEY_FILE=/etc/ssl/etcd/ssl/member-k8s-ctr-key.pem
 ETCD_PEER_TRUSTED_CA_FILE=/etc/ssl/etcd/ssl/ca.pem
 ETCD_PEER_CLIENT_CERT_AUTH=true
-```
 
+```
 **etcd 상태 확인**:
 
 ```bash
@@ -589,11 +585,11 @@ ETCDCTL_API=3 etcdctl \
   --key=/etc/ssl/etcd/ssl/admin-k8s-ctr-key.pem \
   --endpoints=https://192.168.10.10:2379 \
   endpoint health
-```
 
+```
 ---
 
-## ☸️ Kubernetes 클러스터 배포
+## Kubernetes 클러스터 배포
 
 ### 1. Node 컴포넌트 설치
 
@@ -623,8 +619,8 @@ rotateCertificates: true
 serverTLSBootstrap: true
 tlsCertFile: /var/lib/kubelet/pki/kubelet.crt
 tlsPrivateKeyFile: /var/lib/kubelet/pki/kubelet.key
-```
 
+```
 **kubelet.service**:
 
 ```ini
@@ -644,8 +640,8 @@ RestartSec=10s
 
 [Install]
 WantedBy=multi-user.target
-```
 
+```
 ### 2. Control Plane 구성
 
 **kubeadm init 실행**:
@@ -701,14 +697,14 @@ networking:
   dnsDomain: cluster.local
   podSubnet: 10.233.64.0/18
   serviceSubnet: 10.233.0.0/18
-```
 
+```
 **kubeadm init 실행**:
 
 ```bash
 kubeadm init --config=/etc/kubernetes/kubeadm-config.yaml --upload-certs
-```
 
+```
 **생성되는 Static Pod 매니페스트**:
 
 ```
@@ -716,8 +712,8 @@ kubeadm init --config=/etc/kubernetes/kubeadm-config.yaml --upload-certs
 ├── kube-apiserver.yaml
 ├── kube-controller-manager.yaml
 └── kube-scheduler.yaml
-```
 
+```
 ### 3. CNI 플러그인 설치
 
 **Flannel CNI 설치**:
@@ -731,14 +727,14 @@ Kubespray는 선택한 CNI 플러그인(Flannel)의 매니페스트를 적용합
 flannel_backend_type: vxlan
 flannel_network_cidr: 10.233.64.0/18
 flannel_interface: eth0
-```
 
+```
 **Flannel DaemonSet 적용**:
 
 ```bash
 kubectl apply -f /etc/kubernetes/flannel.yaml
-```
 
+```
 
 | CNI | 특징 | 네트워크 모드 |
 |-----|------|-------------|
@@ -759,8 +755,8 @@ metrics_server_enabled: true
 node_feature_discovery_enabled: true
 ingress_nginx_enabled: false
 cert_manager_enabled: false
-```
 
+```
 **설치되는 애드온**:
 
 1. **CoreDNS**: 클러스터 DNS (기본 설치)
@@ -781,11 +777,11 @@ kubectl get pods -n kube-system -l k8s-app=metrics-server
 
 # Node Feature Discovery
 kubectl get pods -n node-feature-discovery
-```
 
+```
 ---
 
-## 🔧 Kubespray 설정 분석
+## Kubespray 설정 분석
 
 ### 1. Inventory 구조
 
@@ -804,8 +800,8 @@ inventory/mycluster/
         ├── addons.yml              # 애드온 설정
         ├── k8s-net-flannel.yml     # Flannel CNI 설정
         └── kube_control_plane.yml  # Control Plane 설정
-```
 
+```
 **inventory.ini 예시**:
 
 ```ini
@@ -824,8 +820,8 @@ k8s-ctr
 [k8s_cluster:children]
 kube_control_plane
 kube_node
-```
 
+```
 ### 2. 주요 변수 설정
 
 **k8s-cluster.yml**:
@@ -854,8 +850,8 @@ auto_renew_certificates: true
 
 # Kubernetes 버전
 kube_version: v1.33.3
-```
 
+```
 **addons.yml**:
 
 ```yaml
@@ -864,16 +860,16 @@ metrics_server_enabled: true
 node_feature_discovery_enabled: true
 ingress_nginx_enabled: false
 cert_manager_enabled: false
-```
 
+```
 **etcd.yml**:
 
 ```yaml
 etcd_deployment_type: host
 etcd_data_dir: /var/lib/etcd
 etcd_events_cluster_enabled: false
-```
 
+```
 **containerd.yml**:
 
 ```yaml
@@ -883,8 +879,8 @@ containerd_registries_mirrors:
     mirrors:
       - host: https://registry-1.docker.io
         capabilities: ["pull", "resolve"]
-```
 
+```
 ### 3. 변수 우선순위
 
 ```mermaid
@@ -895,7 +891,6 @@ graph LR
     D --> E[Role defaults<br>roles/*/defaults/main.yml]
 
 ```
-
 **변수 우선순위 (높음 → 낮음)**:
 
 1. **Extra vars** (`-e key=value`): 최고 우선순위
@@ -910,11 +905,11 @@ graph LR
 # Extra vars로 kube_version 변경
 ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
   -e kube_version="v1.33.3"
-```
 
+```
 ---
 
-## 🔐 인증서 자동 갱신
+## 인증서 자동 갱신
 
 ### 1. Kubeadm Auto Renew
 
@@ -925,8 +920,8 @@ Kubespray는 **kubeadm cert auto renew** 기능을 활성화하여 인증서를 
 ```yaml
 # inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
 auto_renew_certificates: true
-```
 
+```
 **자동 갱신 대상 인증서**:
 
 | 인증서 | 유효기간 | 갱신 주기 |
@@ -953,8 +948,8 @@ Persistent=true
 
 [Install]
 WantedBy=timers.target
-```
 
+```
 **k8s-certs-renew.service**:
 
 ```ini
@@ -966,8 +961,8 @@ After=kubelet.service
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/k8s-certs-renew.sh
-```
 
+```
 **Timer 상태 확인**:
 
 ```bash
@@ -979,8 +974,8 @@ systemctl status k8s-certs-renew.timer
 
 # 다음 실행 시간 확인
 systemctl list-timers k8s-certs-renew.timer
-```
 
+```
 ### 3. 갱신 스크립트 분석
 
 **k8s-certs-renew.sh**:
@@ -1000,8 +995,8 @@ find /etc/kubernetes/manifests/ -type f -exec touch {} \;
 
 # Kubelet 재시작 (선택적)
 systemctl restart kubelet
-```
 
+```
 **수동 갱신**:
 
 ```bash
@@ -1017,8 +1012,8 @@ kubeadm certs renew apiserver-kubelet-client
 
 # Control Plane 재시작
 systemctl restart kubelet
-```
 
+```
 **인증서 만료 확인**:
 
 ```bash
@@ -1027,11 +1022,11 @@ kubeadm certs check-expiration
 
 # openssl로 확인
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates
-```
 
+```
 ---
 
-## 🌐 HA 환경 지원
+## HA 환경 지원
 
 ### 1. Control Plane HA
 
@@ -1061,8 +1056,8 @@ k8s-ctr3
 [kube_node]
 k8s-w1
 k8s-w2
-```
 
+```
 **HA 특징**:
 
 - **kube-apiserver**: 모든 Control Plane 노드에서 실행 (Active-Active)
@@ -1092,8 +1087,8 @@ k8s-w2
 # /etc/etcd.env
 ETCD_INITIAL_CLUSTER=k8s-ctr1=https://192.168.10.11:2380,k8s-ctr2=https://192.168.10.12:2380,k8s-ctr3=https://192.168.10.13:2380
 ETCD_INITIAL_CLUSTER_STATE=new
-```
 
+```
 ### 3. Client-Side LoadBalancing
 
 Kubespray는 Worker 노드에 **Nginx 기반 LoadBalancer**를 구성하여 API Server에 분산 접속합니다.
@@ -1106,8 +1101,8 @@ Worker Node (k8s-w1)
 │   └── kubeconfig → localhost:6443
 └── nginx (localhost:6443)
     └── upstream → k8s-ctr1:6443, k8s-ctr2:6443, k8s-ctr3:6443
-```
 
+```
 **nginx.conf**:
 
 ```nginx
@@ -1126,8 +1121,8 @@ stream {
         proxy_connect_timeout 1s;
     }
 }
-```
 
+```
 **kubelet kubeconfig**:
 
 ```yaml
@@ -1136,8 +1131,8 @@ clusters:
 - cluster:
     server: https://localhost:6443  # Nginx LoadBalancer
   name: cluster.local
-```
 
+```
 **장점**:
 - 외부 LoadBalancer 불필요
 - API Server 장애 시 자동 failover
@@ -1145,7 +1140,7 @@ clusters:
 
 ---
 
-## 🔄 클러스터 운영
+## 클러스터 운영
 
 ### 1. 클러스터 업그레이드
 
@@ -1155,8 +1150,8 @@ clusters:
 # Kubernetes 버전 업그레이드
 ansible-playbook -i inventory/mycluster/inventory.ini upgrade-cluster.yml \
   -e kube_version=v1.34.0
-```
 
+```
 **업그레이드 순서**:
 
 1. etcd 업그레이드 (필요 시)
@@ -1180,8 +1175,8 @@ ansible-playbook -i inventory/mycluster/inventory.ini upgrade-cluster.yml \
 # inventory.ini에 새 노드 추가 후 실행
 ansible-playbook -i inventory/mycluster/inventory.ini scale.yml \
   --limit=k8s-w3
-```
 
+```
 **노드 제거**:
 
 ```bash
@@ -1191,8 +1186,8 @@ kubectl drain k8s-w1 --ignore-daemonsets --delete-emptydir-data
 # 노드 제거 Playbook
 ansible-playbook -i inventory/mycluster/inventory.ini remove-node.yml \
   -e node=k8s-w1
-```
 
+```
 ### 3. 백업 및 복구
 
 **etcd 백업**:
@@ -1207,8 +1202,8 @@ ETCDCTL_API=3 etcdctl snapshot save /backup/etcd-snapshot.db \
 
 # Snapshot 검증
 ETCDCTL_API=3 etcdctl snapshot status /backup/etcd-snapshot.db
-```
 
+```
 **etcd 복구**:
 
 ```bash
@@ -1227,8 +1222,8 @@ chown -R etcd:etcd /var/lib/etcd
 
 # etcd 재시작
 systemctl start etcd
-```
 
+```
 **자동 백업 스크립트**:
 
 ```bash
@@ -1248,11 +1243,11 @@ ETCDCTL_API=3 etcdctl snapshot save "$SNAPSHOT" \
 
 # 7일 이상 된 백업 삭제
 find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. Kubespray vs Kubeadm
 
@@ -1269,16 +1264,16 @@ find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
 | **설정 관리** | Inventory 기반 | 각 노드별 설정 파일 |
 
 **Kubespray 장점**:
-- ✅ 프로덕션급 클러스터 빠른 배포
-- ✅ Best Practice 자동 적용
-- ✅ 멀티 노드 동시 배포
-- ✅ IaC(Infrastructure as Code)
-- ✅ 일관된 설정 관리
+- 프로덕션급 클러스터 빠른 배포
+- Best Practice 자동 적용
+- 멀티 노드 동시 배포
+- IaC(Infrastructure as Code)
+- 일관된 설정 관리
 
 **Kubeadm 장점**:
-- ✅ 간단한 사용법
-- ✅ 공식 도구 (Kubernetes 프로젝트)
-- ✅ 작은 클러스터에 적합
+- 간단한 사용법
+- 공식 도구 (Kubernetes 프로젝트)
+- 작은 클러스터에 적합
 
 ### 2. Ansible Role 기반 구조
 
@@ -1309,8 +1304,8 @@ roles/container-engine/
 │   └── main.yml        # Handler (재시작 등)
 └── vars/
     └── main.yml        # Role 변수
-```
 
+```
 ### 3. 퍼블릭 vs 폐쇄망 배포
 
 **퍼블릭 환경 배포**:
@@ -1318,8 +1313,8 @@ roles/container-engine/
 ```bash
 # 인터넷 연결된 환경
 ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
-```
 
+```
 **폐쇄망(Air-Gap) 환경 배포**:
 
 1. **바이너리 사전 다운로드**:
@@ -1327,7 +1322,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
    ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
      --tags download --skip-tags upload,upgrade
    ```
-
 2. **이미지 사전 다운로드**:
    ```bash
    # 이미지 목록 생성
@@ -1335,7 +1329,6 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
      --tags download --skip-tags upload,upgrade \
      -e download_container=true
    ```
-
 3. **Private Registry 구성**:
    ```yaml
    # group_vars/all/containerd.yml
@@ -1345,23 +1338,21 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
          - host: https://registry.internal.com
            capabilities: ["pull", "resolve"]
    ```
-
 4. **오프라인 배포 실행**:
    ```bash
    ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
      -e download_run_once=false \
      -e download_localhost=true
    ```
-
 **폐쇄망 배포 요구사항**:
-- ✅ Private Registry (Harbor, Nexus 등)
-- ✅ 바이너리 저장소 (HTTP 서버)
-- ✅ Ansible Control Node (폐쇄망 내부)
-- ✅ 사전 다운로드된 파일 목록
+- Private Registry (Harbor, Nexus 등)
+- 바이너리 저장소 (HTTP 서버)
+- Ansible Control Node (폐쇄망 내부)
+- 사전 다운로드된 파일 목록
 
 ---
 
-## 📚 참고 자료
+## 참고 자료
 
 - [Kubespray 공식 문서](https://kubespray.io/)
 - [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)

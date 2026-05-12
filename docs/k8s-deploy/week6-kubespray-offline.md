@@ -36,7 +36,6 @@ graph TB
     FW2 --> Internal
 
 ```
-
 **특징**:
 - 내부망에서는 **외부 인터넷 접속 불가**
 - 필요 시 **방화벽 정책 승인 후 Bastion Server**를 통해 다운로드
@@ -117,8 +116,8 @@ sysctl --system
 iptables -t nat -A POSTROUTING -o enp0s8 -j MASQUERADE
 iptables -t nat -S
 iptables -t nat -L -n -v
-```
 
+```
 #### [k8s-node] 네트워크 기본 설정
 
 ```bash
@@ -132,8 +131,8 @@ nmcli connection up enp0s9
 
 # 라우팅 확인
 ip route
-```
 
+```
 #### NAT Gateway 동작 원리
 
 ```mermaid
@@ -145,7 +144,6 @@ graph LR
     Admin --> K8sNode
 
 ```
-
 **MASQUERADE 동작**:
 1. k8s-node → admin: Source IP `192.168.10.11` → `10.0.2.15` (SNAT)
 2. admin → Internet: `10.0.2.15`로 요청
@@ -173,8 +171,8 @@ systemctl status nftables.service
 # 재부팅 후 확인
 reboot
 nft list ruleset
-```
 
+```
 #### podman0 forward 허용 (TS)
 
 admin 서버에 podman으로 기동한 registry 컨테이너에 k8s-node에서 이미지 가져오기 실패 시:
@@ -186,8 +184,8 @@ sudo nft add rule ip filter forward iif "podman0" oif "enp0s9" ct state establis
 
 # [k8s-node] 테스트
 podman pull 192.168.10.10:5000/alpine:1.0
-```
 
+```
 ---
 
 ### 2. NTP Server - Client
@@ -218,8 +216,8 @@ systemctl status chronyd.service
 # 상태 확인
 timedatectl status
 chronyc sources -v
-```
 
+```
 #### [k8s-node] NTP 클라이언트 설정
 
 ```bash
@@ -235,8 +233,8 @@ systemctl restart chronyd.service
 # 상태 확인
 timedatectl status
 chronyc sources -v
-```
 
+```
 #### NTP 동기화 흐름
 
 ```mermaid
@@ -249,7 +247,6 @@ graph TB
     AdminNTP --> Node2NTP["k8s-node2<br/>chronyd<br/>Stratum 4"]
 
 ```
-
 ---
 
 ### 3. DNS Server - Client
@@ -314,8 +311,8 @@ systemctl restart NetworkManager
 # 확인
 dig +short google.com @192.168.10.10
 dig +short google.com
-```
 
+```
 #### [k8s-node] DNS 클라이언트 설정
 
 ```bash
@@ -334,8 +331,8 @@ echo "nameserver 192.168.10.10" > /etc/resolv.conf
 # 확인
 dig +short google.com @192.168.10.10
 dig +short google.com
-```
 
+```
 ---
 
 ### 4. Local (Mirror) YUM/DNF Repository
@@ -383,8 +380,8 @@ systemctl status nginx.service
 # 접속 테스트
 curl http://192.168.10.10/rocky/10/
 open http://192.168.10.10/rocky/10/baseos/
-```
 
+```
 #### [k8s-node] 로컬 레포 설정
 
 ```bash
@@ -418,8 +415,8 @@ dnf clean all
 dnf repolist
 dnf install -y nfs-utils
 dnf info nfs-utils | grep -i repo
-```
 
+```
 ---
 
 ### 5. Private Container Registry
@@ -452,8 +449,8 @@ podman run -d \
 podman ps
 ss -tnlp | grep 5000
 curl -s http://localhost:5000/v2/_catalog | jq
-```
 
+```
 #### [admin] 이미지 push
 
 ```bash
@@ -477,8 +474,8 @@ podman push 192.168.10.10:5000/alpine:1.0
 # 확인
 curl -s http://192.168.10.10:5000/v2/_catalog | jq
 curl -s http://192.168.10.10:5000/v2/alpine/tags/list | jq
-```
 
+```
 #### [k8s-node] 이미지 pull
 
 ```bash
@@ -494,8 +491,8 @@ grep "^[^#]" /etc/containers/registries.conf
 # 이미지 가져오기
 podman pull 192.168.10.10:5000/alpine:1.0
 podman images
-```
 
+```
 #### Registry 이미지 해석 흐름
 
 ```mermaid
@@ -512,13 +509,12 @@ graph TB
 
     CheckShortname -->|"No"| CheckMode{"shortname-mode?"}
 
-    CheckMode -->|"enforcing"| Error["❌ 사용자에게<br/>선택 요구"]
+    CheckMode -->|"enforcing"| Error["사용자에게<br/>선택 요구"]
     CheckMode -->|"permissive"| SearchRegistries["unqualified-search-registries<br/>순서대로 시도"]
 
     SearchRegistries --> DirectPull
 
 ```
-
 ---
 
 ### 6. Private PyPI Mirror
@@ -541,8 +537,8 @@ nohup devpi-server --serverdir /data/devpi_data --host 0.0.0.0 --port 3141 > /va
 ss -tnlp | grep devpi-server
 tail -f /var/log/devpi.log
 open http://192.168.10.10:3141
-```
 
+```
 #### [admin] 패키지 업로드
 
 ```bash
@@ -569,8 +565,8 @@ devpi upload /tmp/pypi-packages/*
 # 확인
 tree /data/devpi_data/+files/
 devpi list jmespath netaddr
-```
 
+```
 #### [k8s-node] pip 설정 및 사용
 
 ```bash
@@ -588,8 +584,8 @@ pip list | grep -i jmespath
 
 pip install netaddr
 pip list | grep -i netaddr
-```
 
+```
 **+simple의 의미**:
 - `/root/prod`: 사람용 웹 UI
 - `/root/prod/+simple`: **pip 전용 API 엔드포인트** (PEP 503 Simple API)
@@ -623,10 +619,9 @@ graph TB
     PushImages --> Deploy
     Kubespray --> Deploy
 
-    Deploy -->|"ansible-playbook<br/>cluster.yml"| K8sCluster["✅ K8s Cluster"]
+    Deploy -->|"ansible-playbook<br/>cluster.yml"| K8sCluster["K8s Cluster"]
 
 ```
-
 ### kubespray-offline 지원 기능
 
 | 기능 | 스크립트 | 용도 |
@@ -668,8 +663,8 @@ map_arch() {
         *) echo "$1" ;;
     esac
 }
-```
 
+```
 ---
 
 ## 실습: kubespray-offline 배포
@@ -699,8 +694,8 @@ echo -e "cpu arch: $IMAGE_ARCH"
 # 결과 확인
 du -sh outputs/
 tree outputs/ -L 1
-```
 
+```
 **download-all.sh 실행 흐름**:
 
 ```mermaid
@@ -717,10 +712,9 @@ graph TB
     DownloadKubespray --> DownloadAdditional["download-additional-containers.sh<br/>추가 이미지 다운로드 (nginx, registry)"]
     DownloadAdditional --> CreateRepo["create-repo.sh<br/>createrepo outputs/rpms/local"]
     CreateRepo --> CopyTargetScripts["copy-target-scripts.sh<br/>target-scripts/* → outputs/"]
-    CopyTargetScripts --> Done["✅ Done"]
+    CopyTargetScripts --> Done["Done"]
 
 ```
-
 ### [1] setup-container.sh 실행
 
 ```bash
@@ -737,8 +731,8 @@ tree -ug /opt/cni/bin/
 
 systemctl status containerd.service
 nerdctl images
-```
 
+```
 ### [2] start-nginx.sh 실행
 
 ```bash
@@ -749,8 +743,8 @@ nerdctl images
 nerdctl ps
 ss -tnlp | grep nginx
 open http://192.168.10.10
-```
 
+```
 **Nginx 디렉터리 목록 표시 설정**:
 
 ```bash
@@ -780,8 +774,8 @@ EOF
 
 # Nginx 컨테이너 재시작
 ./start-nginx.sh
-```
 
+```
 ### [3] setup-offline.sh 실행
 
 ```bash
@@ -796,8 +790,8 @@ dnf repolist
 
 # pip 설정 확인
 cat ~/.config/pip/pip.conf
-```
 
+```
 ### [4] setup-py.sh 실행
 
 ```bash
@@ -809,8 +803,8 @@ source pyver.sh
 echo -e "python_version $python${PY}"
 dnf info python3
 tree rpms/local/ | grep -i python
-```
 
+```
 ### [5] start-registry.sh 실행
 
 ```bash
@@ -826,8 +820,8 @@ ss -tnlp | grep registry
 # tcp 5001 port: debug, metrics (참고)
 curl 192.168.10.10:5001/metrics
 curl 192.168.10.10:5001/debug/pprof/
-```
 
+```
 ### [6] load-push-images.sh 실행 (2분 소요)
 
 ```bash
@@ -849,8 +843,8 @@ curl -s http://localhost:35000/v2/kube-apiserver/manifests/v1.34.3 | jq
 
 # 저장 디렉터리 확인
 tree /var/lib/registry/ -L 5
-```
 
+```
 **이미지 Registry push 흐름**:
 
 ```mermaid
@@ -864,7 +858,6 @@ graph LR
     Registry --> Storage["Storage<br/>/var/lib/registry"]
 
 ```
-
 ### [7] extract-kubespray.sh 실행
 
 ```bash
@@ -873,8 +866,8 @@ graph LR
 
 # 확인
 tree kubespray-2.30.0/ -L 1
-```
 
+```
 ---
 
 ## Kubespray 클러스터 배포 (3분 소요)
@@ -895,8 +888,8 @@ which ansible
 # pip 업데이트 및 Ansible 설치
 pip install -U pip
 pip install -r requirements.txt
-```
 
+```
 ### Inventory 설정
 
 ```bash
@@ -927,8 +920,8 @@ EOF
 
 # ansible 연결 확인
 ansible -i inventory/mycluster/inventory.ini all -m ping
-```
 
+```
 ### offline-repo 설정 (k8s-node)
 
 ```bash
@@ -952,8 +945,8 @@ done
 
 ssh k8s-node1 dnf repolist
 ssh k8s-node2 dnf repolist
-```
 
+```
 ### Group Vars 설정
 
 ```bash
@@ -985,8 +978,8 @@ sed -i 's|helm_enabled: false|helm_enabled: true|g' inventory/mycluster/group_va
 sed -i 's|metrics_server_enabled: false|metrics_server_enabled: true|g' inventory/mycluster/group_vars/k8s_cluster/addons.yml
 echo "metrics_server_requests_cpu: 25m" >> inventory/mycluster/group_vars/k8s_cluster/addons.yml
 echo "metrics_server_requests_memory: 16Mi" >> inventory/mycluster/group_vars/k8s_cluster/addons.yml
-```
 
+```
 ### [macOS 사용자] etcd CPU arch 변수 수정 (TS)
 
 ```bash
@@ -996,15 +989,15 @@ echo "metrics_server_requests_memory: 16Mi" >> inventory/mycluster/group_vars/k8
 # offline.yml 수정
 cat inventory/mycluster/group_vars/all/offline.yml | grep amd64
 sed -i 's/amd64/arm64/g' inventory/mycluster/group_vars/all/offline.yml
-```
 
+```
 ### Kubespray 배포 (3분 소요)
 
 ```bash
 # Kubespray 배포
 ansible-playbook -i inventory/mycluster/inventory.ini -v cluster.yml -e kube_version="1.34.3"
-```
 
+```
 ### kubectl 설정 및 확인
 
 ```bash
@@ -1030,8 +1023,8 @@ k9s
 
 # 이미지 저장소 확인
 kubectl get deploy,sts,ds -n kube-system -owide
-```
 
+```
 ---
 
 ## Troubleshooting
@@ -1039,11 +1032,12 @@ kubectl get deploy,sts,ds -n kube-system -owide
 ### 1. Flannel 파드 최초 정상 기동을 위한 디폴트 라우팅 설정
 
 **문제**:
+
 ```bash
 TASK [network_plugin/flannel : Flannel | Wait for flannel subnet.env file presence]
 fatal: [k8s-node1]: FAILED! => {"changed": false, "elapsed": 600, "msg": "Timeout when waiting for file /run/flannel/subnet.env"}
-```
 
+```
 **원인**:
 - Flannel은 기본적으로 노드의 **Default Route**가 설정된 인터페이스를 찾아서 VxLAN 엔드포인트로 사용
 - 기본 라우팅이 없으면 Flannel이 어떤 인터페이스를 사용할지 결정하지 못해 실패
@@ -1055,16 +1049,17 @@ fatal: [k8s-node1]: FAILED! => {"changed": false, "elapsed": 600, "msg": "Timeou
 nmcli connection modify enp0s9 +ipv4.routes "0.0.0.0/0 192.168.10.10 200"
 nmcli connection up enp0s9
 ip route
-```
 
+```
 ### 2. podman0 forward 허용 (admin 서버 Registry 접근 실패)
 
 **문제**:
+
 ```bash
 # [k8s-node] admin 서버의 registry 접근 실패
 podman pull 192.168.10.10:5000/alpine:1.0
-```
 
+```
 **원인**:
 - admin 서버에 nftables 적용 후 k8s-node → admin 서버 podman0 인터페이스로 회신 못함
 - podman0 forward 룰 없음
@@ -1078,8 +1073,8 @@ sudo nft add rule ip filter forward iif "podman0" oif "enp0s9" ct state establis
 
 # [k8s-node] 테스트
 podman pull 192.168.10.10:5000/alpine:1.0
-```
 
+```
 ---
 
 ## 주요 개념
@@ -1126,10 +1121,9 @@ graph TB
     YumRepo --> Kubespray
     PyPIMirror --> Kubespray
 
-    Kubespray --> K8s["✅ Kubernetes Cluster"]
+    Kubespray --> K8s["Kubernetes Cluster"]
 
 ```
-
 ### 3. Containerd Registry Mirror 설정
 
 ```bash
@@ -1137,8 +1131,8 @@ graph TB
 tree /etc/containerd/
 cat /etc/containerd/config.toml
 cat /etc/containerd/certs.d/192.168.10.10:35000/hosts.toml
-```
 
+```
 **hosts.toml**:
 
 ```toml
@@ -1148,8 +1142,8 @@ server = "https://192.168.10.10:35000"
   capabilities = ["pull","resolve"]
   skip_verify = true
   override_path = false
-```
 
+```
 **동작 원리**:
 1. kubelet → containerd: "192.168.10.10:35000/kube-apiserver:v1.34.3" 이미지 pull 요청
 2. containerd → `/etc/containerd/certs.d/192.168.10.10:35000/hosts.toml` 읽기

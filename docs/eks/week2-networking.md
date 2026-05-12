@@ -6,7 +6,7 @@
 
 ---
 
-## 🌐 AWS VPC CNI 소개
+## AWS VPC CNI 소개
 
 ### 1. VPC CNI
 
@@ -38,7 +38,6 @@ graph TB
     H --> I[AWS Network]
 
 ```
-
 **VPC CNI의 장점**:
 1. **Native 성능**: Overlay Network Overhead 없음
 2. **AWS 통합**: Security Group, NACLmichael 직접 적용
@@ -76,8 +75,8 @@ sequenceDiagram
     C->>K: Pod IP 반환
     K->>K: Setup Network Namespace
     K->>K: Configure Routes
-```
 
+```
 **동작 흐름**:
 1. **kubelet**이 Pod 스케줄링 시 CNI Plugin 호출
 2. **VPC CNI**가 L-IPAM(Local IP Address Manager)에 IP 요청
@@ -121,17 +120,18 @@ graph TB
     E --> H[Pod3: 10.0.1.64]
 
 ```
-
 **최대 Pod 수 계산**:
+
 ```
 Max Pods = (ENI 당 IP 개수 - 1) × 2 + 2
-```
 
+```
 예: m5.large (ENI 3개, ENI당 IP 10개)
+
 ```
 Max Pods = (10 - 1) × 2 + 2 = 20개
-```
 
+```
 #### (2) Prefix Delegation mode
 
 **특징**:
@@ -158,17 +158,18 @@ graph TB
     B --> G[Pod16: 192.168.2.31]
 
 ```
-
 **최대 Pod 수 계산**:
+
 ```
 Max Pods = ENI × (Prefix 당 IP 개수 - 1) × 16
-```
 
+```
 예: m5.large (ENI 3개, ENI당 Prefix 10개)
+
 ```
 New Max Pods = 3 × 10 × 16 = 480개
-```
 
+```
 **Prefix Delegation 활성화**:
 
 ```bash
@@ -177,8 +178,8 @@ kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 
 # 확인
 kubectl get ds aws-node -n kube-system -o yaml | grep ENABLE_PREFIX_DELEGATION
-```
 
+```
 ### 4. 보안 그룹 관리
 
 **Pod 단위 보안 그룹** (Security Groups for Pods):
@@ -195,7 +196,6 @@ graph TB
     E[EKS Managed ENI] -->|Node Security Group| F[Node]
 
 ```
-
 **설정 방법**:
 
 ```yaml
@@ -209,11 +209,11 @@ spec:
   containers:
   - name: app
     image: nginx
-```
 
+```
 ---
 
-## 🔍 노드에서 기본 네트워크 정보 확인
+## 노드에서 기본 네트워크 정보 확인
 
 ### 1. 노드 접속 및 IP 조회
 
@@ -226,8 +226,8 @@ kubectl get nodes -o custom-columns=NAME:.metadata.name,IP:.status.addresses[?(@
 
 # 노드에 SSH 접속
 ssh -i ~/.ssh/mykey.pem ec2-user@<NODE_IP>
-```
 
+```
 ### 2. 네트워크 인터페이스 확인
 
 ```bash
@@ -241,8 +241,8 @@ ip addr show
 1: lo: <LOOPBACK,UP,LOWER_UP>
 2: eth0@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> (Primary ENI)
 3: eni1@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> (Secondary ENI)
-```
 
+```
 **VPC CNI가 생성한 인터페이스**:
 - `eth0`: Primary ENI (Node IP)
 - `eniY@ifX`: Pod에 할당된 veth pair
@@ -253,8 +253,8 @@ kubectl get pod -o wide
 
 # CNI log 확인
 kubectl logs -n kube-system -l k8s-app=aws-node --tail=100
-```
 
+```
 ### 3. 라우팅 테이블 확인
 
 ```bash
@@ -266,8 +266,8 @@ default via 192.168.1.1 dev eth0                     # 기본 게이트웨이
 192.168.1.0/24 dev eth0 proto kernel scope link      # 노드 네트워크
 192.168.1.64 dev eni1 scope link                     # Pod1 to ENI1
 192.168.1.235 dev eni2 scope link                    # Pod2 to ENI2
-```
 
+```
 **CNI 라우팅 규칙**:
 - 각 Pod의 IP는 해당 veth pair의 ENI로 라우팅
 - 노드가 Pod IP에 대한 직접 라우팅 보유
@@ -275,11 +275,12 @@ default via 192.168.1.1 dev eth0                     # 기본 게이트웨이
 
 ---
 
-## 📡 노드 간 파드 통신
+## 노드 간 파드 통신
 
 ### 1. 파드 통신 흐름
 
 **동일 노드 내 Pod 간 통신**:
+
 ```mermaid
 graph LR
     A[Pod1: 10.10.1.10] --> B[eth0 - veth pair]
@@ -288,8 +289,8 @@ graph LR
     D --> E[Pod2: 10.10.1.20]
 
 ```
-
 **다른 노드 간 Pod 통신**:
+
 ```mermaid
 sequenceDiagram
     participant P1 as Pod1 on Node1<br/>10.10.1.10
@@ -309,8 +310,8 @@ sequenceDiagram
     N2-->>VPC: Forward to Node1 subnet
     VPC-->>N1: Route to 10.10.1.10
     N1-->>P1: Deliver response
-```
 
+```
 **흐름 설명**:
 1. **Pod1 → Node1**: Pod1이 패킷을 eth0(veth pair)를 통해 전송
 2. **Node1 라우팅**: Node1의 라우팅 테이블에서 목적지 확인
@@ -339,7 +340,6 @@ graph TB
     D --> E[Pod Packet<br/>10.1.1.1 → 10.1.1.2]
 
 ```
-
 **특징**:
 - Pod CIDR이 VPC 외부 대역 (e.g., 10.1.1.0/24)
 - Encapsulation (VXLAN, IP-in-IP) 필요
@@ -362,7 +362,6 @@ graph TB
     D --> C
 
 ```
-
 **특징**:
 - Pod IP가 VPC CIDR 내부 (e.g., 192.168.1.0/24)
 - Encapsulation 불필요
@@ -385,8 +384,8 @@ sequenceDiagram
     I-->>N: Source: 8.8.8.8<br/>Dest: 192.168.1.10
     N-->>N: DNAT Rule<br/>192.168.1.10 → 192.168.1.64
     N-->>P: Source: 8.8.8.8<br/>Dest: 192.168.1.64
-```
 
+```
 **iptables NAT 규칙 확인**:
 
 ```bash
@@ -395,11 +394,11 @@ sudo iptables -t nat -S
 
 # AWS-SNAT-CHAIN 규칙
 -A AWS-SNAT-CHAIN-0 ! -d 192.168.0.0/16 -m comment --comment "AWS, SNAT" -j SNAT --to-source 192.168.1.10
-```
 
+```
 ---
 
-## 🌍 파드에서 외부 통신
+## 파드에서 외부 통신
 
 ### 1. 외부 통신 흐름
 
@@ -413,7 +412,6 @@ graph LR
     D --> E[Internet]
 
 ```
-
 **단계별 흐름**:
 1. Pod에서 패킷 생성 (Source: 192.168.1.64)
 2. Node의 iptables NAT 규칙 적용
@@ -430,14 +428,14 @@ iptables -t nat -A AWS-SNAT-CHAIN-0 ! -d <VPC_CIDR> -j SNAT --to-source <NODE_IP
 
 # 예시
 iptables -t nat -A AWS-SNAT-CHAIN-0 ! -d 192.168.0.0/16 -j SNAT --to-source 192.168.1.10
-```
 
+```
 - `! -d 192.168.0.0/16`: VPC CIDR 외부 트래픽만
 - `-j SNAT --to-source 192.168.1.10`: Node IP로 변환
 
 ---
 
-## ⚙️ AWS VPC CNI 설정 변경
+## AWS VPC CNI 설정 변경
 
 AWS VPC CNI는 여러 환경 변수로 동작을 제어할 수 있습니다.
 
@@ -448,8 +446,8 @@ AWS VPC CNI는 여러 환경 변수로 동작을 제어할 수 있습니다.
 ```bash
 # ENI를 1개 미리 준비
 kubectl set env daemonset aws-node -n kube-system WARM_ENI_TARGET=1
-```
 
+```
 **동작 방식**:
 - 예약된 ENI를 미리 연결하여 Pod 생성 시 즉시 IP 할당
 - Pod가 증가하면 ENI 개수 유지
@@ -465,8 +463,8 @@ kubectl set env daemonset aws-node -n kube-system WARM_ENI_TARGET=1
 ```bash
 # IP 주소를 10개 미리 준비
 kubectl set env daemonset aws-node -n kube-system WARM_IP_TARGET=10
-```
 
+```
 **동작 방식**:
 - Secondary IP를 미리 할당하여 Pod 생성 속도 향상
 - Pod 삭제 시에도 IP 유지 (재사용)
@@ -482,8 +480,8 @@ kubectl set env daemonset aws-node -n kube-system WARM_IP_TARGET=10
 ```bash
 # 최소 30개 IP 주소 유지
 kubectl set env daemonset aws-node -n kube-system MINIMUM_IP_TARGET=30
-```
 
+```
 **동작 방식**:
 - 노드 시작 시 최소 IP 개수 확보
 - Scale-out 시 빠른 Pod 생성 보장
@@ -494,7 +492,7 @@ kubectl set env daemonset aws-node -n kube-system MINIMUM_IP_TARGET=30
 
 ---
 
-## 📊 노드에 파드 생성 갯수 제한
+## 노드에 파드 생성 갯수 제한
 
 ### 1. Secondary IP mode
 
@@ -502,14 +500,14 @@ kubectl set env daemonset aws-node -n kube-system MINIMUM_IP_TARGET=30
 
 ```
 Max Pods = (ENI 수 × (ENI당 IP 개수 - 1)) + 2
-```
 
+```
 **예시: m5.large (ENI 3개, IP 10개/ENI)**:
 
 ```
 Max Pods = (3 × (10 - 1)) + 2 = 29개
-```
 
+```
 **인스턴스별 최대 Pod 수**:
 
 | Instance Type | ENI 개수 | IP/ENI | Max Pods (Secondary IP) |
@@ -527,14 +525,14 @@ Max Pods = (3 × (10 - 1)) + 2 = 29개
 
 ```
 New Max Pods = (ENI 수 × (ENI당 지원하는 IPv4 Prefix - 1)) × 16 + 2
-```
 
+```
 **예시: m5.large (ENI 3개, Prefix 10개/ENI)**:
 
 ```
 New Max Pods = (3 × (10 - 1)) × 16 + 2 = 434개
-```
 
+```
 **Prefix Delegation 활성화**:
 
 ```bash
@@ -543,8 +541,8 @@ kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 
 # 확인
 kubectl get ds aws-node -n kube-system -o yaml | grep ENABLE_PREFIX_DELEGATION
-```
 
+```
 **장점**:
 - **대폭 증가한 Pod 수**: m5.large에서 29개 → 434개
 - **IP 효율성**: /28 Prefix 단위 할당으로 IP 절약
@@ -560,8 +558,8 @@ kubectl get node <NODE_NAME> -o json | jq .status.capacity.pods
 
 # 또는
 kubectl describe node <NODE_NAME> | grep pods
-```
 
+```
 **maxPods 수동 조정** (t3.medium 예시):
 
 ```bash
@@ -574,15 +572,15 @@ EOF
 
 # kubelet 재시작
 sudo systemctl restart kubelet
-```
 
+```
 **주의사항**:
 - ENI 제한을 초과하면 Pod는 Pending 상태
 - IP 부족 시 자동으로 ENI 추가되지만 시간 소요
 
 ---
 
-## 🔧 Kubernetes Service
+## Kubernetes Service
 
 ### 1. Service 개념
 
@@ -608,7 +606,6 @@ graph TB
     end
 
 ```
-
 ### 2. Service 종류
 
 Kubernetes에는 총 4가지 Service 종류가 있습니다.
@@ -637,8 +634,8 @@ spec:
   - protocol: TCP
     port: 10200        # Service Port
     targetPort: 8080   # Pod Port
-```
 
+```
 **동작 원리**:
 
 ```mermaid
@@ -654,8 +651,8 @@ sequenceDiagram
     K->>K: Random Pod selection
     K->>P1: Forward to 172.16.1.1:8080
     P1-->>C: Response
-```
 
+```
 **특징**:
 - ClusterIP는 쿠버네티스 클러스터 내부에서만 접근
 - 외부 클라이언트는 접근 불가
@@ -678,8 +675,8 @@ spec:
     port: 10200
     targetPort: 8080
     nodePort: 30100   # 30000-32767 범위
-```
 
+```
 ```mermaid
 graph LR
     A[External Client] -->|NodeIP:30100| B[Node1<br/>192.168.1.10]
@@ -693,7 +690,6 @@ graph LR
     D --> G[Pod3]
 
 ```
-
 **특징**:
 - 외부에서 `<NodeIP>:<NodePort>`로 접근
 - 모든 노드에서 동일한 NodePort 사용
@@ -716,8 +712,8 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8080
-```
 
+```
 **AWS에서 생성되는 리소스**:
 - Classic Load Balancer (CLB) 또는
 - Network Load Balancer (NLB, AWS Load Balancer Controller 사용 시)
@@ -739,7 +735,6 @@ graph TB
     F --> I[Pod3]
 
 ```
-
 **특징**:
 - 외부에서 ELB DNS 이름으로 접근
 - 자동으로 Health Check 설정
@@ -757,8 +752,8 @@ metadata:
 spec:
   type: ExternalName
   externalName: mydb.example.com
-```
 
+```
 **특징**:
 - CNAME 레코드로 외부 서비스 참조
 - ClusterIP 없음
@@ -766,7 +761,7 @@ spec:
 
 ---
 
-## 🔀 kube-proxy 모드
+## kube-proxy 모드
 
 **kube-proxy**는 Service를 구현하는 핵심 컴포넌트로, 여러 모드를 지원합니다.
 
@@ -782,7 +777,6 @@ graph TB
     C --> E[Pod2]
 
 ```
-
 **특징**:
 - kube-proxy 프로세스가 직접 트래픽 처리
 - User Space ↔ Kernel Space 전환으로 성능 저하
@@ -800,7 +794,6 @@ graph TB
     B --> E[Pod3]
 
 ```
-
 **동작 원리**:
 1. kube-proxy가 iptables 규칙 생성
 2. 패킷이 Service IP로 전송
@@ -827,7 +820,6 @@ graph TB
     B --> E[Pod3]
 
 ```
-
 **특징**:
 - **Hash Table** 기반으로 빠른 룩업
 - iptables보다 훨씬 빠름
@@ -846,8 +838,8 @@ data:
 
 # kube-proxy 재시작
 kubectl delete pod -n kube-system -l k8s-app=kube-proxy
-```
 
+```
 **장점**:
 - **성능**: iptables보다 매우 빠름
 - **확장성**: 수만 개 Service 처리 가능
@@ -886,7 +878,6 @@ graph TB
     E --> F[Pod]
 
 ```
-
 **동작 원리**:
 - **eBPF**: Kernel 내부에서 프로그램 실행
 - **XDP**: NIC 드라이버 레벨에서 패킷 처리
@@ -898,7 +889,7 @@ graph TB
 
 ---
 
-## ⚖️ AWS LoadBalancer Controller
+## AWS LoadBalancer Controller
 
 **AWS Load Balancer Controller**는 Kubernetes Service를 AWS NLB/ALB와 연동합니다.
 
@@ -926,7 +917,6 @@ graph TB
     E --> H[Pod C on Node2]
 
 ```
-
 **장점**:
 - 구현 간단
 - 호환성 높음
@@ -951,7 +941,6 @@ graph TB
     B --> E[Pod C: 192.168.1.30]
 
 ```
-
 **장점**:
 - 1 hop (직접 연결)
 - 소스 IP 보존
@@ -988,8 +977,8 @@ eksctl create iamserviceaccount \
 
 # (5) Service Account 확인
 kubectl get sa aws-load-balancer-controller -n kube-system -o yaml
-```
 
+```
 ### 3. NLB 배포
 
 **Helm으로 AWS Load Balancer Controller 설치**:
@@ -1010,8 +999,8 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
 
 # 확인
 kubectl get deploy -n kube-system aws-load-balancer-controller
-```
 
+```
 **NLB Service 배포**:
 
 ```yaml
@@ -1030,8 +1019,8 @@ spec:
   ports:
   - port: 80
     targetPort: 8080
-```
 
+```
 **확인**:
 
 ```bash
@@ -1041,11 +1030,11 @@ kubectl get svc echo-service-nlb
 # NLB DNS 확인
 NLB_DNS=$(kubectl get svc echo-service-nlb -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 curl http://$NLB_DNS
-```
 
+```
 ---
 
-## 🚪 Ingress (L7 HTTP)
+## Ingress (L7 HTTP)
 
 ### 1. Ingress Controller
 
@@ -1065,7 +1054,6 @@ graph TB
     D --> H[Web Pod 2]
 
 ```
-
 - **AWS ALB Ingress Controller** (AWS Load Balancer Controller)
 - **NGINX Ingress Controller**
 - **Traefik**
@@ -1108,8 +1096,8 @@ spec:
             name: web-service
             port:
               number: 80
-```
 
+```
 **동작 흐름**:
 
 ```mermaid
@@ -1127,8 +1115,8 @@ sequenceDiagram
     P-->>S: Response
     S-->>A: Response
     A-->>C: Response
-```
 
+```
 **특징**:
 - **Host-based routing**: 도메인별 라우팅
 - **Path-based routing**: URL 경로별 라우팅
@@ -1136,7 +1124,7 @@ sequenceDiagram
 
 ---
 
-## 🌐 ExternalDNS
+## ExternalDNS
 
 ### 1. ExternalDNS
 
@@ -1151,7 +1139,6 @@ graph LR
     C --> E[DNS Record<br/>web.example.com]
 
 ```
-
 ### 2. ExternalDNS 설정
 
 **Helm으로 설치**:
@@ -1171,8 +1158,8 @@ helm install external-dns bitnami/external-dns \
 
 # 확인
 kubectl get deploy external-dns
-```
 
+```
 **Service에 Annotation 추가**:
 
 ```yaml
@@ -1188,18 +1175,18 @@ spec:
     app: api
   ports:
   - port: 80
-```
 
+```
 **Route53 레코드 자동 생성 확인**:
 
 ```bash
 # Route53 레코드 조회
 aws route53 list-resource-record-sets --hosted-zone-id <ZONE_ID> --query "ResourceRecordSets[?Name=='api.example.com.']"
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. VPC CNI vs Overlay CNI
 
@@ -1265,7 +1252,6 @@ graph TB
     D --> H[External Service<br/>db.example.com]
 
 ```
-
 **선택 기준**:
 - **내부 통신만**: ClusterIP
 - **간단한 외부 접근**: NodePort

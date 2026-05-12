@@ -4,10 +4,10 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 
 ## 주요 카테고리
 
-### [🚀 CUDA](cuda/nvidia-cuda-architecture/)
+### [ CUDA](cuda/nvidia-cuda-architecture/)
 - [NVIDIA CUDA 컴파일 과정 및 GPU 아키텍처 심화](cuda/nvidia-cuda-architecture/)
 
-### [☸️ EKS (Amazon Elastic Kubernetes Service)](eks/week1-intro-deployment/)
+### [ EKS (Amazon Elastic Kubernetes Service)](eks/week1-intro-deployment/)
 - [Week 1 - EKS 소개 및 배포](eks/week1-intro-deployment/)
 - [Week 2 - Networking](eks/week2-networking/)
 - [Week 3 - Scaling](eks/week3-scaling/)
@@ -16,7 +16,7 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 - [Week 6 - CI/CD](eks/week6-cicd/)
 - [Week 7 - Cluster Upgrade](eks/week7-cluster-upgrade/)
 
-### [🔧 K8s Deploy](k8s-deploy/week1-kubernetes-hard-way/)
+### [ K8s Deploy](k8s-deploy/week1-kubernetes-hard-way/)
 - [Week 1 - Kubernetes Hard Way](k8s-deploy/week1-kubernetes-hard-way/)
 - [Week 2 - Ansible Basics](k8s-deploy/week2-ansible-basics/)
 - [Week 3 - Kubeadm Upgrade](k8s-deploy/week3-kubeadm-upgrade/)
@@ -25,7 +25,7 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 - [Week 6 - Kubespray Offline](k8s-deploy/week6-kubespray-offline/)
 - [Week 7 - RKE2 & Cluster API](k8s-deploy/week7-rke2-cluster-api/)
 
-### [🔄 CI/CD](cicd/week1-image-build/)
+### [ CI/CD](cicd/week1-image-build/)
 - [Week 1 - Image Build](cicd/week1-image-build/)
 - [Week 2 - Helm & Tekton](cicd/week2-helm-tekton/)
 - [Week 3 - Jenkins & ArgoCD](cicd/week3-jenkins-argocd/)

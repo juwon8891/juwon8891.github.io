@@ -5,7 +5,7 @@
 
 ---
 
-## ⚙️ Vault Secrets Operator (VSO) 심화
+## Vault Secrets Operator (VSO) 심화
 
 ### 1. VSO 동작 원리 상세
 
@@ -30,8 +30,8 @@ sequenceDiagram
     VAULT->>POD: 7. Vault Auth Token 발급
     POD->>VAULT: 8. Auth Token으로 Secret 요청
     VAULT->>POD: 9. Secret 반환
-```
 
+```
 **4단계 프로세스**:
 
 1. **Vault에 Secret 요청 처리를 위한 사전 Role(Policy) 설정**
@@ -69,8 +69,8 @@ vault write auth/kubernetes/role/webapp \
     policies=webapp \
     ttl=24h \
     audience="https://kubernetes.default.svc.cluster.local"
-```
 
+```
 **설정 구조**:
 - **Kubernetes Auth Method** ← **Policy** (경로 및 권한) ← **Secret** (실제 데이터)
 
@@ -80,8 +80,8 @@ vault write auth/kubernetes/role/webapp \
 # Vault가 K8S API와 통신하기 위한 권한
 SUBJECT        | SUBJECT TYPE    | SCOPE       | NAMESPACE | ROLE                      | BINDING
 vault          | ServiceAccount  | ClusterRole |           | system:auth-delegator     | vault-server-binding
-```
 
+```
 **ClusterRole 권한 상세**:
 
 | Resource | Verbs | 설명 |
@@ -95,18 +95,18 @@ vault          | ServiceAccount  | ClusterRole |           | system:auth-delegat
 # Vault ServiceAccount 권한 확인
 kubectl rbac-tool lookup vault
 kubectl rolesum vault -n vault
-```
 
+```
 ### 3. Service Account Token 이해
 
 #### ServiceAccount (SA) 개념
 
 **ServiceAccount**는 Pod에서 실행되는 애플리케이션 프로세스에 대한 식별자를 제공합니다.
 
-- ✅ Pod 내부 애플리케이션 프로세스가 자신에게 부여된 SA 식별자로 K8S API 서버 인증
-- ✅ kubelet이 kube-apiserver로부터 TokenRequest API를 통해 토큰 발급
-- ✅ 토큰은 Pod 삭제 시 또는 수명 주기 이후 만료 (기본 1시간)
-- ✅ 특정 Pod에 바인딩되며 kube-apiserver를 대상으로 함
+- Pod 내부 애플리케이션 프로세스가 자신에게 부여된 SA 식별자로 K8S API 서버 인증
+- kubelet이 kube-apiserver로부터 TokenRequest API를 통해 토큰 발급
+- 토큰은 Pod 삭제 시 또는 수명 주기 이후 만료 (기본 1시간)
+- 특정 Pod에 바인딩되며 kube-apiserver를 대상으로 함
 
 #### Token Controller
 
@@ -141,8 +141,8 @@ kubectl rolesum vault -n vault
 #### Service Account Token Volume Projection
 
 **기존 방식의 문제점**:
-- ❌ 기본 SA Token은 사용하기에 부족
-- ❌ 토큰 대상(audience), 유효 기간(expiration) 등 속성 지정 불가
+- 기본 SA Token은 사용하기에 부족
+- 토큰 대상(audience), 유효 기간(expiration) 등 속성 지정 불가
 
 **Volume Projection 사용**:
 
@@ -167,16 +167,16 @@ spec:
           path: vault-token
           expirationSeconds: 7200
           audience: "https://vault.vault:8200"
-```
 
+```
 **장점**:
-- ✅ **대상(audience)** 지정 가능: Vault 전용 토큰
-- ✅ **유효 기간(expirationSeconds)** 설정: 보안 강화
-- ✅ **자동 갱신**: kubelet이 만료 전 자동 갱신
+- **대상(audience)** 지정 가능: Vault 전용 토큰
+- **유효 기간(expirationSeconds)** 설정: 보안 강화
+- **자동 갱신**: kubelet이 만료 전 자동 갱신
 
 ---
 
-## 🔐 Vault on Kubernetes 실습
+## Vault on Kubernetes 실습
 
 ### 1. Kubernetes에 Vault 설치
 
@@ -198,8 +198,8 @@ EOF
 # 확인
 kubectl cluster-info
 kubectl get nodes
-```
 
+```
 #### Helm을 사용한 Vault 배포
 
 ```bash
@@ -262,8 +262,8 @@ helm upgrade vault hashicorp/vault \
 
 # 배포 확인
 kubectl get sts,pods,svc,ep,pvc,cm -n vault
-```
 
+```
 **초기 상태 확인**:
 
 ```bash
@@ -271,18 +271,18 @@ kubectl get sts,pods,svc,ep,pvc,cm -n vault
 kubectl get pods -n vault
 
 # 출력:
-# NAME       READY   STATUS    RESTARTS   AGE
-# vault-0    0/1     Running   0          35s
+# NAME READY STATUS RESTARTS AGE
+# vault-0 0/1 Running 0 35s
 
 # Vault Status 확인 (Sealed 상태)
 kubectl exec -ti vault-0 -n vault -- vault status
 
 # 출력:
-# Key                Value
-# ---                -----
-# Seal Type          shamir
-# Initialized        false
-# Sealed             true
+# Key Value
+# --- -----
+# Seal Type shamir
+# Initialized false
+# Sealed true
 # ...
 
 # Vault 로그 확인
@@ -290,8 +290,8 @@ kubectl stern -n vault -l app.kubernetes.io/name=vault
 
 # 출력:
 # vault-0 vault 2025-04-16T05:35:09.225Z [INFO] core: seal configuration missing, not initialized
-```
 
+```
 ### 2. Vault Unseal 과정
 
 #### Vault 초기화 및 Unseal
@@ -310,13 +310,13 @@ cat cluster-keys.json | jq
 
 # 출력:
 # {
-#   "unseal_keys_b64": [
-#     "VthosBSlObBJ1DSpenVby4wmxt+Dx2dWeldBK725ies="
-#   ],
-#   "root_token": "hvs.XXXXXXXXXXXXXXXXXXXX"
+# "unseal_keys_b64": [
+# "VthosBSlObBJ1DSpenVby4wmxt+Dx2dWeldBK725ies="
+# ],
+# "root_token": "hvs.XXXXXXXXXXXXXXXXXXXX"
 # }
-```
 
+```
 **Unseal Key 추출 및 Unseal**:
 
 ```bash
@@ -327,28 +327,28 @@ VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" cluster-keys.json)
 kubectl exec vault-0 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY
 
 # 출력:
-# Key                Value
-# ---                -----
-# Seal Type          shamir
-# Initialized        true
-# Sealed             false  ← Unsealed 성공!
+# Key Value
+# --- -----
+# Seal Type shamir
+# Initialized true
+# Sealed false ← Unsealed 성공!
 # ...
 
 # Pod 상태 확인 (Readiness Probe 성공)
 kubectl get pod -n vault
 
 # 출력:
-# NAME       READY   STATUS    RESTARTS   AGE
-# vault-0    1/1     Running   0          9m3s
-```
+# NAME READY STATUS RESTARTS AGE
+# vault-0 1/1 Running 0 9m3s
 
+```
 **Root Token 확인**:
 
 ```bash
 # Root Token 추출
 jq -r ".root_token" cluster-keys.json
-```
 
+```
 #### Vault CLI 설정 및 로그인
 
 **macOS 설치**:
@@ -370,8 +370,8 @@ vault status
 # Root Token으로 로그인
 vault login
 # Token 입력: hvs.XXXXXXXXXXXXXXXXXXXX
-```
 
+```
 **UI 접속**:
 
 ```bash
@@ -381,8 +381,8 @@ open http://localhost:30000
 # 로그인:
 # - Method: Token
 # - Token: hvs.XXXXXXXXXXXXXXXXXXXX
-```
 
+```
 ### 3. Secret 생성 및 확인
 
 #### KV Secrets Engine 활성화
@@ -394,8 +394,8 @@ vault secrets enable -path=secret kv-v2
 # 확인
 vault secrets list -detailed
 vault secrets list
-```
 
+```
 #### Secret 생성
 
 ```bash
@@ -412,18 +412,18 @@ vault kv get secret/webapp/config
 # secret/data/webapp/config
 #
 # ======= Metadata =======
-# Key              Value
-# ---              -----
-# created_time     2025-04-15T12:50:53.565975884Z
-# version          1
+# Key Value
+# --- -----
+# created_time 2025-04-15T12:50:53.565975884Z
+# version 1
 #
 # ====== Data ======
-# Key        Value
-# ---        -----
-# password   static-password
-# username   static-user
-```
+# Key Value
+# --- -----
+# password static-password
+# username static-user
 
+```
 #### API를 통한 Secret 확인
 
 ```bash
@@ -436,11 +436,11 @@ curl -s --header "X-Vault-Token: $VAULT_ROOT_TOKEN" \
   http://127.0.0.1:30000/v1/secret/data/webapp/config | jq
 
 # Web UI에서도 확인 가능
-```
 
+```
 ---
 
-## 🔑 Kubernetes 인증 설정
+## Kubernetes 인증 설정
 
 ### 1. Policy 및 Role 구성
 
@@ -462,14 +462,14 @@ vault write auth/kubernetes/config \
 vault read auth/kubernetes/config
 
 # 출력:
-# Key                     Value
-# ---                     -----
-# disable_iss_validation  true
-# kubernetes_ca_cert      n/a
-# kubernetes_host         https://kubernetes.default.svc
+# Key Value
+# --- -----
+# disable_iss_validation true
+# kubernetes_ca_cert n/a
+# kubernetes_host https://kubernetes.default.svc
 # ...
-```
 
+```
 #### Policy 생성
 
 ```bash
@@ -479,8 +479,8 @@ path "secret/data/webapp/config" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 **Policy 설명**:
 - **Path**: `secret/data/webapp/config` (KV v2는 `/data/` 경로 포함)
 - **Capabilities**: `["read"]` (읽기 전용)
@@ -498,8 +498,8 @@ vault write auth/kubernetes/role/webapp \
 
 # 출력:
 # Success! Data written to: auth/kubernetes/role/webapp
-```
 
+```
 **Role 설명**:
 - **bound_service_account_names**: `vault` (허용할 SA 이름)
 - **bound_service_account_namespaces**: `default` (허용할 네임스페이스)
@@ -521,8 +521,8 @@ kubectl rbac-tool lookup vault
 
 # Role 상세 확인
 kubectl rolesum vault -n vault
-```
 
+```
 **ClusterRole `system:auth-delegator` 권한**:
 
 | Resource | Verbs | 설명 |
@@ -549,8 +549,8 @@ spec:
   - name: nginx
     image: nginx
     # SA Token이 자동으로 /var/run/secrets/kubernetes.io/serviceaccount에 마운트됨
-```
 
+```
 **Projected Volume 방식**:
 
 ```yaml
@@ -574,8 +574,8 @@ spec:
           path: vault-token
           expirationSeconds: 7200  # 2시간
           audience: "https://vault.vault:8200"
-```
 
+```
 **장점**:
 1. **audience 지정**: Vault 전용 토큰 생성
 2. **expiration 제어**: 보안을 위한 짧은 수명 주기
@@ -586,13 +586,13 @@ spec:
 **TokenRequest API**는 ServiceAccount의 하위 리소스로, 일정 시간 동안 해당 SA에서 사용할 수 있는 토큰을 가져옵니다.
 
 **특징**:
-- ✅ 컨테이너 내에서 직접 호출 불필요 (kubelet이 자동 처리)
-- ✅ Projected Volume을 통해 자동 설정
-- ✅ 토큰 만료 전 자동 갱신
+- 컨테이너 내에서 직접 호출 불필요 (kubelet이 자동 처리)
+- Projected Volume을 통해 자동 설정
+- 토큰 만료 전 자동 갱신
 
 ---
 
-## 🏗️ Vault HA (High Availability)
+## Vault HA (High Availability)
 
 ### 1. HA 아키텍처 이해
 
@@ -624,12 +624,11 @@ graph TB
     LB -->|Read| VAULT2
 
 ```
-
 **HA 동작 방식**:
-- ✅ **Active**: 모든 쓰기 요청 처리, 읽기 요청도 처리 가능
-- ✅ **Standby**: 읽기 요청만 처리 가능, Active 장애 시 자동 승격
-- ✅ **Raft Consensus**: 리더 선출 및 데이터 복제 (최소 3대 권장)
-- ✅ **자동 Failover**: Active 장애 시 Standby 중 하나가 자동으로 Active로 승격
+- **Active**: 모든 쓰기 요청 처리, 읽기 요청도 처리 가능
+- **Standby**: 읽기 요청만 처리 가능, Active 장애 시 자동 승격
+- **Raft Consensus**: 리더 선출 및 데이터 복제 (최소 3대 권장)
+- **자동 Failover**: Active 장애 시 Standby 중 하나가 자동으로 Active로 승격
 
 ### 2. Raft 스토리지 백엔드
 
@@ -638,10 +637,10 @@ graph TB
 **Raft**는 분산 합의 알고리즘으로, Vault HA의 핵심 스토리지 백엔드입니다.
 
 **Raft의 장점**:
-- ✅ **외부 의존성 없음**: Consul 불필요 (Vault 자체에 내장)
-- ✅ **강력한 일관성**: Leader-based consensus
-- ✅ **자동 Failover**: Leader 장애 시 자동 선출
-- ✅ **Snapshot 지원**: 백업 및 복구 용이
+- **외부 의존성 없음**: Consul 불필요 (Vault 자체에 내장)
+- **강력한 일관성**: Leader-based consensus
+- **자동 Failover**: Leader 장애 시 자동 선출
+- **Snapshot 지원**: 백업 및 복구 용이
 
 **Raft Quorum**:
 - **3노드**: 1대 장애 허용
@@ -654,11 +653,11 @@ graph TB
 
 | 특성 | Raft (Integrated) | Consul |
 |-----|------------------|--------|
-| **설치 복잡도** | ✅ Vault만 설치 | ❌ Vault + Consul 별도 설치 |
-| **운영 복잡도** | ✅ 낮음 (단일 시스템) | ❌ 높음 (두 시스템 관리) |
-| **성능** | ✅ 빠름 (네트워크 홉 감소) | ⚠️ 상대적으로 느림 |
-| **의존성** | ✅ 없음 | ❌ Consul 클러스터 필수 |
-| **권장 사용** | ✅ 대부분의 경우 권장 | ⚠️ 기존 Consul 환경 |
+| **설치 복잡도** | Vault만 설치 | Vault + Consul 별도 설치 |
+| **운영 복잡도** | 낮음 (단일 시스템) | 높음 (두 시스템 관리) |
+| **성능** | 빠름 (네트워크 홉 감소) | **주의** 상대적으로 느림 |
+| **의존성** | 없음 | Consul 클러스터 필수 |
+| **권장 사용** | 대부분의 경우 권장 | **주의** 기존 Consul 환경 |
 
 ### 3. HA 클러스터 구성 실습
 
@@ -701,8 +700,8 @@ kubectl patch deployment ingress-nginx-controller -n ingress-nginx \
 kubectl get deployment ingress-nginx-controller -n ingress-nginx -o yaml \
   | sed '/- --publish-status-address=localhost/a\            - --enable-ssl-passthrough' \
   | kubectl apply -f -
-```
 
+```
 #### Vault HA Helm Values
 
 ```yaml
@@ -769,8 +768,8 @@ server:
 
 ui:
   enabled: true
-```
 
+```
 #### Vault HA 설치
 
 ```bash
@@ -788,17 +787,17 @@ helm upgrade vault hashicorp/vault \
 kubectl get sts,pods,svc,pvc -n vault
 
 # 출력:
-# NAME                     READY   STATUS    RESTARTS   AGE
-# pod/vault-0              0/1     Running   0          100s
-# pod/vault-1              0/1     Running   0          100s
-# pod/vault-2              0/1     Running   0          100s
+# NAME READY STATUS RESTARTS AGE
+# pod/vault-0 0/1 Running 0 100s
+# pod/vault-1 0/1 Running 0 100s
+# pod/vault-2 0/1 Running 0 100s
 #
-# NAME                                STATUS   VOLUME                                     CAPACITY
-# persistentvolumeclaim/data-vault-0  Bound    pvc-3df4e80d-b692-429a-aee9-368bd1297aa9   10Gi
-# persistentvolumeclaim/data-vault-1  Bound    pvc-7a199dd9-53c5-4b63-9970-f8888e2c4e8c   10Gi
-# persistentvolumeclaim/data-vault-2  Bound    pvc-6066c850-c7c0-46c5-9ea3-9ffce755c19a   10Gi
-```
+# NAME STATUS VOLUME CAPACITY
+# persistentvolumeclaim/data-vault-0 Bound pvc-3df4e80d-b692-429a-aee9-368bd1297aa9 10Gi
+# persistentvolumeclaim/data-vault-1 Bound pvc-7a199dd9-53c5-4b63-9970-f8888e2c4e8c 10Gi
+# persistentvolumeclaim/data-vault-2 Bound pvc-6066c850-c7c0-46c5-9ea3-9ffce755c19a 10Gi
 
+```
 #### Vault-0 초기화 및 Unseal
 
 ```bash
@@ -822,15 +821,15 @@ kubectl exec vault-0 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY_3
 kubectl exec vault-0 -n vault -- vault status
 
 # 출력:
-# Key                Value
-# ---                -----
-# Seal Type          shamir
-# Initialized        true
-# Sealed             false
-# HA Enabled         true
-# HA Mode            active  ← Active 상태!
-```
+# Key Value
+# --- -----
+# Seal Type shamir
+# Initialized true
+# Sealed false
+# HA Enabled true
+# HA Mode active ← Active 상태!
 
+```
 #### Vault-1, Vault-2 Join 및 Unseal
 
 ```bash
@@ -851,8 +850,8 @@ kubectl exec vault-2 -n vault -- vault operator raft join \
 kubectl exec vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY_1
 kubectl exec vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY_2
 kubectl exec vault-2 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY_3
-```
 
+```
 #### Raft Cluster 상태 확인
 
 ```bash
@@ -864,13 +863,13 @@ kubectl exec vault-0 -n vault -- vault login $VAULT_ROOT_TOKEN
 kubectl exec vault-0 -n vault -- vault operator raft list-peers
 
 # 출력:
-# Node                                    Address                        State       Voter
-# ----                                    -------                        -----       -----
-# vault-0                                 vault-0.vault-internal:8201    leader      true
-# vault-1                                 vault-1.vault-internal:8201    follower    true
-# vault-2                                 vault-2.vault-internal:8201    follower    true
-```
+# Node Address State Voter
+# ---- ------- ----- -----
+# vault-0 vault-0.vault-internal:8201 leader true
+# vault-1 vault-1.vault-internal:8201 follower true
+# vault-2 vault-2.vault-internal:8201 follower true
 
+```
 #### HA Failover 테스트
 
 ```bash
@@ -884,7 +883,7 @@ kubectl delete pod vault-0 -n vault
 kubectl exec vault-1 -n vault -- vault status | grep "HA Mode"
 
 # 출력:
-# HA Mode            active  ← Vault-1이 새로운 Leader로 승격!
+# HA Mode active ← Vault-1이 새로운 Leader로 승격!
 
 # Vault-0 재시작 후 Unseal 필요
 kubectl wait --for=condition=Ready pod/vault-0 -n vault --timeout=60s
@@ -896,12 +895,12 @@ kubectl exec vault-0 -n vault -- vault operator unseal $VAULT_UNSEAL_KEY_3
 kubectl exec vault-0 -n vault -- vault status | grep "HA Mode"
 
 # 출력:
-# HA Mode            standby  ← Standby로 복귀
-```
+# HA Mode standby ← Standby로 복귀
 
+```
 ---
 
-## 🔒 Vault with LDAP 인증
+## Vault with LDAP 인증
 
 ### 1. LDAP 인증 방식 이해
 
@@ -924,8 +923,8 @@ sequenceDiagram
     VAULT->>USER: 5. Vault Token 발급 (Policy 첨부)
     USER->>VAULT: 6. Token으로 Secret 요청
     VAULT->>USER: 7. Secret 반환
-```
 
+```
 **Vault Workflow (Secrets, Policy, Authentication)**:
 
 **1. Secrets (시크릿)**
@@ -964,8 +963,8 @@ vault write auth/ldap/config \
 
 # 설정 확인
 vault read auth/ldap/config
-```
 
+```
 **설정 파라미터**:
 - **url**: LDAP 서버 주소
 - **userdn**: 사용자 검색 Base DN
@@ -991,8 +990,8 @@ vault write auth/ldap/groups/admins \
 # 확인
 vault list auth/ldap/groups
 vault read auth/ldap/groups/developers
-```
 
+```
 #### 사용자별 정책 매핑 (옵션)
 
 ```bash
@@ -1002,8 +1001,8 @@ vault write auth/ldap/users/alice \
 
 # 확인
 vault read auth/ldap/users/alice
-```
 
+```
 #### LDAP 로그인 테스트
 
 ```bash
@@ -1017,12 +1016,12 @@ vault login -method=ldap username=alice
 vault token lookup
 
 # 출력:
-# Key                 Value
-# ---                 -----
-# policies            [default dev-policy]
+# Key Value
+# --- -----
+# policies [default dev-policy]
 # ...
-```
 
+```
 #### LDAP 인증 동작 확인
 
 **사용자 alice가 developers 그룹 소속인 경우**:
@@ -1035,7 +1034,7 @@ vault token lookup
 
 ---
 
-## 🛡️ Vault TLS 보안 설정
+## Vault TLS 보안 설정
 
 ### 1. 인증서 생성 및 적용
 
@@ -1053,8 +1052,8 @@ openssl x509 -req -days 365 -in vault-csr.pem -signkey vault-key.pem -out vault-
 
 # CA Certificate (Self-Signed 경우 동일)
 cp vault-cert.pem vault-ca.pem
-```
 
+```
 #### Kubernetes Secret 생성
 
 ```bash
@@ -1064,8 +1063,8 @@ kubectl create secret generic vault-tls \
   --from-file=tls.key=vault-key.pem \
   --from-file=ca.crt=vault-ca.pem \
   -n vault
-```
 
+```
 #### Vault Server TLS 설정
 
 **Helm Values 수정** (`vault-ha-values.yaml`):
@@ -1085,8 +1084,8 @@ server:
         tls_key_file  = "/vault/userconfig/vault-tls/tls.key"
         tls_min_version = "tls12"
       }
-```
 
+```
 #### Vault 업그레이드
 
 ```bash
@@ -1097,8 +1096,8 @@ helm upgrade vault hashicorp/vault \
 
 # Pod 재시작 대기
 kubectl rollout status statefulset/vault -n vault
-```
 
+```
 ### 2. Ingress SSL Passthrough
 
 #### Ingress-Nginx SSL Passthrough 활성화
@@ -1110,8 +1109,8 @@ kubectl rollout status statefulset/vault -n vault
 kubectl get deployment ingress-nginx-controller -n ingress-nginx -o yaml \
   | sed '/- --publish-status-address=localhost/a\            - --enable-ssl-passthrough' \
   | kubectl apply -f -
-```
 
+```
 #### Vault Ingress 생성
 
 ```yaml
@@ -1140,16 +1139,16 @@ spec:
             name: vault
             port:
               number: 8200
-```
 
+```
 ```bash
 # Ingress 적용
 kubectl apply -f vault-ingress.yaml
 
 # Ingress 확인
 kubectl get ingress -n vault
-```
 
+```
 ### 3. 클라이언트 TLS 설정
 
 #### Vault CLI TLS 설정
@@ -1165,8 +1164,8 @@ vault status
 
 # 로그인
 vault login $VAULT_ROOT_TOKEN
-```
 
+```
 #### curl을 사용한 API 호출
 
 ```bash
@@ -1179,8 +1178,8 @@ curl --cacert vault-ca.pem \
 curl --insecure \
   --header "X-Vault-Token: $VAULT_ROOT_TOKEN" \
   https://vault.example.com/v1/sys/health | jq
-```
 
+```
 #### 애플리케이션 TLS 설정
 
 **Python 예시**:
@@ -1200,8 +1199,8 @@ secret = client.secrets.kv.v2.read_secret_version(
 )
 
 print(secret['data']['data'])
-```
 
+```
 **Go 예시**:
 
 ```go
@@ -1240,11 +1239,11 @@ func main() {
     secret, _ := client.Logical().Read("secret/data/webapp/config")
     fmt.Println(secret.Data)
 }
-```
 
+```
 ---
 
-## 💡 MCP Server와 Vault
+## MCP Server와 Vault
 
 ### 1. AI Agent Identity 관리
 
@@ -1252,15 +1251,15 @@ func main() {
 
 **MCP Server**는 AI Agent가 외부 시스템과 통신하기 위한 프로토콜입니다.
 
-- ❌ AI Agent별로 개별 시크릿(Token, Password) 관리 필요
-- ❌ 시크릿 유출 시 범위가 넓어 보안 위험 증가
-- ❌ 시크릿 Rotation 시 모든 Agent 재설정 필요
+- AI Agent별로 개별 시크릿(Token, Password) 관리 필요
+- 시크릿 유출 시 범위가 넓어 보안 위험 증가
+- 시크릿 Rotation 시 모든 Agent 재설정 필요
 
 **Vault 기반 해결책**:
-- ✅ **Identity-based Access**: 각 Agent마다 고유 Identity 부여
-- ✅ **Dynamic Secrets**: 요청 시마다 임시 Credential 생성
-- ✅ **Automatic Rotation**: TTL 만료 시 자동 폐기 및 갱신
-- ✅ **Audit Logging**: 모든 접근 기록 추적
+- **Identity-based Access**: 각 Agent마다 고유 Identity 부여
+- **Dynamic Secrets**: 요청 시마다 임시 Credential 생성
+- **Automatic Rotation**: TTL 만료 시 자동 폐기 및 갱신
+- **Audit Logging**: 모든 접근 기록 추적
 
 ### 2. Remote MCP 시크릿 관리
 
@@ -1322,7 +1321,6 @@ graph TB
     MCP2 -->|6. Call| API2
 
 ```
-
 ### 3. HashiCorp 권장 패턴
 
 #### Demo 코드 분석
@@ -1344,8 +1342,8 @@ vault write auth/approle/role/agent-2 \
     token_policies="agent-2-policy" \
     token_ttl=10m \
     token_max_ttl=1h
-```
 
+```
 **2. Policy 분리 (최소 권한 원칙)**:
 
 ```bash
@@ -1368,8 +1366,8 @@ path "database/creds/agent-2-role" {
   capabilities = ["read"]
 }
 EOF
-```
 
+```
 **3. Dynamic Database Credentials**:
 
 ```bash
@@ -1386,8 +1384,8 @@ vault write database/roles/agent-2-role \
     creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT,INSERT ON db2.* TO '{{name}}'@'%';" \
     default_ttl="10m" \
     max_ttl="1h"
-```
 
+```
 **4. Agent 코드 예시 (Python)**:
 
 ```python
@@ -1423,13 +1421,13 @@ conn = mysql.connector.connect(
 
 # MCP Server 호출
 # ...
-```
 
+```
 **장점**:
-- ✅ **각 Agent는 자신의 Identity만 관리** (RoleID + SecretID)
-- ✅ **Dynamic Credentials**: 10분마다 자동 갱신
-- ✅ **최소 권한**: Agent-1은 db1만, Agent-2는 db2만 접근
-- ✅ **Audit Trail**: Vault가 모든 접근 기록
+- **각 Agent는 자신의 Identity만 관리** (RoleID + SecretID)
+- **Dynamic Credentials**: 10분마다 자동 갱신
+- **최소 권한**: Agent-1은 db1만, Agent-2는 db2만 접근
+- **Audit Trail**: Vault가 모든 접근 기록
 
 ---
 

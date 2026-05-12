@@ -6,7 +6,7 @@
 
 ---
 
-## 📝 실습 메모
+## 실습 메모
 
 ### 1. Preparing for Cluster Upgrades
 
@@ -20,13 +20,13 @@ graph LR
     D --> E[4. Deprecated API<br/>점검]
     E --> F[5. HA 전략<br/>PDB 설정]
     F --> G[업그레이드 시작]
-```
 
+```
 **중요 사항**:
-- ✅ **kube-ops-view** 또는 **ui-web**을 통한 실시간 모니터링
-- ✅ **노드그룹별** 업그레이드 전략 수립 (관리형 vs 셀프 vs 카펜터)
-- ✅ **다양한 방법** 비교: eksctl, AWS 콘솔, AWS CLI, Terraform
-- ⚠️ **주의**: 업그레이드는 **되돌릴 수 없음** (Rollback 불가)
+- **kube-ops-view** 또는 **ui-web**을 통한 실시간 모니터링
+- **노드그룹별** 업그레이드 전략 수립 (관리형 vs 셀프 vs 카펜터)
+- **다양한 방법** 비교: eksctl, AWS 콘솔, AWS CLI, Terraform
+- **주의** **주의**: 업그레이드는 **되돌릴 수 없음** (Rollback 불가)
 
 ### 2. In-place Cluster Upgrades: 1.30 → 1.31
 
@@ -47,8 +47,8 @@ graph TB
     KARP --> END
     SELF --> END
     FG --> END
-```
 
+```
 **실습 순서**:
 1. **EKS Control Plane** Upgrade (10분 소요): 1.30 → 1.31
 2. **EKS Add-on** Upgrade (2분 소요): 1.31에 적합한 Add-on 버전으로 업그레이드
@@ -71,7 +71,7 @@ graph TB
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. 실습 환경 정보 확인
 
@@ -85,8 +85,8 @@ graph TB
 # CloudFormation Stack 출력 확인
 # IdePassword: 워크샵 IDE 접속 암호
 # IdeUrl: https://{random}.cloudfront.net (code-server)
-```
 
+```
 **code-server 접속**:
 - UI-web을 통한 시각화 도구 제공
 
@@ -100,23 +100,23 @@ export role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0/i-00d9a1ac022bd4f29
 
 # EKS 클러스터 정보
 eksctl get cluster
-# NAME       REGION    EKSCTL  CREATED
-# eksworkshop-eksctl  us-west-2  False   ...
+# NAME REGION EKSCTL CREATED
+# eksworkshop-eksctl us-west-2 False ...
 
 # 노드그룹 정보
 eksctl get nodegroup --cluster $CLUSTER_NAME
-# NODEGROUP    NODEPOOL    STATUS  CREATED  MIN SIZE  MAX SIZE  DESIRED  CAPACITY  INSTANCE TYPE
-# blue-mng     ...         ACTIVE  ...      2         6         4        4         m5.large
-# initial      ...         ACTIVE  ...      2         6         4        4         m5.large
+# NODEGROUP NODEPOOL STATUS CREATED MIN SIZE MAX SIZE DESIRED CAPACITY INSTANCE TYPE
+# blue-mng ... ACTIVE ... 2 6 4 4 m5.large
+# initial ... ACTIVE ... 2 6 4 4 m5.large
 
 # 노드 확인
 kubectl get nodes
-# NAME                                        STATUS  ROLES   AGE  VERSION
-# ip-10-0-13-152.us-west-2.compute.internal  Ready   <none>  1d   v1.30.14-eks-f69f56f
-# ip-10-0-18-209.us-west-2.compute.internal  Ready   <none>  1d   v1.30.14-eks-f69f56f
+# NAME STATUS ROLES AGE VERSION
+# ip-10-0-13-152.us-west-2.compute.internal Ready <none> 1d v1.30.14-eks-f69f56f
+# ip-10-0-18-209.us-west-2.compute.internal Ready <none> 1d v1.30.14-eks-f69f56f
 # ...
-```
 
+```
 **노드 레이블 및 Taint 확인**:
 
 ```bash
@@ -130,8 +130,8 @@ kubectl get nodes -o json | jq '.items[] | {
   "labels": .metadata.labels,
   "taints": .spec.taints
 }'
-```
 
+```
 **노드 상세 정보**:
 
 ```bash
@@ -143,12 +143,12 @@ kubernetes.io/os,\
 topology.kubernetes.io/zone
 
 # 예시 출력:
-# NAME            INSTANCE-TYPE  ARCH    OS      ZONE
-# ip-10-0-47-39   m5.large       amd64   linux   us-west-2c
-# ip-10-0-13-152  m5.large       amd64   linux   us-west-2c
+# NAME INSTANCE-TYPE ARCH OS ZONE
+# ip-10-0-47-39 m5.large amd64 linux us-west-2c
+# ip-10-0-13-152 m5.large amd64 linux us-west-2c
 # ...
-```
 
+```
 **노드 Taints 정보**:
 
 ```bash
@@ -159,8 +159,8 @@ kubectl get nodes -o custom-columns=\
 # 예시:
 # - dedicated: OrdersApp (eks.amazonaws.com/nodegroup, karpenter.sh/nodepool)
 # - default 노드는 Taint 없음
-```
 
+```
 ### 2. Sample Application 배포
 
 #### 2.1 Sample Application 아키텍처
@@ -207,8 +207,8 @@ graph TB
 
     ORDERS -.-> RABBITMQ
     CHECKOUT -.-> RABBITMQ
-```
 
+```
 **컴포넌트 설명**:
 
 | Component | Description |
@@ -239,8 +239,8 @@ graph LR
     D --> J[Assets]
     D --> K[Karpenter]
     D --> L[RabbitMQ]
-```
 
+```
 **ArgoCD 저장소 클론**:
 
 ```bash
@@ -252,21 +252,21 @@ git clone codecommit::${REGION}:://eks-gitops-repo
 tree eks-gitops-repo/ -L 2
 # eks-gitops-repo/
 # ├── app-of-apps
-# │   ├── Chart.yaml
-# │   └── templates
+# │ ├── Chart.yaml
+# │ └── templates
 # ├── apps
-# │   ├── assets
-# │   ├── carts
-# │   ├── catalog
-# │   ├── checkout
-# │   ├── karpenter
-# │   ├── kustomization.yaml
-# │   ├── orders
-# │   ├── other
-# │   └── rabbitmq
+# │ ├── assets
+# │ ├── carts
+# │ ├── catalog
+# │ ├── checkout
+# │ ├── karpenter
+# │ ├── kustomization.yaml
+# │ ├── orders
+# │ ├── other
+# │ └── rabbitmq
 # └── values.yaml
-```
 
+```
 **ArgoCD 접속**:
 
 ```bash
@@ -281,8 +281,8 @@ export ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath="{.data.password}" | base64 -d)
 echo "Username: admin"
 echo "Password: ${ARGOCD_PWD}"
-```
 
+```
 **ArgoCD CLI 확인**:
 
 ```bash
@@ -290,18 +290,18 @@ echo "Password: ${ARGOCD_PWD}"
 argocd app list
 
 # 출력 예시:
-# NAME      SYNC STATUS  HEALTH STATUS
-# apps      Synced      Healthy
-# assets    Synced      Healthy
-# carts     Synced      Healthy
-# catalog   Synced      Healthy
-# checkout  Synced      Healthy
-# karpenter Synced      Healthy
-# orders    Synced      Healthy
-# rabbitmq  Synced      Healthy
-# ui        Synced      Healthy
-```
+# NAME SYNC STATUS HEALTH STATUS
+# apps Synced Healthy
+# assets Synced Healthy
+# carts Synced Healthy
+# catalog Synced Healthy
+# checkout Synced Healthy
+# karpenter Synced Healthy
+# orders Synced Healthy
+# rabbitmq Synced Healthy
+# ui Synced Healthy
 
+```
 #### 2.4 UI 접속을 위한 NLB 설정
 
 **UI 서비스 확인**:
@@ -309,13 +309,13 @@ argocd app list
 ```bash
 # UI 서비스 LoadBalancer 주소
 kubectl get svc -n ui
-# NAME  TYPE          CLUSTER-IP    EXTERNAL-IP                          PORT(S)    AGE
-# ui    LoadBalancer  172.20.97.57  k8s-argocd-argocar-...elb.us-west-2.amazonaws.com  80:31331/TCP
+# NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
+# ui LoadBalancer 172.20.97.57 k8s-argocd-argocar-...elb.us-west-2.amazonaws.com 80:31331/TCP
 
 # UI 접속
 kubectl get targetgroupbindings -n argocd
-```
 
+```
 ### 3. EKS API/ConfigMap, IRSA 정보 확인
 
 #### 3.1 EKS API 확인
@@ -327,18 +327,18 @@ aws eks list-access-entries \
 
 # 출력 예시:
 # {
-#   "accessEntries": [
-#     "arn:aws:iam::964061878287:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS",
-#     "arn:aws:iam::964061878287:role/blue-mng-eks-node-group-20260422091459286500000000f",
-#     "arn:aws:iam::964061878287:role/default-selfmng-node-group-20260422091459194400000000d",
-#     "arn:aws:iam::964061878287:role/fp-profile-20260422092539725700000001f",
-#     "arn:aws:iam::964061878287:role/initial-eks-node-group-20260422091459209900000000e",
-#     "arn:aws:iam::964061878287:role/karpenter-eksworkshop-eksctl",
-#     "arn:aws:iam::964061878287:role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0"
-#   ]
+# "accessEntries": [
+# "arn:aws:iam::964061878287:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS",
+# "arn:aws:iam::964061878287:role/blue-mng-eks-node-group-20260422091459286500000000f",
+# "arn:aws:iam::964061878287:role/default-selfmng-node-group-20260422091459194400000000d",
+# "arn:aws:iam::964061878287:role/fp-profile-20260422092539725700000001f",
+# "arn:aws:iam::964061878287:role/initial-eks-node-group-20260422091459209900000000e",
+# "arn:aws:iam::964061878287:role/karpenter-eksworkshop-eksctl",
+# "arn:aws:iam::964061878287:role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0"
+# ]
 # }
-```
 
+```
 **IAM Identity Mapping 확인**:
 
 ```bash
@@ -346,12 +346,12 @@ aws eks list-access-entries \
 eksctl get iamidentitymapping --cluster $CLUSTER_NAME
 
 # 출력:
-# GROUPS                  ACCOUNT
-# arn:aws:iam::964061878287:role/WSParticipantRole  admin  system:masters
-# arn:aws:iam::964061878287:role/blue-mng-eks-node-group-...  system:node:{{EC2PrivateDNSName}}  system:bootstrappers, system:nodes
+# GROUPS ACCOUNT
+# arn:aws:iam::964061878287:role/WSParticipantRole admin system:masters
+# arn:aws:iam::964061878287:role/blue-mng-eks-node-group-... system:node:{{EC2PrivateDNSName}} system:bootstrappers, system:nodes
 # ...
-```
 
+```
 #### 3.2 AWS 관리 콘솔 확인
 
 **추가 설명**: AWS 관리 콘솔에서 `964061878287:role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0` admin 권한 확인.
@@ -380,8 +380,8 @@ kubectl describe sa -n kube-system karpenter
 
 # karpenter ServiceAccount
 # arn:aws:iam::964061878287:role/karpenter-20260422093008166
-```
 
+```
 **OIDC Provider 확인**:
 
 ```bash
@@ -398,11 +398,11 @@ aws eks describe-cluster --name $CLUSTER_NAME | \
 
 # OpenID Connect Providers 확인
 aws iam list-open-id-connect-providers | jq
-```
 
+```
 ---
 
-## 🔍 EKS Upgrade Insights
+## EKS Upgrade Insights
 
 ### 1. Upgrade Insights 개요
 
@@ -415,8 +415,8 @@ graph LR
     C -->|Yes| D[문제 해결]
     C -->|No| E[업그레이드 시작]
     D --> E
-```
 
+```
 **점검 항목** (6가지):
 1. **kube-proxy version skew**: kube-proxy 버전이 Control Plane 버전과 일치하는지 확인
 2. **Cluster health issues**: 클러스터 헬스 체크 (Node NotReady 등)
@@ -435,31 +435,31 @@ aws eks list-insights --region ${AWS_REGION} \
 
 # 출력 예시:
 # {
-#   "insights": [
-#     {
-#       "id": "676cc9cf-5241-4366-a024-3235ac1854b5",
-#       "name": "kube-proxy version skew",
-#       "category": "UPGRADE_READINESS",
-#       "kubernetesVersion": "1.31",
-#       "lastRefreshTime": "2026-04-22T09:38:46+00:00",
-#       "lastTransitionTime": "2026-04-22T09:37:45+00:00",
-#       "description": "Checks version of kube-proxy in cluster to see if upgrade would cause non compliance with supported Kubernetes kube-proxy version skew policy.",
-#       "insightStatus": {
-#         "status": "PASSING",
-#         "reason": "kube-proxy versions match the cluster control plane version."
-#       }
-#     },
-#     ...
-#   ]
+# "insights": [
+# {
+# "id": "676cc9cf-5241-4366-a024-3235ac1854b5",
+# "name": "kube-proxy version skew",
+# "category": "UPGRADE_READINESS",
+# "kubernetesVersion": "1.31",
+# "lastRefreshTime": "2026-04-22T09:38:46+00:00",
+# "lastTransitionTime": "2026-04-22T09:37:45+00:00",
+# "description": "Checks version of kube-proxy in cluster to see if upgrade would cause non compliance with supported Kubernetes kube-proxy version skew policy.",
+# "insightStatus": {
+# "status": "PASSING",
+# "reason": "kube-proxy versions match the cluster control plane version."
 # }
-```
+# },
+# ...
+# ]
+# }
 
+```
 **AWS 콘솔에서 확인**:
 - EKS 클러스터 → **Upgrade** 탭 → **Upgrade Insights** 섹션
 
 ---
 
-## 🛡️ HA 전략 (High Availability Strategies)
+## HA 전략 (High Availability Strategies)
 
 ### 1. PodDisruptionBudgets (PDB)
 
@@ -474,8 +474,8 @@ graph TB
         C --> E[새 노드에서<br/>Pod 재시작]
         D --> F[대기<br/>다른 Pod 삭제 후]
     end
-```
 
+```
 #### 1.1 PDB 설정 예시
 
 **orders 애플리케이션에 PDB 추가**:
@@ -493,8 +493,8 @@ spec:
     matchLabels:
       app.kubernetes.io/component: service
       app.kubernetes.io/instance: orders
-```
 
+```
 **GitOps로 배포**:
 
 ```bash
@@ -510,24 +510,24 @@ EOF
 git add apps/orders/pdb.yaml
 git commit -m "Add PDB to orders"
 argocd app sync orders
-```
 
+```
 #### 1.2 PDB 검증
 
 ```bash
 # PDB 확인
 kubectl get pdb -A
 
-# NAMESPACE  NAME        MIN AVAILABLE  MAX UNAVAILABLE  ALLOWED DISRUPTIONS  AGE
-# orders     orders-pdb  1              N/A              1                    6h36m
+# NAMESPACE NAME MIN AVAILABLE MAX UNAVAILABLE ALLOWED DISRUPTIONS AGE
+# orders orders-pdb 1 N/A 1 6h36m
 
 # orders 애플리케이션 Pod 확인
 kubectl get pod -n orders
 
-# NAME                      READY  STATUS   RESTARTS  AGE
-# orders-788b566b87-qgm72   1/1    Running  0         6h
-```
+# NAME READY STATUS RESTARTS AGE
+# orders-788b566b87-qgm72 1/1 Running 0 6h
 
+```
 **PDB가 없는 경우 vs PDB가 있는 경우**:
 
 ```bash
@@ -535,12 +535,12 @@ kubectl get pod -n orders
 kubectl drain $nodeName --ignore-daemonsets --force --delete-emptydir-data
 
 # PDB 있는 경우
-# ⚠️ error when evicting pods/"orders-5b97745747-j2h8d" -n orders:
+# error when evicting pods/"orders-5b97745747-j2h8d" -n orders:
 # Cannot evict pod as it would violate the pod's disruption budget.
 
 # 해결: 다른 노드에서 새로운 Pod가 먼저 시작된 후 삭제
-```
 
+```
 #### 1.3 노드 Drain 시 동작
 
 ```bash
@@ -554,8 +554,8 @@ kubectl get pdb -n orders
 
 # 새 노드에서 Pod 시작 후 기존 Pod 삭제
 kubectl get pod -n orders -o wide
-```
 
+```
 ### 2. TopologySpreadConstraints
 
 **TopologySpreadConstraints**는 **Pod를 여러 가용 영역(AZ)**에 분산 배치하여 장애 시 가용성을 보장합니다.
@@ -583,8 +583,8 @@ graph TB
     SVC --> P4
     SVC --> P5
     SVC --> P6
-```
 
+```
 **Deployment에 TopologySpreadConstraints 추가**:
 
 ```yaml
@@ -603,8 +603,8 @@ spec:
           labelSelector:
             matchLabels:
               app.kubernetes.io/name: orders
-```
 
+```
 **설정 설명**:
 - `maxSkew: 1`: 각 영역 간 Pod 개수 차이 최대 1
 - `topologyKey: topology.kubernetes.io/zone`: 가용 영역 기준 분산
@@ -612,7 +612,7 @@ spec:
 
 ---
 
-## ⬆️ Control Plane 업그레이드
+## ⬆ Control Plane 업그레이드
 
 ### 1. 업그레이드 방법 1: eksctl
 
@@ -621,10 +621,10 @@ spec:
 ```bash
 # eksctl로 Control Plane 업그레이드
 eksctl upgrade cluster --name $EKS_CLUSTER_NAME --approve
-```
 
+```
 **주의사항**:
-- ⚠️ **이래 실행하지 않음!** (명령어만 참고)
+- **주의** **이래 실행하지 않음!** (명령어만 참고)
 - 현재 버전보다 **한 버전 더 높은 버전**만 업그레이드 가능
 - 절대 두 개 이상의 Kubernetes 버전 업그레이드는 **지원되지 않음**
 
@@ -655,15 +655,15 @@ aws eks update-cluster-version \
 
 # 출력:
 # {
-#   "update": {
-#     "id": "b5f0ba18-9a87-4450-b5a0-825e6e84496f",
-#     "status": "InProgress",
-#     "params": [
-#       { "type": "Version", "value": "1.31" },
-#       { "type": "PlatformVersion", "value": "eks.x" }
-#     ],
-#     ...
-#   }
+# "update": {
+# "id": "b5f0ba18-9a87-4450-b5a0-825e6e84496f",
+# "status": "InProgress",
+# "params": [
+# { "type": "Version", "value": "1.31" },
+# { "type": "PlatformVersion", "value": "eks.x" }
+# ],
+# ...
+# }
 # }
 
 # 업그레이드 상태 확인
@@ -673,8 +673,8 @@ aws eks describe-update \
   --update-id b5f0ba18-9a87-4450-b5a0-825e6e84496f
 
 # Successful 상태가 되면 업그레이드 완료
-```
 
+```
 ### 4. 업그레이드 방법 4: Terraform (권장)
 
 **Terraform을 사용한 실제 업그레이드 실행!**
@@ -685,8 +685,8 @@ aws eks describe-update \
 # Terraform 상태 확인
 cd ~/environment/terraform
 terraform state list
-```
 
+```
 **모니터링을 위한 작업 추가**:
 
 ```bash
@@ -698,16 +698,16 @@ kubectl get pods --all-namespaces \
 # UI_WEB 확인 (1분마다 갱신)
 export UI_WEB=$(kubectl get svc -n ui-web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 while true; do curl -s $UI_WEB/actuator/health/liveness | jq '.status' && sleep 1; done
-```
 
+```
 **cluster_version 변수 업데이트**:
 
 ```bash
 # variable.tf의 cluster_version 변수를 1.30 → 1.31로 변경
 cd ~/environment/terraform
 # (variables.tf 파일 편집)
-```
 
+```
 **variables.tf 수정**:
 
 ```hcl
@@ -716,8 +716,8 @@ variable "cluster_version" {
   type        = string
   default     = "1.31"  # 1.30에서 변경
 }
-```
 
+```
 **Terraform Plan 실행**:
 
 ```bash
@@ -729,8 +729,8 @@ aws eks describe-cluster --name $CLUSTER_NAME | \
 terraform plan -no-color > plan-output.txt
 
 # IDE에서 열어보기
-```
 
+```
 **Terraform Plan 요약**:
 - 클러스터 버전을 변경하면 Terraform이 어떤 변경을 하는지 볼 수 있습니다.
 - **AMI나 태그만 변경**, 관리 노드 그룹 및 애드온 등과 같은 관련 리소스를 업데이트하기 쉽습니다.
@@ -745,8 +745,8 @@ terraform apply -auto-approve
 # 10분 소요 (eks control plane 1.31 업그레이드)
 aws eks describe-cluster --name $EKS_CLUSTER_NAME | \
   jq '.cluster.endpoint'
-```
 
+```
 **업그레이드 완료 확인**:
 
 ```bash
@@ -767,11 +767,11 @@ kubectl get pods --all-namespaces \
 
 # 파드 AGE 정보 확인
 kubectl get pod -A ...
-```
 
+```
 ---
 
-## 🔧 Add-on 업그레이드
+## Add-on 업그레이드
 
 ### 1. Add-on 업그레이드 개요
 
@@ -781,10 +781,10 @@ kubectl get pod -A ...
 # 가능한 업그레이드 버전 확인
 eksctl get addon --cluster $CLUSTER_NAME
 
-# NAME      VERSION  STATUS  ISSUES  IAMROLE  UPDATE AVAILABLE  CONFIGURATION  VALUES
-# aws-ebs-csi-driver  v1.58.0-eksbuild.1  ACTIVE  0  ...  v1.x
-```
+# NAME VERSION STATUS ISSUES IAMROLE UPDATE AVAILABLE CONFIGURATION VALUES
+# aws-ebs-csi-driver v1.58.0-eksbuild.1 ACTIVE 0 ... v1.x
 
+```
 **eksctl을 사용하여 EKS 1.30의 기존 애드온을 보려면**:
 
 1. **CoreDNS** (역기서 호환성을 확인할 수 있습니다)
@@ -802,8 +802,8 @@ eksctl get addon --cluster $CLUSTER_NAME
 
 # CoreDNS 업그레이드 (예: v1.x)
 # (실제 업그레이드는 EKS Control Plane 업그레이드 시 자동 진행되는 경우도 있음)
-```
 
+```
 ### 3. kube-proxy
 
 **kube-proxy 업그레이드**:
@@ -814,8 +814,8 @@ kubectl get ds kube-proxy -n kube-system -o yaml | grep image:
 
 # 업그레이드 (필요 시)
 # eksctl로 자동 업그레이드 또는 Terraform 변수 변경
-```
 
+```
 ### 4. VPC CNI
 
 **VPC CNI 업그레이드**:
@@ -825,8 +825,8 @@ kubectl get ds kube-proxy -n kube-system -o yaml | grep image:
 kubectl get ds aws-node -n kube-system -o yaml | grep image:
 
 # 업그레이드 (필요 시)
-```
 
+```
 ### 5. EBS CSI Driver
 
 **EBS CSI Driver 업그레이드** (옵션):
@@ -837,11 +837,11 @@ eksctl get addon --cluster $CLUSTER_NAME | grep ebs
 
 # 업그레이드
 # (Terraform에서 관리하는 경우 자동 업그레이드)
-```
 
+```
 ---
 
-## 🖥️ Nodes 업그레이드
+## Nodes 업그레이드
 
 ### 1. 관리형 노드그룹 (Managed Node Group)
 
@@ -855,8 +855,8 @@ graph LR
     B --> C[initial 노드그룹<br/>K8s 버전<br/>1.30 → 1.31<br/>업그레이드]
     C --> D[다음 실습을 위해<br/>신규 관리 노드 그룹 삭제]
     D --> E[커스텀 노드그룹<br/>ami_id 적용 지정<br/>업그레이드<br/>1.30 → 1.31]
-```
 
+```
 **사전 준비**: 사용자 지정 AMI를 사용하여 신규 관리 노드 그룹에 기본 AMI와 custom 노드그룹(ami_id 적용 지정) 업그레이드: 1.30 → 1.31
 
 **[사전 준비] 카펜터 기본 정보 확인**:
@@ -868,21 +868,21 @@ kubectl get ec2nodeclass
 
 # checkout 파드 10개 증설 → 카펜터 노드를 통해 신규 노드 프로비저닝 저장
 # (이후 1.30 기준 노드는 삭제)
-```
 
+```
 **[사전 준비] 셀프 노드그룹 정보 확인**:
 
 ```bash
 # 셀프 노드그룹 정보
 # 셀프 노드그룹에 ami 업데이트 후 적용을 확인하여 1.31 버전 EC2 생성되고, 이후 1.30 EC2는 삭제
-```
 
+```
 **[사전 준비] 파게이트 노드 업그레이드**:
 
 ```bash
 # 파게이트 노드를 통해 1.31 ami를 사용하는 신규 노드 배포되고, 1.30 기준 노드는 삭제
-```
 
+```
 #### 1.2 Blue-Green 업그레이드
 
 **Blue-Green approach for Managed node group update** (30분 소요): 1.30 → 1.31
@@ -892,22 +892,22 @@ graph LR
     A[사전 준비<br/>ebs pvc/pv를<br/>사용하는<br/>app이 배포된<br/>blue-mng<br/>관리형 노드 그룹<br/>정보 확인] --> B[1.31 버전을<br/>사용하는<br/>green-mng<br/>신규 관리형<br/>노드 그룹 생성]
     B --> C[blue-mng →<br/>green-mng<br/>관리형 노드<br/>그룹으로<br/>app 마이그레이션]
     C --> D[옛 blue-mng<br/>노드 그룹<br/>삭제]
-```
 
+```
 **[사전 준비] ebs pvc/pv를 사용하는 app이 배포된 blue-mng 관리형 노드 그룹 정보 확인**:
 
 ```bash
 # blue-mng 노드 확인
 kubectl get nodes -l eks.amazonaws.com/nodegroup=blue-mng
-```
 
+```
 **1.31 버전을 사용하는 green-mng 신규 관리형 노드 그룹 생성**:
 
 ```bash
 # Terraform으로 green-mng 생성
 # (또는 eksctl로 생성 가능)
-```
 
+```
 **blue-mng → green-mng 관리형 노드 그룹으로 app 마이그레이션**:
 
 ```bash
@@ -916,15 +916,15 @@ kubectl drain $nodeName --ignore-daemonsets --force --delete-emptydir-data
 
 # green-mng로 Pod 이동 확인
 kubectl get pod -n orders -o wide
-```
 
+```
 **옛 blue-mng 노드 그룹 삭제**:
 
 ```bash
 # blue-mng 삭제
 eksctl delete nodegroup --cluster $CLUSTER_NAME --name blue-mng
-```
 
+```
 ### 2. 카펜터 노드 (Karpenter)
 
 **카펜터 노드 업그레이드**: 1.30 → 1.31
@@ -933,15 +933,15 @@ eksctl delete nodegroup --cluster $CLUSTER_NAME --name blue-mng
 graph LR
     A[사전 준비<br/>카펜터 기본 정보 확인<br/>nodepool, ec2nodeclass] --> B[checkout 파드<br/>10개 증설<br/>→ 카펜터 노드를 통해<br/>신규 노드 프로비저닝 저장]
     B --> C[카펜터를 통해<br/>1.31 ami를 사용하는<br/>신규 노드 배포되고,<br/>1.30 기존 노드는 삭제]
-```
 
+```
 **카펜터 NodePool 업데이트**:
 
 ```bash
 # 카펜터를 통해 1.31 ami를 사용하는 신규 노드 배포
 # (자동으로 1.30 노드 삭제)
-```
 
+```
 ### 3. 셀프 노드그룹 (Self-managed)
 
 **셀프 노드그룹 업그레이드**: 1.30 → 1.31
@@ -949,15 +949,15 @@ graph LR
 ```mermaid
 graph LR
     A[사전 준비<br/>셀프 노드그룹 정보 확인] --> B[셀프 노드그룹에<br/>ami 업데이트 후 적용을 확인하여<br/>1.31 버전 EC2 생성되고,<br/>이후 1.30 EC2는 삭제]
-```
 
+```
 **ASG (Auto Scaling Group) Launch Template 업데이트**:
 
 ```bash
 # Launch Template에서 AMI 업데이트 (1.31 버전)
 # 이후 1.30 EC2는 종료되고, 1.31 EC2가 생성됨
-```
 
+```
 ### 4. 파게이트 프로파일 (Fargate)
 
 **파게이트 노드 업그레이드**: 1.30 → 1.31
@@ -965,19 +965,19 @@ graph LR
 ```mermaid
 graph LR
     A[파게이트 노드를 통해<br/>1.31 ami를 사용하는<br/>신규 노드 배포되고] --> B[1.30 기존 노드는 삭제]
-```
 
+```
 **파게이트 업그레이드**:
 
 ```bash
 # 파게이트 프로파일은 Control Plane 업그레이드 후 자동으로 새 버전 사용
 # Pod를 재시작하여 1.31 버전 적용
 kubectl rollout restart deployment -n <namespace>
-```
 
+```
 ---
 
-## 💡 핵심 개념 정리
+## 핵심 개념 정리
 
 ### 1. EKS 업그레이드 순서
 
@@ -1002,8 +1002,8 @@ graph TB
     FG --> VERIFY
 
     VERIFY --> END[완료]
-```
 
+```
 **⇒ 최종 모든 노드가 1.31 버전임을 확인**
 
 ### 2. In-Place vs Blue-Green
@@ -1021,20 +1021,20 @@ graph TB
 
 **업그레이드 체크리스트**:
 
-1. ✅ **Upgrade Insights 사전 점검** (kube-proxy, Add-on, Deprecated API 등)
-2. ✅ **백업 생성** (etcd 스냅샷, PV 스냅샷)
-3. ✅ **PDB 설정** (minAvailable로 가용성 보장)
-4. ✅ **TopologySpreadConstraints 적용** (AZ 분산 배치)
-5. ✅ **모니터링 도구 활성화** (kube-ops-view, CloudWatch)
-6. ✅ **순차 업그레이드** (Control Plane → Add-on → Nodes)
-7. ✅ **한 버전씩 업그레이드** (1.30 → 1.31, 두 버전 점프 불가)
-8. ✅ **업그레이드 후 검증** (Pod 상태, 애플리케이션 헬스 체크)
-9. ✅ **Terraform 사용 권장** (IaC로 재현 가능한 업그레이드)
+1. **Upgrade Insights 사전 점검** (kube-proxy, Add-on, Deprecated API 등)
+2. **백업 생성** (etcd 스냅샷, PV 스냅샷)
+3. **PDB 설정** (minAvailable로 가용성 보장)
+4. **TopologySpreadConstraints 적용** (AZ 분산 배치)
+5. **모니터링 도구 활성화** (kube-ops-view, CloudWatch)
+6. **순차 업그레이드** (Control Plane → Add-on → Nodes)
+7. **한 버전씩 업그레이드** (1.30 → 1.31, 두 버전 점프 불가)
+8. **업그레이드 후 검증** (Pod 상태, 애플리케이션 헬스 체크)
+9. **Terraform 사용 권장** (IaC로 재현 가능한 업그레이드)
 
 **주의사항**:
-- ⚠️ **업그레이드는 되돌릴 수 없음** (Rollback 불가)
-- ⚠️ **Deprecated API 사전 확인 필수** (v1.32에서 제거되는 API)
-- ⚠️ **Amazon Linux 노드는 2025년 11월 26일 지원 종료** (AL2023으로 마이그레이션)
+- **주의** **업그레이드는 되돌릴 수 없음** (Rollback 불가)
+- **주의** **Deprecated API 사전 확인 필수** (v1.32에서 제거되는 API)
+- **주의** **Amazon Linux 노드는 2025년 11월 26일 지원 종료** (AL2023으로 마이그레이션)
 
 ---
 

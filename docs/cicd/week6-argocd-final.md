@@ -5,7 +5,7 @@
 
 ---
 
-## 🏗️ ArgoCD 고가용성 구성
+## ArgoCD 고가용성 구성
 
 ### 1. 고가용성 아키텍처
 
@@ -67,7 +67,6 @@ graph TB
     RH --> RS2
 
 ```
-
 **컴포넌트별 역할**:
 
 | 컴포넌트 | 역할 | HA 요구사항 |
@@ -131,8 +130,8 @@ helm upgrade --install argocd argo/argo-cd \
   --version 9.0.5 \
   -f argocd-ha-values.yaml \
   --namespace argocd
-```
 
+```
 ### 2. Redis HA 설정
 
 #### Redis Sentinel 아키텍처
@@ -159,7 +158,7 @@ graph TB
     end
 
     subgraph "Failover Process"
-        S1 -.->|1. Master Down| X[❌ Master Fails]
+        S1 -.->|1. Master Down| X[Master Fails]
         S2 -.->|2. Vote| VOTE[Quorum Vote]
         S3 -.->|2. Vote| VOTE
         VOTE -.->|3. Elect| NEW[🆕 New Master]
@@ -167,7 +166,6 @@ graph TB
     end
 
 ```
-
 **Sentinel 동작 방식**:
 1. **정족수(Quorum)**: 최소 2개의 Sentinel이 Master 장애 합의
 2. **투표(Vote)**: 과반수 Sentinel이 새 Master 선출
@@ -181,10 +179,10 @@ graph TB
 kubectl get pod -n argocd | grep redis
 
 # 출력 예시:
-# argocd-redis-ha-haproxy-xxx        1/1   Running
-# argocd-redis-ha-server-0           3/3   Running
-# argocd-redis-ha-server-1           3/3   Running
-# argocd-redis-ha-server-2           3/3   Running
+# argocd-redis-ha-haproxy-xxx 1/1 Running
+# argocd-redis-ha-server-0 3/3 Running
+# argocd-redis-ha-server-1 3/3 Running
+# argocd-redis-ha-server-2 3/3 Running
 
 # Redis Master 확인
 kubectl exec -n argocd argocd-redis-ha-server-0 -c redis -- \
@@ -197,8 +195,8 @@ kubectl exec -n argocd argocd-redis-ha-server-0 -c redis -- \
 # Sentinel 상태 확인
 kubectl exec -n argocd argocd-redis-ha-server-0 -c sentinel -- \
   redis-cli -p 26379 sentinel masters
-```
 
+```
 ### 3. ApplicationSet Controller 확장
 
 #### Leader Election 메커니즘
@@ -221,14 +219,13 @@ sequenceDiagram
     S->>K: 4. Try acquire Lease
     K->>S: 5. Lease denied (leader exists)
 
-    Note over L: ❌ Leader Pod crashes
+    Note over L: Leader Pod crashes
 
     S->>K: 6. Detect Lease expired
     K->>S: 7. Lease granted (become leader)
     S->>G: 8. Take over processing
 
 ```
-
 **Leader Election 설정**:
 
 ```bash
@@ -236,17 +233,17 @@ sequenceDiagram
 kubectl get lease -n argocd argocd-applicationset-controller
 
 # 출력 예시:
-# NAME                                HOLDER                                      AGE
-# argocd-applicationset-controller    argocd-applicationset-controller-xxx-yyy    5m
+# NAME HOLDER AGE
+# argocd-applicationset-controller argocd-applicationset-controller-xxx-yyy 5m
 
 # Leader Pod 확인
 kubectl describe lease -n argocd argocd-applicationset-controller
 # Holder Identity: argocd-applicationset-controller-7d5f9b8c5-abc12
-```
 
+```
 ---
 
-## 🔄 고급 Sync 전략
+## 고급 Sync 전략
 
 ### 1. Sync Windows
 
@@ -255,9 +252,9 @@ kubectl describe lease -n argocd argocd-applicationset-controller
 **Sync Window**는 특정 시간대에만 동기화를 허용하거나 차단하는 기능입니다.
 
 **사용 사례**:
-- ✅ 업무 시간 외(야간)에만 프로덕션 배포
-- ✅ 유지보수 시간대 자동 동기화 차단
-- ✅ 주중/주말 배포 정책 분리
+- 업무 시간 외(야간)에만 프로덕션 배포
+- 유지보수 시간대 자동 동기화 차단
+- 주중/주말 배포 정책 분리
 
 #### Sync Window 설정
 
@@ -295,8 +292,8 @@ spec:
     duration: 1h
     manualSync: true  # 수동 Sync만 허용
 EOF
-```
 
+```
 **Sync Window 옵션**:
 - `schedule`: Cron 형식 시간표 (분 시 일 월 요일)
 - `duration`: 윈도우 지속 시간
@@ -311,8 +308,8 @@ argocd proj get production
 
 # Application Sync 가능 여부 확인
 argocd app get myapp | grep "Sync Windows"
-```
 
+```
 ### 2. Progressive Delivery
 
 #### Argo Rollouts 통합
@@ -331,11 +328,10 @@ graph LR
     V1 -->|1. Deploy| V2A
     V2A -->|2. Analysis OK| V2B
     V2B -->|3. Analysis OK| V2C
-    V2A -.->|Analysis Fail| ROLLBACK[❌ Rollback to V1]
+    V2A -.->|Analysis Fail| ROLLBACK[Rollback to V1]
     V2B -.->|Analysis Fail| ROLLBACK
 
 ```
-
 #### Rollout 예시
 
 ```yaml
@@ -385,8 +381,8 @@ spec:
         image: myapp:v2.0.0
         ports:
         - containerPort: 8080
-```
 
+```
 #### AnalysisTemplate 정의
 
 ```yaml
@@ -419,8 +415,8 @@ spec:
               service="{{ args.service-name }}"
             }[5m]
           ))
-```
 
+```
 ### 3. Automated Self-Healing
 
 #### Self-Healing 설정
@@ -459,8 +455,8 @@ spec:
     kind: Secret
     jqPathExpressions:
     - .data.token  # 동적으로 생성되는 토큰 무시
-```
 
+```
 **IgnoreDifferences 사용 사례**:
 - **HPA 관리 replicas**: HPA가 동적으로 조정하는 replicas 무시
 - **Cluster Autoscaler annotations**: CA가 추가하는 annotation 무시
@@ -469,7 +465,7 @@ spec:
 
 ---
 
-## 📊 Resource Tracking
+## Resource Tracking
 
 ### 1. Tracking Methods
 
@@ -496,8 +492,8 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-cm
 
 # ArgoCD Application Controller 재시작
 kubectl rollout restart deployment argocd-application-controller -n argocd
-```
 
+```
 ### 2. Annotation vs Label
 
 #### Annotation 방식 동작
@@ -515,17 +511,18 @@ metadata:
     argocd.argoproj.io/tracking-id: "myapp:v1:ConfigMap:default/myconfig"
 data:
   key: value
-```
 
+```
 **Tracking ID 구성**:
+
 ```
 <app-name>:<app-namespace>:<group>:<kind>:<namespace>/<name>
-```
 
+```
 **장점**:
-- ✅ Label 충돌 없음
-- ✅ 여러 ArgoCD 인스턴스 동시 사용 가능
-- ✅ Helm Chart와 완벽히 호환
+- Label 충돌 없음
+- 여러 ArgoCD 인스턴스 동시 사용 가능
+- Helm Chart와 완벽히 호환
 
 ### 3. Best Practices
 
@@ -564,11 +561,11 @@ data:
         jsonPointers:
         - /spec/clusterIP
         - /spec/clusterIPs
-```
 
+```
 ---
 
-## 🎯 ApplicationSet 고급 활용
+## ApplicationSet 고급 활용
 
 ### 1. Matrix Generator
 
@@ -594,7 +591,6 @@ graph TB
     end
 
 ```
-
 #### Matrix Generator 예시
 
 ```yaml
@@ -640,8 +636,8 @@ spec:
         automated:
           prune: true
           selfHeal: true
-```
 
+```
 **결과**:
 - `apps/app1` × `dev` → `app1-dev`
 - `apps/app1` × `prod` → `app1-prod`
@@ -655,21 +651,23 @@ spec:
 **Git File Generator**는 **Git 리포지토리의 JSON/YAML 파일**을 읽어 애플리케이션을 생성합니다.
 
 **사용 사례**:
-- ✅ 각 팀이 자신의 애플리케이션 목록 관리
-- ✅ Self-Service 배포 플랫폼
-- ✅ 중앙화된 설정 저장소
+- 각 팀이 자신의 애플리케이션 목록 관리
+- Self-Service 배포 플랫폼
+- 중앙화된 설정 저장소
 
 #### Git File Generator 예시
 
 **Git 리포지토리 구조**:
+
 ```
 apps-config/
 ├── team-a.yaml
 ├── team-b.yaml
 └── team-c.yaml
-```
 
+```
 **team-a.yaml**:
+
 ```yaml
 # Team A의 애플리케이션 목록
 applications:
@@ -682,9 +680,10 @@ applications:
   repoURL: https://github.com/team-a/backend.git
   path: k8s/overlays/prod
   namespace: team-a-backend
-```
 
+```
 **ApplicationSet 정의**:
+
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -714,8 +713,8 @@ spec:
         automated:
           prune: true
           selfHeal: true
-```
 
+```
 ### 3. Pull Request Generator
 
 #### Pull Request Generator란?
@@ -742,7 +741,6 @@ sequenceDiagram
     AS->>K: 9. Delete preview namespace
 
 ```
-
 #### Pull Request Generator 예시
 
 ```yaml
@@ -790,18 +788,19 @@ spec:
           selfHeal: true
         syncOptions:
         - CreateNamespace=true
-```
 
+```
 **GitHub Token Secret 생성**:
+
 ```bash
 kubectl create secret generic github-token \
   --from-literal=token=<GITHUB_PERSONAL_ACCESS_TOKEN> \
   -n argocd
-```
 
+```
 ---
 
-## 🚀 멀티 클러스터 관리
+## 멀티 클러스터 관리
 
 ### 1. Cluster Bootstrap
 
@@ -837,7 +836,6 @@ graph TB
     C4 --> A4
 
 ```
-
 #### 클러스터 등록
 
 ```bash
@@ -852,11 +850,11 @@ argocd cluster add kind-prod-cluster \
 
 # 클러스터 목록 확인
 argocd cluster list
-# SERVER                          NAME            VERSION  STATUS   MESSAGE
-# https://kubernetes.default.svc  in-cluster      1.28     Success
-# https://prod.example.com:6443   prod-cluster    1.28     Success
-```
+# SERVER NAME VERSION STATUS MESSAGE
+# https://kubernetes.default.svc in-cluster 1.28 Success
+# https://prod.example.com:6443 prod-cluster 1.28 Success
 
+```
 ### 2. Cluster Credentials 관리
 
 #### ServiceAccount 기반 인증
@@ -906,8 +904,8 @@ EOF
 
 # Token 확인
 kubectl get secret -n argocd argocd-manager-token -o jsonpath='{.data.token}' | base64 -d
-```
 
+```
 ### 3. App of Apps 패턴
 
 #### App of Apps란?
@@ -947,10 +945,10 @@ graph TB
     ROOT --> T2
 
 ```
-
 #### App of Apps 구현
 
 **Git 리포지토리 구조**:
+
 ```
 gitops-repo/
 ├── apps/
@@ -969,9 +967,10 @@ gitops-repo/
     ├── core/
     ├── platform/
     └── tenants/
-```
 
+```
 **Root Application**:
+
 ```yaml
 # apps/root.yaml
 apiVersion: argoproj.io/v1alpha1
@@ -997,9 +996,10 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-```
 
+```
 **Child Application 예시**:
+
 ```yaml
 # apps/core/ingress-nginx.yaml
 apiVersion: argoproj.io/v1alpha1
@@ -1027,11 +1027,11 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-```
 
+```
 ---
 
-## 🔑 LDAP/Active Directory 통합
+## LDAP/Active Directory 통합
 
 ### 1. OpenLDAP 서버 구축
 
@@ -1063,8 +1063,8 @@ dc=example,dc=org          # Base DN (Root DN)
     │   └── member: uid=bob,ou=people,dc=example,dc=org
     └── cn=admins
         └── member: uid=alice,ou=people,dc=example,dc=org
-```
 
+```
 - **DN (Distinguished Name)**: `uid=alice,ou=people,dc=example,dc=org`
 - **RDN (Relative Distinguished Name)**: `uid=alice`
 - **Base DN**: `dc=example,dc=org`
@@ -1151,11 +1151,12 @@ EOF
 
 # 배포 확인
 kubectl get deploy,pod,svc,ep -n openldap
-```
 
+```
 #### OpenLDAP 초기 설정
 
 **1. phpLDAPadmin 웹 UI 접속**:
+
 ```bash
 # 브라우저에서 접속
 open http://127.0.0.1:30000
@@ -1163,9 +1164,10 @@ open http://127.0.0.1:30000
 # 로그인 정보:
 # - Login DN: cn=admin,dc=example,dc=org
 # - Password: admin
-```
 
+```
 **2. OU (Organizational Unit) 생성**:
+
 ```bash
 kubectl -n openldap exec -it deploy/openldap -c openldap -- bash
 
@@ -1179,9 +1181,10 @@ dn: ou=groups,dc=example,dc=org
 objectClass: organizationalUnit
 ou: groups
 EOF
-```
 
+```
 **3. 사용자 추가**:
+
 ```bash
 # alice 사용자 추가
 cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
@@ -1214,9 +1217,10 @@ uidNumber: 10002
 gidNumber: 10002
 homeDirectory: /home/bob
 EOF
-```
 
+```
 **4. 그룹 생성 및 멤버 할당**:
+
 ```bash
 # devs 그룹 생성
 cat <<EOF | ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin
@@ -1233,9 +1237,10 @@ objectClass: groupOfNames
 cn: admins
 member: uid=alice,ou=people,dc=example,dc=org
 EOF
-```
 
+```
 **5. LDAP 검색 테스트**:
+
 ```bash
 # 모든 사용자 조회
 ldapsearch -x -H ldap://localhost:389 \
@@ -1255,8 +1260,8 @@ ldapsearch -x -H ldap://localhost:389 \
   -b "ou=groups,dc=example,dc=org" \
   -D "cn=admin,dc=example,dc=org" \
   -w admin
-```
 
+```
 ---
 
 ### 2. Keycloak LDAP Federation
@@ -1303,7 +1308,6 @@ graph TB
     RBAC --> APP
 
 ```
-
 #### Keycloak LDAP 설정
 
 ```bash
@@ -1331,8 +1335,8 @@ graph TB
 # Membership LDAP Attribute: member
 # Membership Attribute Type: DN
 # Mode: READ_ONLY
-```
 
+```
 ### 3. ArgoCD RBAC with LDAP Groups
 
 #### LDAP 그룹 기반 RBAC 정책
@@ -1367,9 +1371,10 @@ data:
 
   # LDAP 그룹 클레임 매핑
   scopes: '[groups, email]'
-```
 
+```
 **그룹 클레임 설정**:
+
 ```yaml
 # argocd-cm ConfigMap
 apiVersion: v1
@@ -1391,8 +1396,8 @@ data:
     # LDAP 그룹 클레임
     claimMapping:
       groups: groups
-```
 
+```
 ### 4. LDAP 동기화 및 캐싱
 
 #### Keycloak User Storage SPI 최적화
@@ -1413,8 +1418,8 @@ data:
 # Full Sync Period: 604800 (7일)
 # Periodic Changed Users Sync: Enabled
 # Changed Users Sync Period: 86400 (1일)
-```
 
+```
 #### LDAP 연결 풀 최적화
 
 ```yaml
@@ -1426,11 +1431,11 @@ env:
   value: "5000"
 - name: LDAP_READ_TIMEOUT
   value: "60000"
-```
 
+```
 ---
 
-## 🔐 시크릿 관리 전략
+## 시크릿 관리 전략
 
 ### 1. Sealed Secrets
 
@@ -1454,7 +1459,6 @@ sequenceDiagram
     SS->>KS: 5. 일반 Secret 생성
 
 ```
-
 #### Sealed Secrets 설치 및 사용
 
 ```bash
@@ -1480,19 +1484,19 @@ cat sealed-secret.yaml
 # apiVersion: bitnami.com/v1alpha1
 # kind: SealedSecret
 # metadata:
-#   name: mysecret
+# name: mysecret
 # spec:
-#   encryptedData:
-#     username: AgB8F3vZ...
-#     password: AgC9K2xL...
+# encryptedData:
+# username: AgB8F3vZ...
+# password: AgC9K2xL...
 
 # 배포
 kubectl apply -f sealed-secret.yaml
 
 # 복호화된 Secret 확인
 kubectl get secret mysecret -o jsonpath='{.data.password}' | base64 -d
-```
 
+```
 ### 2. External Secrets Operator
 
 #### External Secrets Operator란?
@@ -1529,7 +1533,6 @@ graph LR
     ESO --> KS
 
 ```
-
 #### External Secrets Operator 사용
 
 ```bash
@@ -1584,8 +1587,8 @@ EOF
 
 # 생성된 Secret 확인
 kubectl get secret db-password -o jsonpath='{.data.password}' | base64 -d
-```
 
+```
 ### 3. HashiCorp Vault 통합
 
 #### Vault External Secrets 설정
@@ -1632,11 +1635,11 @@ spec:
     remoteRef:
       key: secret/data/prod/database
       property: password
-```
 
+```
 ---
 
-## 📈 모니터링 및 관찰성
+## 모니터링 및 관찰성
 
 ### 1. Prometheus Metrics
 
@@ -1658,8 +1661,8 @@ curl http://localhost:8082/metrics
 # argocd_app_reconcile_count - Reconciliation 횟수
 # argocd_git_request_total - Git 요청 횟수
 # argocd_redis_request_total - Redis 요청 횟수
-```
 
+```
 #### Prometheus ServiceMonitor 정의
 
 ```yaml
@@ -1676,8 +1679,8 @@ spec:
   - port: metrics
     interval: 30s
     path: /metrics
-```
 
+```
 #### Grafana 대시보드
 
 **ArgoCD 공식 Grafana 대시보드**:
@@ -1689,8 +1692,8 @@ spec:
 # 1. Dashboards → Import
 # 2. Grafana.com Dashboard ID: 14584
 # 3. Prometheus 데이터 소스 선택
-```
 
+```
 ### 2. Notification 설정
 
 #### Notification 아키텍처
@@ -1735,7 +1738,6 @@ graph TB
     TM3 --> C3
 
 ```
-
 #### Slack Notification 설정
 
 ```bash
@@ -1772,7 +1774,7 @@ data:
   # Template 정의
   template.app-sync-succeeded: |
     message: |
-      ✅ Application {{.app.metadata.name}} has been successfully synced.
+      Application {{.app.metadata.name}} has been successfully synced.
       Repository: {{.app.spec.source.repoURL}}
       Revision: {{.app.status.sync.revision}}
     slack:
@@ -1793,7 +1795,7 @@ data:
 
   template.app-sync-failed: |
     message: |
-      ❌ Application {{.app.metadata.name}} sync has failed.
+      Application {{.app.metadata.name}} sync has failed.
       Error: {{.app.status.operationState.message}}
     slack:
       attachments: |
@@ -1811,8 +1813,8 @@ data:
           }]
         }]
 EOF
-```
 
+```
 #### Application에 Notification 적용
 
 ```yaml
@@ -1827,8 +1829,8 @@ metadata:
     notifications.argoproj.io/subscribe.on-health-degraded.slack: argocd-alerts
 spec:
   # ...
-```
 
+```
 ### 3. Audit Logging
 
 #### Audit Log 활성화
@@ -1857,8 +1859,8 @@ EOF
 
 # ArgoCD Server 재시작
 kubectl rollout restart deployment argocd-server -n argocd
-```
 
+```
 #### Audit Log 확인
 
 ```bash
@@ -1867,18 +1869,18 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 
 # 로그 예시 (JSON 형식):
 # {
-#   "level": "info",
-#   "msg": "finished unary call with code OK",
-#   "grpc.code": "OK",
-#   "grpc.method": "Get",
-#   "grpc.service": "application.ApplicationService",
-#   "grpc.start_time": "2024-01-01T00:00:00Z",
-#   "grpc.time_ms": 5.123,
-#   "span.kind": "server",
-#   "system": "grpc"
+# "level": "info",
+# "msg": "finished unary call with code OK",
+# "grpc.code": "OK",
+# "grpc.method": "Get",
+# "grpc.service": "application.ApplicationService",
+# "grpc.start_time": "2024-01-01T00:00:00Z",
+# "grpc.time_ms": 5.123,
+# "span.kind": "server",
+# "system": "grpc"
 # }
-```
 
+```
 ---
 
 **🎉 6주차 학습 완료!**

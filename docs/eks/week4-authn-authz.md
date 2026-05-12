@@ -71,26 +71,25 @@ graph LR
     D -.-> H[Is this valid?]
 
 ```
-
 #### Authentication Methods (인증 방법)
 
 | 방법 | 주체 | EKS 사용 | 설명 |
 |------|------|----------|------|
-| **X.509 Client Certificates** | User, Node | ✅ | kubelet 인증 (Node Authorizer) |
-| **Service Account Tokens** | Pod | ✅ | Pod 내부 애플리케이션 인증 (JWT) |
-| **Bootstrap Tokens** | Node | ❌ | kubeadm 전용 |
-| **Static Token File** | User | ❌ | 비권장 (보안 취약) |
-| **OIDC Tokens** | User | ✅ | 외부 IdP 연동 (Google, Keycloak 등) |
-| **Webhook Token Authentication** | User | ✅ | **AWS IAM Authenticator** (EKS 기본) |
+| **X.509 Client Certificates** | User, Node | | kubelet 인증 (Node Authorizer) |
+| **Service Account Tokens** | Pod | | Pod 내부 애플리케이션 인증 (JWT) |
+| **Bootstrap Tokens** | Node | | kubeadm 전용 |
+| **Static Token File** | User | | 비권장 (보안 취약) |
+| **OIDC Tokens** | User | | 외부 IdP 연동 (Google, Keycloak 등) |
+| **Webhook Token Authentication** | User | | **AWS IAM Authenticator** (EKS 기본) |
 
 #### Authorization Methods (인가 방법)
 
 | 방법 | EKS 기본 설정 | 설명 |
 |------|---------------|------|
-| **Node Authorization** | ✅ Enabled | kubelet 전용 (system:node:xxx) |
-| **RBAC** | ✅ Enabled | Role-Based Access Control |
-| **ABAC** | ❌ Disabled | Attribute-Based (레거시) |
-| **Webhook** | ❌ Disabled | 외부 인가 서버 연동 |
+| **Node Authorization** | Enabled | kubelet 전용 (system:node:xxx) |
+| **RBAC** | Enabled | Role-Based Access Control |
+| **ABAC** | Disabled | Attribute-Based (레거시) |
+| **Webhook** | Disabled | 외부 인가 서버 연동 |
 
 ---
 
@@ -120,8 +119,8 @@ sequenceDiagram
     CM-->>API: Username: arn:aws:iam::...<br/>Groups: system:masters
     API->>API: RBAC 검증
     API-->>User: Response (Node List)
-```
 
+```
 **핵심 포인트**:
 - **Client-side**: `aws-iam-authenticator` (kubectl 플러그인)
 - **Server-side**: `aws-iam-authenticator server` (Webhook)
@@ -130,6 +129,7 @@ sequenceDiagram
 - **ConfigMap**: `kube-system/aws-auth` (IAM → K8S 매핑)
 
 **aws-auth ConfigMap 예시**:
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -148,8 +148,8 @@ data:
       username: admin
       groups:
         - system:masters
-```
 
+```
 #### 2.2. OIDC (OpenID Connect) Provider
 
 **정의**: **OAuth 2.0 기반**의 인증 레이어, ID Token을 통해 사용자 신원 확인
@@ -160,6 +160,7 @@ data:
 - **Web Identity 토큰** 교환 메커니즘
 
 **OIDC Provider 등록**:
+
 ```bash
 # EKS 클러스터 생성 시 자동 생성
 
@@ -169,13 +170,14 @@ eksctl utils associate-iam-oidc-provider --cluster myeks --approve
 # 확인
 aws iam list-open-id-connect-providers
 # https://oidc.eks.ap-northeast-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E
-```
 
+```
 **OIDC Discovery 문서**:
+
 ```bash
 curl https://oidc.eks.ap-northeast-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E/.well-known/openid-configuration
-```
 
+```
 **OIDC Core Components**:
 - **End User**: OAuth 2.0의 Resource Owner (최종 사용자)
 - **Relying Party (RP)**: 신뢰 당사자 (애플리케이션, Client)
@@ -190,6 +192,7 @@ curl https://oidc.eks.ap-northeast-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716
 - Pod에 명시하지 않으면 `default` SA 사용
 
 **Token 자동 마운트**:
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -221,16 +224,17 @@ spec:
           - path: namespace
             fieldRef:
               fieldPath: metadata.namespace
-```
 
+```
 **Projected Volume 구조**:
+
 ```
 /var/run/secrets/kubernetes.io/serviceaccount/
 ├── token          # JWT (Bound Service Account Token, 1시간 TTL)
 ├── ca.crt         # K8S API Server CA 인증서
 └── namespace      # Pod가 속한 Namespace
-```
 
+```
 **Bound Service Account Token (BSAT)**:
 - **Kubernetes v1.22+** 기본 활성화
 - **Audience**: `vault-token` (검증용)
@@ -281,16 +285,18 @@ sequenceDiagram
     STS-->>Pod: 임시 자격 증명<br/>(AccessKey, SecretKey, SessionToken)
     Pod->>S3: S3:ListBucket<br/>(임시 자격 증명 사용)
     S3-->>Pod: Bucket List
-```
 
+```
 #### IRSA 구성 단계
 
 **1. OIDC Provider 등록**:
+
 ```bash
 eksctl utils associate-iam-oidc-provider --cluster myeks --approve
-```
 
+```
 **2. IAM Role 생성 (Trust Policy)**:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -310,9 +316,10 @@ eksctl utils associate-iam-oidc-provider --cluster myeks --approve
     }
   ]
 }
-```
 
+```
 **3. ServiceAccount Annotation**:
+
 ```yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -321,9 +328,10 @@ metadata:
   namespace: dev-team
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/dev-k8s-s3-read
-```
 
+```
 **4. Pod에서 사용**:
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -336,23 +344,24 @@ spec:
   - name: aws-cli
     image: amazon/aws-cli
     command: ["sleep", "3600"]
-```
 
+```
 **5. 확인**:
+
 ```bash
 kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 # 2024-01-01 12:00:00 my-bucket
-```
 
+```
 #### IRSA 주의사항
 
-❌ **IRSA가 동작하지 않는 경우**:
+**IRSA가 동작하지 않는 경우**:
 - OIDC Provider 미등록
 - Trust Policy의 `sub` 조건 불일치 (Namespace/SA 이름 확인)
 - IAM Role ARN Annotation 누락
 - Pod에 `serviceAccountName` 미지정
 
-⚠️ **성능 이슈**:
+**주의** **성능 이슈**:
 - IRSA는 **매 API 호출마다 Token Refresh** 가능 → 과도한 STS 호출
 - **해결책**: boto3 Session 재사용, Credential Caching
 
@@ -384,7 +393,6 @@ graph TB
     ClusterRoleBinding --> ClusterRole
 
 ```
-
 #### Role vs ClusterRole
 
 | 항목 | Role | ClusterRole |
@@ -396,6 +404,7 @@ graph TB
 #### RBAC 예시
 
 **Role 생성**:
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -406,9 +415,10 @@ rules:
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["get", "list", "watch"]
-```
 
+```
 **RoleBinding 생성**:
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -423,17 +433,18 @@ roleRef:
   kind: Role
   name: pod-viewer
   apiGroup: rbac.authorization.k8s.io
-```
 
+```
 **권한 확인**:
+
 ```bash
 kubectl auth can-i get pods --as=system:serviceaccount:dev-team:dev-k8s -n dev-team
 # yes
 
 kubectl auth can-i delete pods --as=system:serviceaccount:dev-team:dev-k8s -n dev-team
 # no
-```
 
+```
 #### 표준 ClusterRole
 
 | ClusterRole | 권한 범위 |
@@ -464,7 +475,6 @@ graph LR
     F -.-> I[ValidatingWebhook<br/>예: Policy Validation]
 
 ```
-
 - **MutatingAdmissionWebhook**: 요청 변경 (Pod Env 주입 등)
 - **ValidatingAdmissionWebhook**: 요청 검증 (Policy 위반 차단)
 - **PodSecurityAdmission**: Pod 보안 정책 강제
@@ -472,10 +482,11 @@ graph LR
 - **LimitRanger**: Container 리소스 기본값/한도 설정
 
 **IRSA MutatingWebhook 예시**:
+
 ```bash
 kubectl get mutatingwebhookconfigurations pod-identity-webhook -o yaml
-```
 
+```
 ---
 
 ### 6. OAuth 2.0 & OIDC 이론
@@ -503,7 +514,6 @@ graph TB
     RS -.->|4. 리소스 제공| Client
 
 ```
-
 #### OAuth 2.0 Authorization Code Flow
 
 ```mermaid
@@ -522,8 +532,8 @@ sequenceDiagram
     AS->>App: 7. Access Token<br/>(+ Refresh Token)
     App->>RS: 8. API 요청<br/>(Bearer Token)
     RS->>App: 9. 리소스 제공
-```
 
+```
 #### OIDC (OpenID Connect)
 
 **정의**: **OAuth 2.0 위에 구축된 인증 레이어**, **ID Token (JWT)** 추가
@@ -538,6 +548,7 @@ sequenceDiagram
 - **scope=openid**: OIDC 활성화 필수
 
 **OIDC Authorization Code Flow**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -552,8 +563,8 @@ sequenceDiagram
     App->>Keycloak: 6. Token Request
     Keycloak->>App: 7. Access Token<br/>+ ID Token (JWT)<br/>+ Refresh Token
     App->>App: 8. ID Token 검증<br/>(사용자 신원 확인)
-```
 
+```
 ---
 
 ### 7. JWT (JSON Web Token)
@@ -571,7 +582,6 @@ graph LR
     JWT --> Signature[Signature<br/>HMACSHA256<br/>secret]
 
 ```
-
 **JWT 검증 흐름**:
 1. Header + Payload를 Base64 디코딩
 2. 서버의 Secret Key (또는 Public Key)로 Signature 검증
@@ -612,7 +622,6 @@ graph LR
     Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
 
 ```
-
 ### 2. IRSA (IAM Roles for Service Accounts) 전체 흐름
 
 ```mermaid
@@ -641,8 +650,8 @@ sequenceDiagram
     Note over Pod: 3. AWS API 호출
     Pod->>S3: ListBuckets<br/>(임시 자격 증명)
     S3-->>Pod: Bucket List
-```
 
+```
 ### 3. EKS kubectl 인증 흐름 (AWS IAM Authenticator)
 
 ```mermaid
@@ -669,8 +678,8 @@ sequenceDiagram
 
     API->>API: RBAC 검증<br/>(system:masters → Full Access)
     API-->>User: Node List
-```
 
+```
 ### 4. Namespace별 ServiceAccount 분리 실습
 
 ```mermaid
@@ -699,14 +708,13 @@ graph TB
         end
     end
 
-    Pod1 -.->|kubectl get pods<br/>-n dev-team| Allow1[✅ Allow]
-    Pod1 -.->|kubectl get pods<br/>-n infra-team| Deny1[❌ Forbidden]
+    Pod1 -.->|kubectl get pods<br/>-n dev-team| Allow1[Allow]
+    Pod1 -.->|kubectl get pods<br/>-n infra-team| Deny1[Forbidden]
 
-    Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[✅ Allow]
-    Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[❌ Forbidden]
+    Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[Allow]
+    Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[Forbidden]
 
 ```
-
 ### 5. Bearer Token (JWT) 동작 원리
 
 ```mermaid
@@ -729,7 +737,6 @@ graph TB
     RBAC -->|6. Allow/Deny| Response[API Response]
 
 ```
-
 ### 6. OIDC Authorization Code Flow (상세)
 
 ```mermaid
@@ -756,8 +763,8 @@ sequenceDiagram
     API->>Keycloak: 14. Token Introspection<br/>(Optional)
     Keycloak-->>API: 15. Token Valid ✓
     API-->>App: 16. API Response
-```
 
+```
 ### 7. OAuth 2.0 vs OIDC vs IRSA 비교
 
 ```mermaid
@@ -784,7 +791,6 @@ graph TB
     oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
 
 ```
-
 ---
 
 ## 실습 내용 요약
@@ -830,12 +836,12 @@ kubectl run kubectl-pod \
 
 # 권한 확인
 kubectl exec -it kubectl-pod -n dev-team -- kubectl get pods -n dev-team
-# ✅ Allow
+# Allow
 
 kubectl exec -it kubectl-pod -n dev-team -- kubectl get pods -n infra-team
-# ❌ Error: Forbidden (User cannot list pods in namespace "infra-team")
-```
+# Error: Forbidden (User cannot list pods in namespace "infra-team")
 
+```
 ### 실습 2: IRSA 설정
 
 **목표**: Pod에 S3 ReadOnly 권한 부여
@@ -884,8 +890,8 @@ EOF
 # 5. 확인
 kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 # 2024-01-01 12:00:00 my-bucket
-```
 
+```
 ### 실습 3: ConfigMap vs EKS API (인증/인가 비교)
 
 **목표**: `aws-auth` ConfigMap과 EKS API의 차이 이해
@@ -898,6 +904,7 @@ kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 | **에러 처리** | YAML 문법 오류 시 전체 실패 | 개별 Entry 관리 |
 
 **ConfigMap 방식**:
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -910,9 +917,10 @@ data:
       username: admin
       groups:
         - system:masters
-```
 
+```
 **EKS API 방식**:
+
 ```bash
 # Access Entry 생성
 aws eks create-access-entry \
@@ -926,8 +934,8 @@ aws eks associate-access-policy \
   --principal-arn arn:aws:iam::123456789012:user/admin \
   --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
   --access-scope type=cluster
-```
 
+```
 ### 실습 4: OIDC Identity Provider (Keycloak 연동)
 
 **목표**: Keycloak을 통해 사용자 인증
@@ -957,8 +965,8 @@ kubectl config set-credentials oidc-user \
   --exec-arg=--oidc-issuer-url=http://a1b2c3d4.ap-northeast-2.elb.amazonaws.com/realms/master \
   --exec-arg=--oidc-client-id=kubernetes \
   --exec-arg=--oidc-client-secret=xxxxxxxx
-```
 
+```
 ---
 
 ## 핵심 개념 비교표
@@ -967,12 +975,12 @@ kubectl config set-credentials oidc-user \
 
 | 방법 | 주체 | Token 형식 | 유효 기간 | EKS 사용 | 용도 |
 |------|------|------------|-----------|----------|------|
-| X.509 Client Cert | User, Node | PEM/DER | 1년 | ✅ | kubelet 인증 (Node Authorizer) |
-| ServiceAccount JWT | Pod | JWT (Projected Volume) | 1시간 (기본) | ✅ | Pod 내 애플리케이션 → K8S API |
-| AWS IAM Authenticator | User | JWT (Presigned STS URL) | 15분 | ✅ | kubectl → K8S API (EKS 기본) |
-| OIDC Token | User | JWT (ID Token) | IdP 설정 | ✅ | 외부 IdP (Google, Keycloak) 연동 |
-| Bootstrap Token | Node | secret.token | 24시간 | ❌ | kubeadm 전용 (TLS Bootstrap) |
-| Static Token File | User | Plain Text | 무제한 | ❌ | 비권장 (보안 취약) |
+| X.509 Client Cert | User, Node | PEM/DER | 1년 | | kubelet 인증 (Node Authorizer) |
+| ServiceAccount JWT | Pod | JWT (Projected Volume) | 1시간 (기본) | | Pod 내 애플리케이션 → K8S API |
+| AWS IAM Authenticator | User | JWT (Presigned STS URL) | 15분 | | kubectl → K8S API (EKS 기본) |
+| OIDC Token | User | JWT (ID Token) | IdP 설정 | | 외부 IdP (Google, Keycloak) 연동 |
+| Bootstrap Token | Node | secret.token | 24시간 | | kubeadm 전용 (TLS Bootstrap) |
+| Static Token File | User | Plain Text | 무제한 | | 비권장 (보안 취약) |
 
 ### IRSA vs EKS Pod Identity 비교
 
@@ -991,11 +999,11 @@ kubectl config set-credentials oidc-user \
 
 | Grant Type | 용도 | Client Secret 필요 | Refresh Token | EKS/OIDC 사용 |
 |------------|------|---------------------|---------------|---------------|
-| Authorization Code | Server-side Web App | ✅ | ✅ | ✅ (OIDC 기본) |
-| Implicit | SPA (레거시) | ❌ | ❌ | ❌ (보안 취약, 비권장) |
-| Resource Owner Password | Trusted First-party App | ✅ | ✅ | ❌ (비권장) |
-| Client Credentials | Machine-to-Machine | ✅ | ❌ | ❌ |
-| Refresh Token | Token 갱신 | ✅ | - | ✅ |
+| Authorization Code | Server-side Web App | | | (OIDC 기본) |
+| Implicit | SPA (레거시) | | | (보안 취약, 비권장) |
+| Resource Owner Password | Trusted First-party App | | | (비권장) |
+| Client Credentials | Machine-to-Machine | | | |
+| Refresh Token | Token 갱신 | | - | |
 
 ### K8S RBAC Verbs 정리
 
@@ -1017,17 +1025,19 @@ kubectl config set-credentials oidc-user \
 ### 1. IRSA가 동작하지 않을 때
 
 **증상**:
+
 ```
 An error occurred (AccessDenied) when calling the ListBuckets operation: User: arn:aws:sts::123456789012:assumed-role/eksctl-myeks-nodegroup-xxx is not authorized to perform: s3:ListAllMyBuckets
-```
 
+```
 **원인**:
-- ❌ OIDC Provider 미등록
-- ❌ ServiceAccount Annotation 누락
-- ❌ Trust Policy 불일치
-- ❌ Pod에 `serviceAccountName` 미지정
+- OIDC Provider 미등록
+- ServiceAccount Annotation 누락
+- Trust Policy 불일치
+- Pod에 `serviceAccountName` 미지정
 
 **해결**:
+
 ```bash
 # 1. OIDC Provider 확인
 aws iam list-open-id-connect-providers
@@ -1035,7 +1045,7 @@ aws iam list-open-id-connect-providers
 # 2. ServiceAccount Annotation 확인
 kubectl get sa dev-k8s -n dev-team -o yaml
 # annotations:
-#   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/dev-k8s-s3-read
+# eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/dev-k8s-s3-read
 
 # 3. Trust Policy 확인
 aws iam get-role --role-name dev-k8s-s3-read --query 'Role.AssumeRolePolicyDocument'
@@ -1048,21 +1058,23 @@ kubectl exec -it aws-cli -n dev-team -- env | grep AWS
 # 5. JWT Token 확인
 kubectl exec -it aws-cli -n dev-team -- cat /var/run/secrets/eks.amazonaws.com/serviceaccount/token
 # eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
+```
 ### 2. kubectl 인증 실패 (AWS IAM Authenticator)
 
 **증상**:
+
 ```
 error: You must be logged in to the server (Unauthorized)
-```
 
+```
 **원인**:
-- ❌ `aws-auth` ConfigMap에 IAM User/Role 미등록
-- ❌ AWS CLI 자격 증명 만료
-- ❌ `aws-iam-authenticator` 미설치
+- `aws-auth` ConfigMap에 IAM User/Role 미등록
+- AWS CLI 자격 증명 만료
+- `aws-iam-authenticator` 미설치
 
 **해결**:
+
 ```bash
 # 1. aws-auth ConfigMap 확인
 kubectl get configmap aws-auth -n kube-system -o yaml
@@ -1081,20 +1093,22 @@ aws sts get-caller-identity
 curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.11/aws-iam-authenticator_0.6.11_linux_amd64
 chmod +x aws-iam-authenticator
 sudo mv aws-iam-authenticator /usr/local/bin/
-```
 
+```
 ### 3. RBAC Forbidden 에러
 
 **증상**:
+
 ```
 Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:dev-team:dev-k8s" cannot list resource "pods" in API group "" in the namespace "infra-team"
-```
 
+```
 **원인**:
-- ❌ RoleBinding이 다른 Namespace를 참조
-- ❌ ClusterRole 대신 Role 사용 (Cluster-wide 리소스 접근 시)
+- RoleBinding이 다른 Namespace를 참조
+- ClusterRole 대신 Role 사용 (Cluster-wide 리소스 접근 시)
 
 **해결**:
+
 ```bash
 # 1. RoleBinding 확인
 kubectl get rolebinding -n dev-team
@@ -1110,38 +1124,38 @@ kubectl auth can-i list pods --as=system:serviceaccount:dev-team:dev-k8s -n infr
 kubectl create clusterrolebinding dev-k8s-cluster-view \
   --clusterrole=view \
   --serviceaccount=dev-team:dev-k8s
-```
 
+```
 ---
 
 ## 보안 Best Practices
 
 ### 1. Least Privilege 원칙
 
-- ✅ **Pod별 ServiceAccount 분리**: `default` SA 사용 금지
-- ✅ **IRSA로 최소 권한 부여**: Node IAM Role 공유 금지
-- ✅ **Namespace별 RBAC 설정**: ClusterRole은 꼭 필요할 때만 사용
-- ❌ **system:masters 그룹 사용 금지**: 슈퍼유저 권한 (인가 우회)
+- **Pod별 ServiceAccount 분리**: `default` SA 사용 금지
+- **IRSA로 최소 권한 부여**: Node IAM Role 공유 금지
+- **Namespace별 RBAC 설정**: ClusterRole은 꼭 필요할 때만 사용
+- **system:masters 그룹 사용 금지**: 슈퍼유저 권한 (인가 우회)
 
 ### 2. Token 보안
 
-- ✅ **Bound Service Account Token 사용**: Kubernetes v1.22+ 기본 활성화
-- ✅ **Token 유효 기간 설정**: `expirationSeconds: 3600` (1시간)
-- ✅ **Pod 삭제 시 Token 자동 무효화**: BSAT 장점
-- ❌ **Static Token File 사용 금지**: 보안 취약
+- **Bound Service Account Token 사용**: Kubernetes v1.22+ 기본 활성화
+- **Token 유효 기간 설정**: `expirationSeconds: 3600` (1시간)
+- **Pod 삭제 시 Token 자동 무효화**: BSAT 장점
+- **Static Token File 사용 금지**: 보안 취약
 
 ### 3. IRSA 보안
 
-- ✅ **Trust Policy에 `sub` 조건 추가**: `system:serviceaccount:<namespace>:<sa-name>`
-- ✅ **`aud` 조건 추가**: `sts.amazonaws.com`
-- ✅ **IAM Policy 최소 권한**: S3 Bucket ARN 명시, Resource `*` 지양
-- ❌ **Node IAM Role에 과도한 권한 부여 금지**
+- **Trust Policy에 `sub` 조건 추가**: `system:serviceaccount:<namespace>:<sa-name>`
+- **`aud` 조건 추가**: `sts.amazonaws.com`
+- **IAM Policy 최소 권한**: S3 Bucket ARN 명시, Resource `*` 지양
+- **Node IAM Role에 과도한 권한 부여 금지**
 
 ### 4. Admission Control
 
-- ✅ **PodSecurityAdmission 활성화**: Pod 보안 정책 강제
-- ✅ **ValidatingWebhook로 Policy 검증**: OPA Gatekeeper, Kyverno
-- ✅ **MutatingWebhook로 보안 강화**: Sidecar Injection, Env 주입
+- **PodSecurityAdmission 활성화**: Pod 보안 정책 강제
+- **ValidatingWebhook로 Policy 검증**: OPA Gatekeeper, Kyverno
+- **MutatingWebhook로 보안 강화**: Sidecar Injection, Env 주입
 
 ---
 

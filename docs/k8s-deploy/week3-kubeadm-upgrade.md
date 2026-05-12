@@ -100,7 +100,6 @@ flowchart TD
     J --> J1["CoreDNS<br>kube-proxy"]
 
 ```
-
 #### 1. Preflight Checks
 
 클러스터 구축 전 사전 점검:
@@ -185,18 +184,18 @@ flowchart TD
     F --> F1["kubelet.conf 생성<br>노드 등록"]
 
 ```
-
 #### 1. Discovery 단계
 
 Control Plane의 cluster-info ConfigMap을 조회하여 API Server 정보를 가져옵니다.
 
 **Shared Token Discovery** 방식:
+
 ```bash
 kubeadm join 192.168.10.100:6443 \
   --token abcdef.0123456789abcdef \
   --discovery-token-ca-cert-hash sha256:1234...
-```
 
+```
 CA 인증서 해시를 검증하여 중간자 공격(MITM)을 방지합니다.
 
 #### 2. TLS Bootstrap
@@ -224,22 +223,22 @@ timedatectl set-timezone Asia/Seoul
 
 # Chrony NTP 설정
 systemctl enable --now chronyd
-```
 
+```
 #### SELinux 설정
 
 ```bash
 # Permissive 모드로 변경
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-```
 
+```
 #### Firewalld 비활성화
 
 ```bash
 systemctl disable --now firewalld
-```
 
+```
 #### Swap 완전 비활성화
 
 ```bash
@@ -251,8 +250,8 @@ sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 # zram swap 비활성화
 systemctl disable --now zram-swap.service
-```
 
+```
 **Swap 비활성화 이유**:
 1. **리소스 예측 불가능**: Pod가 메모리를 초과해도 죽지 않고 디스크를 사용하게 됨
 2. **K8s 관리 철학 위배**: 메모리 부족 시 즉시 OOMKilled 후 재시작하는 것이 K8s 철학
@@ -268,8 +267,8 @@ EOF
 
 modprobe overlay
 modprobe br_netfilter
-```
 
+```
 **overlay**: OverlayFS 파일시스템 사용
 **br_netfilter**: 브리지 네트워크 패킷 필터링 (iptables)
 
@@ -283,8 +282,8 @@ net.ipv4.ip_forward                 = 1
 EOF
 
 sysctl --system
-```
 
+```
 #### hosts 파일 설정
 
 ```bash
@@ -293,8 +292,8 @@ cat <<EOF >> /etc/hosts
 192.168.10.101 k8s-w1
 192.168.10.102 k8s-w2
 EOF
-```
 
+```
 ---
 
 ### 2. Container Runtime 설치 (Containerd)
@@ -304,14 +303,14 @@ EOF
 ```bash
 dnf config-manager --add-repo \
   https://download.docker.com/linux/centos/docker-ce.repo
-```
 
+```
 #### Containerd 설치
 
 ```bash
 dnf install -y containerd.io-2.1.5
-```
 
+```
 #### Containerd 설정
 
 ```bash
@@ -328,8 +327,8 @@ systemctl enable --now containerd
 
 # Snapshotter 확인
 ctr plugin ls | grep overlayfs
-```
 
+```
 **SystemdCgroup 설정의 중요성**:
 - kubelet과 containerd가 **동일한 cgroup driver**를 사용해야 함
 - systemd init 시스템 사용 시 systemd cgroup 권장
@@ -351,8 +350,8 @@ gpgcheck=1
 gpgkey=https://pkgs.k8s.io/core:/stable:/v1.32/rpm/repodata/repomd.xml.key
 exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
-```
 
+```
 **exclude 설정 이유**: 자동 업그레이드 방지 (명시적 버전 관리)
 
 #### 설치
@@ -362,8 +361,8 @@ dnf install -y kubelet-1.32.11 kubeadm-1.32.11 kubectl-1.32.11 \
   --disableexcludes=kubernetes
 
 systemctl enable --now kubelet
-```
 
+```
 #### crictl 설정
 
 ```bash
@@ -372,8 +371,8 @@ runtime-endpoint: unix:///run/containerd/containerd.sock
 image-endpoint: unix:///run/containerd/containerd.sock
 timeout: 10
 EOF
-```
 
+```
 ---
 
 ### 4. Control Plane 초기화 (k8s-ctr)
@@ -383,23 +382,23 @@ kubeadm init \
   --pod-network-cidr=10.244.0.0/16 \
   --service-cidr=10.96.0.0/16 \
   --apiserver-advertise-address=192.168.10.100
-```
 
+```
 #### kubectl 설정
 
 ```bash
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
-```
 
+```
 #### CNI 설치 (Flannel)
 
 ```bash
 kubectl apply -f \
   https://github.com/flannel-io/flannel/releases/download/v0.27.3/kube-flannel.yml
-```
 
+```
 ---
 
 ### 5. Worker 노드 참여 (k8s-w1, k8s-w2)
@@ -410,14 +409,14 @@ Control Plane 초기화 후 출력된 join 명령어를 각 Worker 노드에서 
 kubeadm join 192.168.10.100:6443 \
   --token abcdef.0123456789abcdef \
   --discovery-token-ca-cert-hash sha256:1234...
-```
 
+```
 #### 클러스터 확인
 
 ```bash
 kubectl get nodes
-```
 
+```
 ---
 
 ## OverlayFS와 Snapshotter
@@ -441,7 +440,6 @@ graph TB
     G -.-> E
 
 ```
-
 **장점**:
 - 디스크 공간 절약: 이미지 레이어 공유
 - 빠른 컨테이너 시작: 레이어 재사용
@@ -468,7 +466,6 @@ flowchart LR
     I --> J[Lower Layer 유지]
 
 ```
-
 **Snapshotter 종류**:
 - **overlayfs** (기본, 권장): OverlayFS 기반
 - native: 심플한 디렉터리 복사
@@ -523,8 +520,8 @@ kubeadm certs check-expiration
 
 # 특정 인증서 상세 확인
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
-```
 
+```
 ---
 
 ### 인증서 갱신 (Manual Renewal)
@@ -537,8 +534,8 @@ kubeadm certs renew apiserver
 
 # 모든 인증서 갱신
 kubeadm certs renew all
-```
 
+```
 #### 갱신 영향도
 
 **다운타임**:
@@ -565,14 +562,14 @@ touch /etc/kubernetes/manifests/kube-scheduler.yaml
 
 # 또는 kubelet 재시작
 systemctl restart kubelet
-```
 
+```
 #### admin.conf 재적용
 
 ```bash
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-```
 
+```
 ---
 
 ### 인증서 체인 구조
@@ -601,7 +598,6 @@ graph TD
     end
 
 ```
-
 ---
 
 ## 모니터링 설정
@@ -616,8 +612,8 @@ helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm install metrics-server metrics-server/metrics-server \
   --set 'args[0]=--kubelet-insecure-tls' \
   -n kube-system
-```
 
+```
 **`--kubelet-insecure-tls` 옵션**:
 - kubelet의 서버 인증서를 검증하지 않음
 - 테스트 환경에서 사용 (프로덕션에서는 적절한 인증서 설정 필요)
@@ -627,8 +623,8 @@ helm install metrics-server metrics-server/metrics-server \
 ```bash
 kubectl top nodes
 kubectl top pods -A
-```
 
+```
 ---
 
 ### Kube-Prometheus-Stack 설치
@@ -646,8 +642,8 @@ helm install kube-prometheus-stack \
   --set prometheus.service.nodePort=30001 \
   --set grafana.service.type=NodePort \
   --set grafana.service.nodePort=30002
-```
 
+```
 #### 접속 정보
 
 - **Prometheus**: http://192.168.10.100:30001
@@ -671,44 +667,44 @@ helm install kube-prometheus-stack \
 
 ```bash
 vi /etc/kubernetes/manifests/kube-controller-manager.yaml
-```
 
+```
 ```yaml
 spec:
   containers:
   - command:
     - kube-controller-manager
     - --bind-address=0.0.0.0  # 127.0.0.1 → 0.0.0.0
-```
 
+```
 #### kube-scheduler 설정
 
 ```bash
 vi /etc/kubernetes/manifests/kube-scheduler.yaml
-```
 
+```
 ```yaml
 spec:
   containers:
   - command:
     - kube-scheduler
     - --bind-address=0.0.0.0  # 127.0.0.1 → 0.0.0.0
-```
 
+```
 #### etcd 메트릭 설정
 
 ```bash
 vi /etc/kubernetes/manifests/etcd.yaml
-```
 
+```
 ```yaml
 spec:
   containers:
   - command:
     - etcd
     - --listen-metrics-urls=http://127.0.0.1:2381,http://192.168.10.100:2381
-```
 
+```
 #### 확인
 
 ```bash
@@ -720,8 +716,8 @@ curl http://192.168.10.100:10259/metrics
 
 # etcd 메트릭
 curl http://192.168.10.100:2381/metrics
-```
 
+```
 ---
 
 ### x509 Certificate Exporter 설치
@@ -738,8 +734,8 @@ helm install x509-certificate-exporter enix/x509-certificate-exporter \
   --set hostPathsExporter.daemonSets.cp.tolerations[0].key=node-role.kubernetes.io/control-plane \
   --set hostPathsExporter.daemonSets.cp.watchDirectories={/etc/kubernetes/pki} \
   --set hostPathsExporter.daemonSets.nodes.watchDirectories={/var/lib/kubelet/pki}
-```
 
+```
 **DaemonSet 2종류**:
 - **cp**: Control Plane 노드 (`/etc/kubernetes/pki`)
 - **nodes**: Worker 노드 (`/var/lib/kubelet/pki`)
@@ -783,7 +779,6 @@ graph TB
     end
 
 ```
-
 #### kube-apiserver (HA 환경)
 
 - 업그레이드 시 **NEW 버전과 OLD 버전이 동시 운영** 가능
@@ -865,7 +860,6 @@ graph LR
     end
 
 ```
-
 ---
 
 ### 업그레이드 절차 (In-Place)
@@ -888,8 +882,8 @@ ETCDCTL_API=3 etcdctl snapshot save /backup/etcd-snapshot.db \
   --cacert=/etc/kubernetes/pki/etcd/ca.crt \
   --cert=/etc/kubernetes/pki/etcd/server.crt \
   --key=/etc/kubernetes/pki/etcd/server.key
-```
 
+```
 #### 2. CNI 업그레이드 (Flannel)
 
 ```bash
@@ -899,14 +893,14 @@ kubectl get ds -n kube-flannel kube-flannel-ds -o yaml | grep image:
 # 최신 버전으로 업그레이드
 kubectl apply -f \
   https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
-```
 
+```
 #### 3. 업그레이드 계획 확인
 
 ```bash
 kubeadm upgrade plan
-```
 
+```
 ---
 
 ### Control Plane 업그레이드 (k8s-ctr)
@@ -937,8 +931,8 @@ systemctl restart kubelet
 
 # 7. 확인
 kubectl get nodes
-```
 
+```
 #### 2단계: 1.33 → 1.34
 
 ```bash
@@ -955,8 +949,8 @@ systemctl restart kubelet
 
 # 4. 확인
 kubectl get nodes
-```
 
+```
 ---
 
 ### Worker 노드 업그레이드 (k8s-w1, k8s-w2)
@@ -970,8 +964,8 @@ kubectl get nodes
 ```bash
 # 노드 Drain (파드 eviction)
 kubectl drain k8s-w1 --ignore-daemonsets --delete-emptydir-data
-```
 
+```
 **Worker 노드에서 실행** (k8s-w1):
 
 ```bash
@@ -992,8 +986,8 @@ kubeadm upgrade node
 dnf install -y kubelet-1.33.* --disableexcludes=kubernetes
 systemctl daemon-reload
 systemctl restart kubelet
-```
 
+```
 **Control Plane에서 실행** (k8s-ctr):
 
 ```bash
@@ -1002,8 +996,8 @@ kubectl uncordon k8s-w1
 
 # 확인
 kubectl get nodes
-```
 
+```
 #### 2단계: 1.33 → 1.34
 
 위 단계를 반복하여 1.34로 업그레이드합니다.
@@ -1021,8 +1015,8 @@ systemctl restart kubelet
 
 # Uncordon
 kubectl uncordon k8s-w1
-```
 
+```
 **k8s-w2 노드도 동일하게 진행**합니다.
 
 ---
@@ -1052,7 +1046,6 @@ flowchart TD
     G3 --> H[업그레이드 완료]
 
 ```
-
 ---
 
 ### 업그레이드 고려사항
@@ -1111,8 +1104,8 @@ kernel.keys.root_maxkeys = 1000000
 
 # Root 사용자 키 최대 바이트 (유지)
 kernel.keys.root_maxbytes = 25000000
-```
 
+```
 #### Kube-proxy 적용 파라미터
 
 ```bash
@@ -1124,14 +1117,14 @@ net.netfilter.nf_conntrack_tcp_timeout_close_wait = 60 → 3600
 
 # TCP Established 타임아웃 (초)
 net.netfilter.nf_conntrack_tcp_timeout_established = 432000 → 86400
-```
 
+```
 #### --protect-kernel-defaults 옵션
 
 ```bash
 --protect-kernel-defaults=false  # 기본값과 다른 커널 파라미터 허용
-```
 
+```
 - **false** (기본): kubeadm이 커널 파라미터 변경
 - **true**: 기본값과 다르면 kubelet 시작 실패 (프로덕션 권장)
 

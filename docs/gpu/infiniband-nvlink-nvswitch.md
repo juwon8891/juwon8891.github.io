@@ -1,10 +1,10 @@
-# InfiniBand & GPU 인터커넥트
+# GPU 인터커넥트
 
-> GPU 클러스터의 고성능 통신 기술. 서버 내 GPU-GPU 통신(NVLink, NVSwitch)과 서버 간 통신(InfiniBand, RDMA)을 다룬다.
+> GPU 클러스터의 고성능 통신 기술 - PCIe, NVLink, InfiniBand, RDMA
 
-## GPU 클러스터의 3가지 통신 유형
+## 개요
 
-LLM 학습처럼 대규모 GPU 클러스터를 운영할 때 데이터가 이동하는 경로는 크게 세 가지다.
+GPU 클러스터에서 데이터가 이동하는 경로는 크게 세 가지다.
 
 ```mermaid
 graph TB
@@ -181,7 +181,7 @@ SXM과 PCIe 폼팩터의 주요 차이점은 다음과 같다.
 
 ---
 
-## 서버 간 GPU ↔ GPU 통신 - InfiniBand
+## 서버 간 GPU ↔ GPU 통신
 
 ### 1. InfiniBand란?
 
@@ -289,9 +289,11 @@ graph TB
 
 ---
 
-## InfiniBand 소프트웨어 스택
+## InfiniBand 인프라
 
-### 1. MLNX_OFED (호스트 드라이버)
+### 소프트웨어 스택
+
+#### 1. MLNX_OFED (호스트 드라이버)
 
 **Mellanox OpenFabrics Enterprise Distribution** - 서버 호스트에 설치하는 InfiniBand/RoCE 드라이버 패키지.
 
@@ -350,7 +352,7 @@ ibstatus
 ibv_devinfo
 
 ```
-### 2. MLNX_OS (스위치 OS)
+#### 2. MLNX_OS (스위치 OS)
 
 Managed InfiniBand 스위치에 탑재되는 **Mellanox 전용 운영체제**.
 
@@ -381,7 +383,7 @@ show environment
 | 펌웨어 업그레이드 | 스위치 ASIC 펌웨어 관리 |
 | Partition 관리 | P_Key 테이블 설정 |
 
-### 3. Subnet Manager
+#### 3. Subnet Manager
 
 InfiniBand Fabric의 **핵심 관리 컴포넌트**. Ethernet의 스패닝 트리 + DHCP 서버와 유사한 역할을 한다.
 
@@ -433,11 +435,9 @@ iblinkinfo
 ```
 
 
----
+### 네트워크 식별자
 
-## InfiniBand 네트워크 식별자
-
-### 1. GUID (Global Unique Identifier)
+#### 1. GUID (Global Unique Identifier)
 
 **64비트 영구 식별자** - 이더넷의 MAC 주소에 해당한다.
 
@@ -465,7 +465,7 @@ ibstat | grep -i guid
 ibv_devinfo | grep node_guid
 
 ```
-### 2. LID (Local Identifier)
+#### 2. LID (Local Identifier)
 
 **16비트 임시 식별자** - IP 주소에 해당한다. Subnet Manager가 Fabric 초기화 시 동적으로 할당한다.
 
@@ -498,7 +498,7 @@ ibnodes
 ibtracert 1 5  # LID 1에서 LID 5로의 경로
 
 ```
-### 3. Partition (P_Key)
+#### 3. Partition (P_Key)
 
 이더넷의 **VLAN**에 해당하는 InfiniBand의 논리적 네트워크 분리 기술.
 

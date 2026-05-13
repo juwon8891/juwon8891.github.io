@@ -1,5 +1,5 @@
 
-# [K8s-Deploy] Week 1 - Bootstrap Kubernetes The Hard Way
+# Bootstrap Kubernetes The Hard Way
 
 
 > **새로운 스터디 시작**: Kubernetes 클러스터를 처음부터 수동으로 구축하며 내부 동작 원리를 깊이 이해하는 K8s-Deploy 스터디의 첫 번째 주차입니다.

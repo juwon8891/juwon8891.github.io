@@ -1,5 +1,5 @@
 
-# [K8s-Deploy] Week 5 - Kubespray HA & Upgrade
+# Kubespray HA & Upgrade
 
 
 > **고가용성 Kubernetes 클러스터 운영**: Kubespray를 활용한 HA 구성, API 엔드포인트 전략, 노드 관리 및 클러스터 업그레이드

@@ -1,5 +1,5 @@
 
-# [K8s-Deploy] Week 4 - Kubespray 배포 분석
+# Kubespray 배포 분석
 
 
 > **Ansible 기반 K8s 배포 자동화**: Kubespray를 활용한 프로덕션급 Kubernetes 클러스터 배포 및 내부 동작 분석

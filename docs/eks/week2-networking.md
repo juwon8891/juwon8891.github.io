@@ -1,5 +1,5 @@
 
-# [EKS] Week 2 - EKS Networking
+# EKS Networking
 
 
 > **Week 2 학습 주제**: Amazon EKS의 네트워킹 구조를 깊이 이해하고, VPC CNI, Service, LoadBalancer, Ingress, ExternalDNS 등 네트워크 관련 핵심 기능을 학습합니다.

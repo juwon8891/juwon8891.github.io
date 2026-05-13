@@ -1,5 +1,5 @@
 
-# [EKS] Week 7 - EKS Cluster In-place Upgrades (1.30 → 1.31)
+# EKS Cluster In-place Upgrades (1.30 → 1.31)
 
 
 > **Week 7 학습 주제**: EKS 클러스터를 안전하게 업그레이드하는 전략과 실습. Control Plane, Add-on, Nodes를 순차적으로 업그레이드하며 HA 전략(PDB, TopologySpread)을 적용합니다.

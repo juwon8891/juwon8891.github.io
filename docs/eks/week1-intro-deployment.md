@@ -1,5 +1,5 @@
 
-# [EKS] Week 1 - EKS 소개 및 배포
+# EKS 소개 및 배포
 
 
 > **Week 1 학습 주제**: Amazon EKS의 기본 개념을 이해하고, eksctl, Terraform, CloudFormation을 활용한 다양한 배포 방법과 EKS Cluster Endpoint Access 전략을 학습합니다.

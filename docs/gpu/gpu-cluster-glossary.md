@@ -9,16 +9,19 @@
 - **핵심 특징**: Zero-copy, Kernel bypass, CPU offload
 - **레이턴시**: ~1μs (TCP/IP는 ~100μs)
 - **사용 사례**: GPU AllReduce, 분산 스토리지, HPC
-- **종류**:
-  - **InfiniBand (IB)**: 전용 프로토콜, 가장 높은 성능 (NDR 400Gbps)
-  - **RoCE (RDMA over Converged Ethernet)**: 이더넷 기반, 기존 네트워크 인프라 활용
-  - **iWARP**: TCP/IP 기반, 라우팅 가능
+
+**RDMA 프로토콜 종류**:
+
+| 프로토콜 | 네트워크 | 성능 | 특징 |
+|---------|---------|------|------|
+| **InfiniBand (IB)** | 전용 IB | 최고 (NDR 400Gbps) | 전용 하드웨어, 최저 지연시간 |
+| **RoCE v2** | 이더넷 | 높음 | IP 라우팅 가능, 기존 인프라 활용 |
+| **RoCE v1** | 이더넷 | 높음 | Layer 2 전용 (VLAN 내부만) |
+| **iWARP** | 이더넷 | 중간 | TCP/IP 기반, 라우팅 가능 |
 
 ### RoCE (RDMA over Converged Ethernet)
 - **정의**: 이더넷 네트워크에서 RDMA를 구현하는 프로토콜
-- **버전**:
-  - **RoCEv1**: Layer 2 전용 (같은 VLAN 내에서만 동작)
-  - **RoCEv2** ✅: Layer 3 지원 (IP 라우팅 가능), UDP 캡슐화
+- **v1 vs v2**: v1은 Layer 2 전용 (VLAN 내부), v2는 Layer 3 지원 (IP 라우팅, UDP 캡슐화)
 - **장점**: 기존 이더넷 인프라 재사용, InfiniBand 대비 저렴
 - **단점**: PFC(Priority Flow Control), ECN(Explicit Congestion Notification) 등 네트워크 튜닝 필수
 - **주요 사용처**: 클라우드 GPU 클러스터 (AWS EFA, Azure InfiniBand)

@@ -4,7 +4,7 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 
 ## 주요 카테고리
 
-### [ GPU](gpu/)
+### [ GPU](gpu/gpu-cluster-glossary/)
 - [GPU 클러스터 & 분산 AI 용어 사전](gpu/gpu-cluster-glossary/)
 - [NVIDIA CUDA 아키텍처](gpu/nvidia-cuda-architecture/)
 - [InfiniBand & GPU 인터커넥트](gpu/infiniband-nvlink-nvswitch/)

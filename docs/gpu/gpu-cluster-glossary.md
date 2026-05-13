@@ -1,4 +1,4 @@
-# GPU 클러스터 & 분산 AI 용어 사전
+# GPU 클러스터 용어 사전
 
 > GPU 클러스터 네트워킹(RDMA, InfiniBand), GPU 하드웨어(NVIDIA vs AMD), 분산 AI 추론(vLLM, SGLang) 등 핵심 용어를 정리한다.
 

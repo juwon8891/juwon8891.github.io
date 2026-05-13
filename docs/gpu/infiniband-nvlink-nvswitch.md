@@ -605,17 +605,6 @@ GPU와 HCA는 같은 PCIe 스위치에 연결되어야 NUMA 친화적 통신이 
 | 서버 내 GPU 간 | AllReduce 느림 | NVLink + NVSwitch (SXM GPU) |
 | 서버 간 GPU 간 | 분산 학습 느림 | InfiniBand NDR + GPUDirect RDMA |
 
-### 케이블 선택 기준
-
-| 거리 | 권장 케이블 | 비용 | 비고 |
-|------|-----------|------|------|
-| 0~3m | DAC (Passive Copper) | 최저 | 같은 랙 내 |
-| 3~7m | DAC (Active Copper) | 낮음 | 인접 랙 |
-| 7~100m | AOC (Active Optical) | 높음 | 랙 간, 장거리 |
-| 100m+ | 광트랜시버 + 광케이블 | 최고 | 건물 간 |
-
-> InfiniBand 케이블은 길이를 미리 정확히 측정해야 한다. 재단이 불가능하며 여분을 미리 주문해두는 것이 안전하다.
-
 ---
 
 ## 핵심 개념 정리

@@ -1265,8 +1265,27 @@ metadata:
   name: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  # ... (selector, template 설정 생략)
-  # ConfigMap을 volumeMount로 index.html에 주입
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: nginx
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: index-html
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
+      volumes:
+      - name: index-html
+        configMap:
+          name: {{ .Release.Name }}
 EOF
 
 # templates/service.yaml
@@ -1276,22 +1295,29 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
 spec:
-  type: NodePort
   selector:
     app: {{ .Release.Name }}
   ports:
-  - port: 80
+  - protocol: TCP
+    port: 80
+    targetPort: 80
     nodePort: 30000
+  type: NodePort
 EOF
 
 # values-dev.yaml (개발 환경)
 cat << EOF > nginx-chart/values-dev.yaml
 indexHtml: |
   <!DOCTYPE html>
-  <html><body>
+  <html>
+  <head>
+    <title>Welcome to Nginx!</title>
+  </head>
+  <body>
     <h1>Hello, Kubernetes!</h1>
     <p>DEV: Nginx version $VERSION</p>
-  </body></html>
+  </body>
+  </html>
 
 image:
   repository: nginx
@@ -1304,10 +1330,15 @@ EOF
 cat << EOF > nginx-chart/values-prd.yaml
 indexHtml: |
   <!DOCTYPE html>
-  <html><body>
+  <html>
+  <head>
+    <title>Welcome to Nginx!</title>
+  </head>
+  <body>
     <h1>Hello, Kubernetes!</h1>
     <p>PRD: Nginx version $VERSION</p>
-  </body></html>
+  </body>
+  </html>
 
 image:
   repository: nginx

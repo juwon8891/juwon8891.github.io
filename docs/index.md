@@ -4,7 +4,8 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 
 ## 주요 카테고리
 
-### [ GPU](gpu/nvidia-cuda-architecture/)
+### [ GPU](gpu/gpu-cluster-glossary/)
+- [GPU 클러스터 & 분산 AI 용어 사전](gpu/gpu-cluster-glossary/) - RDMA, NCCL, vLLM/SGLang, NVIDIA vs AMD 비교
 - [NVIDIA CUDA 컴파일 과정 및 GPU 아키텍처 심화](gpu/nvidia-cuda-architecture/)
 - [InfiniBand, NVLink, NVSwitch 등 GPU 인터커넥트 기술](gpu/infiniband-nvlink-nvswitch/)
 

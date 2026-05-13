@@ -1,5 +1,5 @@
 
-# Image Build: GitOps와 컨테이너 이미지 빌드 완전 정복
+# Image Build
 
 > 컨테이너 이미지 빌드, Kustomize, GitOps 기본 개념을 학습합니다.
 

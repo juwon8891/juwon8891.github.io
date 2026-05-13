@@ -1,5 +1,5 @@
 
-# HashiCorp Vault: 엔터프라이즈급 시크릿 관리와 CI/CD 통합
+# Vault Secrets
 
 > HashiCorp Vault를 활용한 시크릿 관리와 CI/CD 파이프라인 보안을 학습합니다.
 

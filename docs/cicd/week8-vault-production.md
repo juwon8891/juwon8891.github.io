@@ -1,5 +1,5 @@
 
-# HashiCorp Vault: VSO와 프로덕션 구성
+# Vault Production
 
 > Vault HA 구성, LDAP 인증, TLS 보안 설정을 학습합니다.
 

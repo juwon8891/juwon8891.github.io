@@ -1,5 +1,5 @@
 
-# ArgoCD 심화: ApplicationSet, Sync Waves, RBAC로 완성하는 엔터프라이즈 GitOps
+# ArgoCD Advanced
 
 > ArgoCD ApplicationSet, Sync Waves, RBAC, Notifications를 학습합니다.
 

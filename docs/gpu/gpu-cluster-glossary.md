@@ -36,12 +36,29 @@
 ### QP (Queue Pair)
 - **정의**: RDMA 통신의 기본 단위. 송신 큐(Send Queue)와 수신 큐(Receive Queue)로 구성
 - **역할**: 각 통신 세션마다 하나의 QP 생성 (TCP 소켓과 유사)
-- **타입**:
-  - **RC (Reliable Connection)**: 1:1 연결, 신뢰성 보장, 순서 보장
-  - **UC (Unreliable Connection)**: 1:1 연결, 순서 보장, 재전송 없음
-  - **UD (Unreliable Datagram)**: 1:N 통신, 순서/신뢰성 보장 없음
-- **상태 머신**: RESET → INIT → RTR(Ready To Receive) → RTS(Ready To Send) → SQD → ERROR
-- **예시**: NCCL에서 GPU 간 AllReduce 시 각 GPU 쌍마다 QP 생성
+
+**Transport 타입 비교**:
+
+| 타입 | 비유 | 신뢰성 | 연결성 | RDMA Read/Atomic | 용도 |
+|------|------|--------|--------|------------------|------|
+| **RC** | TCP | ✅ 보장 | 1:1 연결 | ✅ 가능 | **대부분 사용** (NCCL, MPI, UCX) |
+| **UC** | - | ❌ 재전송 없음 | 1:1 연결 | ❌ 불가능 | 스트리밍 (패킷 손실 허용) |
+| **UD** | UDP | ❌ 보장 없음 | 1:N | ❌ 불가능 | 멀티캐스트, 서비스 발견 |
+| **DC** | - | ✅ 보장 | 동적 연결 | ✅ 가능 | 대규모 클러스터 (QP 수 절약) |
+
+**RC가 기본인 이유**:
+- RDMA Read와 Atomic 연산이 **RC에서만 동작**
+- NCCL, UCX, MPI 등 모든 주요 라이브러리가 RC 사용
+- GPU 간 AllReduce는 RDMA Write + Read 조합 필요 → RC 필수
+
+**DC (Dynamically Connected)**:
+- 수천 개 노드 환경에서 QP 수를 줄이기 위해 사용
+- 예: 1,000 노드 × RC → 100만 개 QP vs DC → 1,000개 QP
+- Mellanox ConnectX-4 이상에서 지원
+
+**상태 머신**: RESET → INIT → RTR(Ready To Receive) → RTS(Ready To Send) → SQD → ERROR
+
+**예시**: NCCL AllReduce 시 각 GPU 쌍마다 RC QP 생성 (RDMA Write + Read 사용)
 
 ### GID (Global Identifier)
 - **정의**: InfiniBand/RoCE에서 각 포트를 식별하는 128비트 주소

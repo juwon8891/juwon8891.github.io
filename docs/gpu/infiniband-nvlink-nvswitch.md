@@ -10,6 +10,8 @@ GPU 클러스터에서 데이터가 이동하는 경로는 크게 세 가지다.
 2. **서버 내 GPU ↔ GPU 통신**: NVLink/NVSwitch (NVIDIA), Infinity Fabric (AMD)
 3. **서버 간 GPU ↔ GPU 통신**: InfiniBand, RDMA (공통)
 
+아래 다이어그램은 GPU 클러스터에서 세 가지 데이터 경로가 실제로 어떻게 구성되는지 보여준다.
+
 ```mermaid
 graph TB
     subgraph "스토리지"

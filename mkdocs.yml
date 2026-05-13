@@ -82,27 +82,27 @@ nav:
     - NVIDIA CUDA 아키텍처: gpu/nvidia-cuda-architecture.md
     - GPU 인터커넥트: gpu/infiniband-nvlink-nvswitch.md
   - EKS:
-    - Week 1 - Intro & Deployment: eks/week1-intro-deployment.md
-    - Week 2 - Networking: eks/week2-networking.md
-    - Week 3 - Scaling: eks/week3-scaling.md
-    - Week 4 - AuthN & AuthZ: eks/week4-authn-authz.md
-    - Week 5 - Pod Readiness Gates: eks/week5-pod-readiness-gates.md
-    - Week 6 - CI/CD: eks/week6-cicd.md
-    - Week 7 - Cluster Upgrade: eks/week7-cluster-upgrade.md
+    - Intro & Deployment: eks/week1-intro-deployment.md
+    - Networking: eks/week2-networking.md
+    - Scaling: eks/week3-scaling.md
+    - AuthN & AuthZ: eks/week4-authn-authz.md
+    - Pod Readiness Gates: eks/week5-pod-readiness-gates.md
+    - CI/CD: eks/week6-cicd.md
+    - Cluster Upgrade: eks/week7-cluster-upgrade.md
   - K8s Deploy:
-    - Week 1 - Kubernetes Hard Way: k8s-deploy/week1-kubernetes-hard-way.md
-    - Week 2 - Ansible Basics: k8s-deploy/week2-ansible-basics.md
-    - Week 3 - Kubeadm Upgrade: k8s-deploy/week3-kubeadm-upgrade.md
-    - Week 4 - Kubespray Deployment: k8s-deploy/week4-kubespray-deployment.md
-    - Week 5 - Kubespray HA & Upgrade: k8s-deploy/week5-kubespray-ha-upgrade.md
-    - Week 6 - Kubespray Offline: k8s-deploy/week6-kubespray-offline.md
-    - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
+    - Kubernetes Hard Way: k8s-deploy/week1-kubernetes-hard-way.md
+    - Ansible Basics: k8s-deploy/week2-ansible-basics.md
+    - Kubeadm Upgrade: k8s-deploy/week3-kubeadm-upgrade.md
+    - Kubespray Deployment: k8s-deploy/week4-kubespray-deployment.md
+    - Kubespray HA & Upgrade: k8s-deploy/week5-kubespray-ha-upgrade.md
+    - Kubespray Offline: k8s-deploy/week6-kubespray-offline.md
+    - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
   - CI/CD:
-    - Week 1 - Image Build: cicd/week1-image-build.md
-    - Week 2 - Helm & Tekton: cicd/week2-helm-tekton.md
-    - Week 3 - Jenkins & ArgoCD: cicd/week3-jenkins-argocd.md
-    - Week 4 - ArgoCD Advanced: cicd/week4-argocd-advanced.md
-    - Week 5 - ArgoCD Security & Keycloak: cicd/week5-argocd-security-keycloak.md
-    - Week 6 - ArgoCD Final: cicd/week6-argocd-final.md
-    - Week 7 - Vault Secrets: cicd/week7-vault-secrets.md
-    - Week 8 - Vault Production: cicd/week8-vault-production.md
+    - Image Build: cicd/week1-image-build.md
+    - Helm & Tekton: cicd/week2-helm-tekton.md
+    - Jenkins & ArgoCD: cicd/week3-jenkins-argocd.md
+    - ArgoCD Advanced: cicd/week4-argocd-advanced.md
+    - ArgoCD Security & Keycloak: cicd/week5-argocd-security-keycloak.md
+    - ArgoCD Final: cicd/week6-argocd-final.md
+    - Vault Secrets: cicd/week7-vault-secrets.md
+    - Vault Production: cicd/week8-vault-production.md

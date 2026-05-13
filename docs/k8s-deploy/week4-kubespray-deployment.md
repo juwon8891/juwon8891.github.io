@@ -15,12 +15,15 @@
 **공식 저장소**: [kubernetes-sigs/kubespray](https://github.com/kubernetes-sigs/kubespray)
 
 **핵심 특징**:
-- **프로덕션급 클러스터 배포**: Best Practice 기반 설정
-- **멀티 플랫폼 지원**: AWS, GCP, Azure, On-Premise, Bare-Metal
-- **다양한 CNI 지원**: Calico, Flannel, Cilium, Weave 등
-- **HA 구성 지원**: Control Plane과 etcd HA 자동 구성
-- **폐쇄망 지원**: Air-Gap 환경에서도 배포 가능
-- **클러스터 라이프사이클 관리**: 배포, 업그레이드, 스케일링, 백업/복구
+
+| 특징 | 설명 |
+|------|------|
+| 프로덕션급 배포 | Best Practice 기반 설정 |
+| 멀티 플랫폼 | AWS, GCP, Azure, On-Premise, Bare-Metal |
+| CNI 지원 | Calico, Flannel, Cilium, Weave 등 |
+| HA 구성 | Control Plane과 etcd HA 자동 구성 |
+| 폐쇄망 지원 | Air-Gap 환경 배포 가능 |
+| 라이프사이클 관리 | 배포, 업그레이드, 스케일링, 백업/복구 |
 
 ### 2. 주요 특징
 

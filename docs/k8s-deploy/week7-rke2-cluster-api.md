@@ -99,6 +99,7 @@ rke2 --version
 # rke2 version v1.28.x+rke2r1-fips
 
 ```
+
 ---
 
 ## RKE2 아키텍처
@@ -313,6 +314,7 @@ datastore-endpoint: "postgres://user:pass@host:5432/dbname"
 datastore-endpoint: "mysql://user:pass@tcp(host:3306)/dbname"
 
 ```
+
 ---
 
 ## RKE2 설치 및 구성
@@ -559,6 +561,7 @@ cilium status
 cilium connectivity test
 
 ```
+
 ---
 
 ## RKE2 업그레이드
@@ -802,6 +805,7 @@ cp custom-ca.key /var/lib/rancher/rke2/server/tls/server-ca.key
 systemctl start rke2-server
 
 ```
+
 ---
 
 ## Cluster API (CAPI) 소개
@@ -1161,6 +1165,7 @@ kubectl get machines
 kubectl get cluster
 
 ```
+
 ---
 
 ## 핵심 개념 정리

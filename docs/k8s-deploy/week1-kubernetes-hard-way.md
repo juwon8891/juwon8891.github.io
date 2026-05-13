@@ -94,6 +94,7 @@ graph TB
     PROXY1 ---|kubeconfig| API
 
 ```
+
 ---
 
 ## CA 및 TLS 인증서 구성
@@ -355,6 +356,7 @@ scp ca.key ca.crt \
     root@server:~/
 
 ```
+
 ---
 
 ## Kubeconfig 파일 생성
@@ -509,6 +511,7 @@ scp admin.kubeconfig \
     root@server:~/
 
 ```
+
 ---
 
 ## Data Encryption at Rest
@@ -982,6 +985,7 @@ kubectl describe clusterrolebindings system:kube-apiserver \
   --kubeconfig admin.kubeconfig
 
 ```
+
 ---
 
 ## Worker Node 구성
@@ -1232,6 +1236,7 @@ ss -tnlp | grep kubelet
 iptables -t nat -L KUBE-SERVICES
 
 ```
+
 ---
 
 ## Pod Network Routes

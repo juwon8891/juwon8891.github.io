@@ -110,6 +110,7 @@ sequenceDiagram
     Note over K8s: 이제 안전하게<br/>기존 Pod 제거
 
 ```
+
 ---
 
 ## 3. EKS vs GKE 구현 비교
@@ -638,6 +639,7 @@ $ aws elbv2 describe-target-health \
 }
 
 ```
+
 ---
 
 ## 5. 주의사항

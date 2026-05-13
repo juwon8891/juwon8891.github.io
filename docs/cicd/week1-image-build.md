@@ -1870,6 +1870,7 @@ kube-scheduler-gitops-study-control-plane           1/1     Running   0         
 kubectl cluster-info
 
 ```
+
 ---
 
 ## 컨테이너 이미지 빌드
@@ -3260,6 +3261,7 @@ patchesJson6902:
           value: "added-value"
 
 ```
+
 ---
 
 ## Dragonfly - P2P 기반 이미지 배포

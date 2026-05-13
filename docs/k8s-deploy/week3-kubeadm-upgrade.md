@@ -294,6 +294,7 @@ cat <<EOF >> /etc/hosts
 EOF
 
 ```
+
 ---
 
 ### 2. Container Runtime 설치 (Containerd)
@@ -373,6 +374,7 @@ timeout: 10
 EOF
 
 ```
+
 ---
 
 ### 4. Control Plane 초기화 (k8s-ctr)
@@ -399,6 +401,7 @@ kubectl apply -f \
   https://github.com/flannel-io/flannel/releases/download/v0.27.3/kube-flannel.yml
 
 ```
+
 ---
 
 ### 5. Worker 노드 참여 (k8s-w1, k8s-w2)
@@ -417,6 +420,7 @@ kubeadm join 192.168.10.100:6443 \
 kubectl get nodes
 
 ```
+
 ---
 
 ## OverlayFS와 Snapshotter
@@ -522,6 +526,7 @@ kubeadm certs check-expiration
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
 
 ```
+
 ---
 
 ### 인증서 갱신 (Manual Renewal)
@@ -570,6 +575,7 @@ systemctl restart kubelet
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 
 ```
+
 ---
 
 ### 인증서 체인 구조
@@ -598,6 +604,7 @@ graph TD
     end
 
 ```
+
 ---
 
 ## 모니터링 설정
@@ -625,6 +632,7 @@ kubectl top nodes
 kubectl top pods -A
 
 ```
+
 ---
 
 ### Kube-Prometheus-Stack 설치
@@ -718,6 +726,7 @@ curl http://192.168.10.100:10259/metrics
 curl http://192.168.10.100:2381/metrics
 
 ```
+
 ---
 
 ### x509 Certificate Exporter 설치
@@ -860,6 +869,7 @@ graph LR
     end
 
 ```
+
 ---
 
 ### 업그레이드 절차 (In-Place)
@@ -901,6 +911,7 @@ kubectl apply -f \
 kubeadm upgrade plan
 
 ```
+
 ---
 
 ### Control Plane 업그레이드 (k8s-ctr)
@@ -951,6 +962,7 @@ systemctl restart kubelet
 kubectl get nodes
 
 ```
+
 ---
 
 ### Worker 노드 업그레이드 (k8s-w1, k8s-w2)
@@ -1046,6 +1058,7 @@ flowchart TD
     G3 --> H[업그레이드 완료]
 
 ```
+
 ---
 
 ### 업그레이드 고려사항

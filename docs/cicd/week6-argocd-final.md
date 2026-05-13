@@ -241,6 +241,7 @@ kubectl describe lease -n argocd argocd-applicationset-controller
 # Holder Identity: argocd-applicationset-controller-7d5f9b8c5-abc12
 
 ```
+
 ---
 
 ## 고급 Sync 전략
@@ -563,6 +564,7 @@ data:
         - /spec/clusterIPs
 
 ```
+
 ---
 
 ## ApplicationSet 고급 활용
@@ -798,6 +800,7 @@ kubectl create secret generic github-token \
   -n argocd
 
 ```
+
 ---
 
 ## 멀티 클러스터 관리
@@ -1029,6 +1032,7 @@ spec:
     - CreateNamespace=true
 
 ```
+
 ---
 
 ## LDAP/Active Directory 통합
@@ -1262,6 +1266,7 @@ ldapsearch -x -H ldap://localhost:389 \
   -w admin
 
 ```
+
 ---
 
 ### 2. Keycloak LDAP Federation
@@ -1433,6 +1438,7 @@ env:
   value: "60000"
 
 ```
+
 ---
 
 ## 시크릿 관리 전략
@@ -1637,6 +1643,7 @@ spec:
       property: password
 
 ```
+
 ---
 
 ## 모니터링 및 관찰성
@@ -1881,6 +1888,7 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 # }
 
 ```
+
 ---
 
 **🎉 6주차 학습 완료!**

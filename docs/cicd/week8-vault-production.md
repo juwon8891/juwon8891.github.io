@@ -438,6 +438,7 @@ curl -s --header "X-Vault-Token: $VAULT_ROOT_TOKEN" \
 # Web UI에서도 확인 가능
 
 ```
+
 ---
 
 ## Kubernetes 인증 설정
@@ -898,6 +899,7 @@ kubectl exec vault-0 -n vault -- vault status | grep "HA Mode"
 # HA Mode standby ← Standby로 복귀
 
 ```
+
 ---
 
 ## Vault with LDAP 인증
@@ -1241,6 +1243,7 @@ func main() {
 }
 
 ```
+
 ---
 
 ## MCP Server와 Vault

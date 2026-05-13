@@ -441,6 +441,7 @@ graph TB
     Pod_Level -.->|노드 부족 시| Node_Level
 
 ```
+
 ---
 
 ## 주요 실습 절차
@@ -688,6 +689,7 @@ kubectl get nodes -l eks.amazonaws.com/compute-type=fargate
 kubectl get pod fargate-pod -o wide
 
 ```
+
 ---
 
 ## 트러블슈팅
@@ -784,6 +786,7 @@ kubectl label pod fargate-pod env=fargate
 kubectl describe pod fargate-pod
 
 ```
+
 ---
 
 ## 참고 자료

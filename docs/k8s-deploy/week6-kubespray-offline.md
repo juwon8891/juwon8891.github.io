@@ -186,6 +186,7 @@ sudo nft add rule ip filter forward iif "podman0" oif "enp0s9" ct state establis
 podman pull 192.168.10.10:5000/alpine:1.0
 
 ```
+
 ---
 
 ### 2. NTP Server - Client
@@ -247,6 +248,7 @@ graph TB
     AdminNTP --> Node2NTP["k8s-node2<br/>chronyd<br/>Stratum 4"]
 
 ```
+
 ---
 
 ### 3. DNS Server - Client
@@ -333,6 +335,7 @@ dig +short google.com @192.168.10.10
 dig +short google.com
 
 ```
+
 ---
 
 ### 4. Local (Mirror) YUM/DNF Repository
@@ -417,6 +420,7 @@ dnf install -y nfs-utils
 dnf info nfs-utils | grep -i repo
 
 ```
+
 ---
 
 ### 5. Private Container Registry
@@ -515,6 +519,7 @@ graph TB
     SearchRegistries --> DirectPull
 
 ```
+
 ---
 
 ### 6. Private PyPI Mirror
@@ -665,6 +670,7 @@ map_arch() {
 }
 
 ```
+
 ---
 
 ## 실습: kubespray-offline 배포
@@ -868,6 +874,7 @@ graph LR
 tree kubespray-2.30.0/ -L 1
 
 ```
+
 ---
 
 ## Kubespray 클러스터 배포 (3분 소요)
@@ -1025,6 +1032,7 @@ k9s
 kubectl get deploy,sts,ds -n kube-system -owide
 
 ```
+
 ---
 
 ## Troubleshooting
@@ -1075,6 +1083,7 @@ sudo nft add rule ip filter forward iif "podman0" oif "enp0s9" ct state establis
 podman pull 192.168.10.10:5000/alpine:1.0
 
 ```
+
 ---
 
 ## 주요 개념

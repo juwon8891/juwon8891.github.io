@@ -487,6 +487,7 @@ graph LR
 kubectl get mutatingwebhookconfigurations pod-identity-webhook -o yaml
 
 ```
+
 ---
 
 ### 6. OAuth 2.0 & OIDC 이론
@@ -565,6 +566,7 @@ sequenceDiagram
     App->>App: 8. ID Token 검증<br/>(사용자 신원 확인)
 
 ```
+
 ---
 
 ### 7. JWT (JSON Web Token)
@@ -791,6 +793,7 @@ graph TB
     oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
 
 ```
+
 ---
 
 ## 실습 내용 요약
@@ -967,6 +970,7 @@ kubectl config set-credentials oidc-user \
   --exec-arg=--oidc-client-secret=xxxxxxxx
 
 ```
+
 ---
 
 ## 핵심 개념 비교표
@@ -1126,6 +1130,7 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
   --serviceaccount=dev-team:dev-k8s
 
 ```
+
 ---
 
 ## 보안 Best Practices

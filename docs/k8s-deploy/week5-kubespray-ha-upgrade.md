@@ -53,6 +53,7 @@ Vagrant.configure("2") do |config|
 end
 
 ```
+
 ---
 
 ### 2. 초기화 스크립트 분석
@@ -360,6 +361,7 @@ kube-controller-manager-k8s-node2   1/1   Running   k8s-node2
 kube-scheduler-k8s-node3            1/1   Running   k8s-node3
 
 ```
+
 ---
 
 ## K8S API 엔드포인트 전략
@@ -483,6 +485,7 @@ ssh k8s-node4 grep "server:" /etc/kubernetes/kubelet.conf
 server: https://127.0.0.1:6443
 
 ```
+
 ---
 
 ### Case 2: External LB + Client-Side LB
@@ -564,6 +567,7 @@ X509v3 Subject Alternative Name:
     DNS:k8s-api-srv.admin-lb.com, DNS:k8s-node1, DNS:kubernetes, DNS:kubernetes.default, DNS:kubernetes.default.svc, DNS:kubernetes.default.svc.cluster.local, IP Address:192.168.10.10, IP Address:192.168.10.11, IP Address:192.168.10.12, IP Address:192.168.10.13, IP Address:10.233.0.1
 
 ```
+
 ---
 
 ### Case 3: External LB Only
@@ -650,6 +654,7 @@ graph TB
     DNS --> End["노드 추가 완료"]
 
 ```
+
 ---
 
 #### (2) 실습: k8s-node5 제거 후 재추가
@@ -706,6 +711,7 @@ k8s-node4    Ready    <none>          20m
 k8s-node5    Ready    <none>          1m   # 새로 추가됨
 
 ```
+
 ---
 
 #### (3) scale.yml 주요 Task 분석
@@ -749,6 +755,7 @@ k8s-node5    Ready    <none>          1m   # 새로 추가됨
   delegate_to: "{{ groups['kube_control_plane'][0] }}"
 
 ```
+
 ---
 
 ### 2. 노드 제거 (remove-node.yml)
@@ -778,6 +785,7 @@ graph TB
     Delete --> End["노드 제거 완료"]
 
 ```
+
 ---
 
 #### (2) 실습: k8s-node5 제거
@@ -816,6 +824,7 @@ k8s-node4    Ready    <none>          25m
 # k8s-node5 제거됨
 
 ```
+
 ---
 
 #### (3) PodDisruptionBudget (PDB) 이슈
@@ -869,6 +878,7 @@ kubectl drain k8s-node5 \
   --force
 
 ```
+
 ---
 
 ### 3. 비정상 노드 강제 삭제
@@ -896,6 +906,7 @@ ssh k8s-node5
 # Connection refused
 
 ```
+
 ---
 
 #### (2) 강제 삭제 명령어
@@ -929,6 +940,7 @@ kubectl delete node k8s-node5
 ssh k8s-node1 iptables -t nat -D KUBE-SERVICES -d 192.168.10.15 -j REJECT
 
 ```
+
 ---
 
 ### 4. 클러스터 리셋 (reset.yml)
@@ -949,6 +961,7 @@ Are you sure you want to reset the entire cluster? (yes/no)
 > yes
 
 ```
+
 ---
 
 #### (2) reset.yml 주요 Task
@@ -992,6 +1005,7 @@ Are you sure you want to reset the entire cluster? (yes/no)
   command: iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
 
 ```
+
 ---
 
 #### (3) 재배포
@@ -1004,6 +1018,7 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook \
   -e kube_version="1.32.9"
 
 ```
+
 ---
 
 ## 모니터링 설정
@@ -1028,6 +1043,7 @@ helm install kube-ops-view geek-cookbook/kube-ops-view \
   --set image.tag="latest"
 
 ```
+
 ---
 
 #### (2) 접속
@@ -1097,6 +1113,7 @@ haproxy_server_up{server="k8s-node2"} 1
 haproxy_server_up{server="k8s-node3"} 1
 
 ```
+
 ---
 
 ## 핵심 개념 정리
@@ -1228,6 +1245,7 @@ grep -Rn "kube_version" inventory/mycluster/ roles/ playbooks/
 # 3. CLI: -e kube_version="1.33.0" (최우선)
 
 ```
+
 ---
 
 ### 3. etcd Deployment Type
@@ -1292,6 +1310,7 @@ etcdctl member list -w table
 etcdctl snapshot save /tmp/etcd-backup.db
 
 ```
+
 ---
 
 #### (2) kubeadm (Static Pod)
@@ -1334,6 +1353,7 @@ spec:
       type: DirectoryOrCreate
 
 ```
+
 ---
 
 #### (3) 비교표
@@ -1381,6 +1401,7 @@ spec:
       app: webpod
 
 ```
+
 ---
 
 #### (2) Drain과 PDB 충돌
@@ -1466,6 +1487,7 @@ kubectl drain k8s-node4 \
   --grace-period=0
 
 ```
+
 ---
 
 #### (4) Best Practice
@@ -1516,6 +1538,7 @@ kubectl --server=https://192.168.10.10:6443 get node
 Unable to connect to the server: x509: certificate is valid for 192.168.10.11, 192.168.10.12, 192.168.10.13, 10.233.0.1, 127.0.0.1, localhost, kubernetes, kubernetes.default, kubernetes.default.svc, kubernetes.default.svc.cluster.local, not 192.168.10.10
 
 ```
+
 ---
 
 #### (2) 원인
@@ -1533,6 +1556,7 @@ X509v3 Subject Alternative Name:
     DNS:k8s-node1, DNS:kubernetes, IP Address:192.168.10.11, IP Address:10.233.0.1
 
 ```
+
 ---
 
 #### (3) 해결 방법
@@ -1568,6 +1592,7 @@ X509v3 Subject Alternative Name:
     DNS:k8s-api-srv.admin-lb.com, DNS:k8s-node1, IP Address:192.168.10.10, IP Address:192.168.10.11
 
 ```
+
 ---
 
 ### 2. Containerd rlimits 이슈
@@ -1586,6 +1611,7 @@ kubectl logs -n kube-system nginx-proxy-k8s-node4
 2026/02/04 12:00:00 [alert] 1#1: setrlimit(RLIMIT_NOFILE, 130048) failed (1: Operation not permitted)
 
 ```
+
 ---
 
 #### (2) 원인
@@ -1610,6 +1636,7 @@ ssh k8s-node4 cat /etc/containerd/config.toml | grep -A5 rlimits
       soft = 65535
 
 ```
+
 ---
 
 #### (3) 해결 방법
@@ -1652,6 +1679,7 @@ kubectl logs -n kube-system nginx-proxy-k8s-node4
 2026/02/04 12:05:00 [notice] 1#1: start worker processes
 
 ```
+
 ---
 
 ### 3. PDB로 인한 Drain 실패
@@ -1674,6 +1702,7 @@ fatal: [k8s-node4]: FAILED! => {
 }
 
 ```
+
 ---
 
 #### (2) 원인 확인
@@ -1709,6 +1738,7 @@ Status:
   Total:                3
 
 ```
+
 ---
 
 #### (3) 해결 방법
@@ -1735,6 +1765,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini -v remove-node.yml \
   -e skip_confirmation=true
 
 ```
+
 ---
 
 #### (2) 노드 라이프사이클 관리
@@ -1816,6 +1847,7 @@ open "http://192.168.10.14:30000/#scale=1.5"
 open "http://192.168.10.10:9000/haproxy_stats"
 
 ```
+
 ---
 
 ### 4. 트러블슈팅 체크리스트

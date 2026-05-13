@@ -915,6 +915,7 @@ graph TB
     EP --> CW
 
 ```
+
 ---
 
 ## EKS Best Practices 아키텍처
@@ -1046,6 +1047,7 @@ Outbound:
   - All Traffic: 허용 (인터넷, AWS 서비스 접근)
 
 ```
+
 ---
 
 ## EKS Auto Mode
@@ -1128,6 +1130,7 @@ aws eks create-cluster \
   --load-balancing-config enabled=true
 
 ```
+
 ---
 
 ## 🆕 EKS 최신 기능

@@ -211,6 +211,7 @@ spec:
     image: nginx
 
 ```
+
 ---
 
 ## 노드에서 기본 네트워크 정보 확인
@@ -396,6 +397,7 @@ sudo iptables -t nat -S
 -A AWS-SNAT-CHAIN-0 ! -d 192.168.0.0/16 -m comment --comment "AWS, SNAT" -j SNAT --to-source 192.168.1.10
 
 ```
+
 ---
 
 ## 파드에서 외부 통신
@@ -1032,6 +1034,7 @@ NLB_DNS=$(kubectl get svc echo-service-nlb -o jsonpath='{.status.loadBalancer.in
 curl http://$NLB_DNS
 
 ```
+
 ---
 
 ## Ingress (L7 HTTP)
@@ -1184,6 +1187,7 @@ spec:
 aws route53 list-resource-record-sets --hosted-zone-id <ZONE_ID> --query "ResourceRecordSets[?Name=='api.example.com.']"
 
 ```
+
 ---
 
 ## 핵심 개념 정리

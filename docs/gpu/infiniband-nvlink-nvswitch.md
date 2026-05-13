@@ -45,6 +45,8 @@ graph TB
     style SW fill:#2d4a6b,stroke:#5b8dd9,color:#e8e8e8
 
 ```
+
+
 ---
 
 ## CPU ↔ GPU 통신
@@ -431,6 +433,8 @@ ibtracert <src_lid> <dst_lid>
 iblinkinfo
 
 ```
+
+
 ---
 
 ## InfiniBand 네트워크 식별자
@@ -558,6 +562,8 @@ LLM=0x0001, ipoib : node1, node2, node3=full;
 Inference=0x0002, ipoib : node4, node5=full;
 
 ```
+
+
 ---
 
 ## GPU 클러스터 설계 고려사항
@@ -708,6 +714,8 @@ Q3: 서버 간 GPU 통신이 느린가? (분산 학습 스케일이 안 됨)
   → YES: InfiniBand NDR (400Gbps) + GPUDirect RDMA 도입
 
 ```
+
+
 ---
 
 ## 마무리

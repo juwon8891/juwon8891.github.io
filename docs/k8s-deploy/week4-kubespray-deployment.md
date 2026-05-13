@@ -446,6 +446,7 @@ crictl info | jq '.config.containerd.runtimes.runc.options.SystemdCgroup'
 kubectl get cm kubelet-config -n kube-system -o yaml | grep cgroupDriver
 
 ```
+
 ---
 
 ## etcd 설치 및 구성
@@ -587,6 +588,7 @@ ETCDCTL_API=3 etcdctl \
   endpoint health
 
 ```
+
 ---
 
 ## Kubernetes 클러스터 배포
@@ -779,6 +781,7 @@ kubectl get pods -n kube-system -l k8s-app=metrics-server
 kubectl get pods -n node-feature-discovery
 
 ```
+
 ---
 
 ## Kubespray 설정 분석
@@ -907,6 +910,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
   -e kube_version="v1.33.3"
 
 ```
+
 ---
 
 ## 인증서 자동 갱신
@@ -1024,6 +1028,7 @@ kubeadm certs check-expiration
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates
 
 ```
+
 ---
 
 ## HA 환경 지원
@@ -1245,6 +1250,7 @@ ETCDCTL_API=3 etcdctl snapshot save "$SNAPSHOT" \
 find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
 
 ```
+
 ---
 
 ## 핵심 개념 정리

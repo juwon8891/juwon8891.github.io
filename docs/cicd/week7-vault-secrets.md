@@ -990,6 +990,7 @@ kubectl exec -it <mysql-pod> -- mysql -u root -prootpassword -e "SELECT user FRO
 # 10분 후 자동으로 삭제됨
 
 ```
+
 ---
 
 ## 암호화와 Vault Transit 엔진
@@ -1245,6 +1246,7 @@ public class UserController {
 }
 
 ```
+
 ---
 
 ## ArgoCD + Vault Plugin (CD 파이프라인)
@@ -1547,6 +1549,7 @@ kubectl exec -it <myapp-pod> -- env | grep DB_
 # DB_PASSWORD=dbpassword123
 
 ```
+
 ---
 
 ## Vault Secrets Operator (VSO)
@@ -1849,6 +1852,7 @@ sequenceDiagram
     VAULT->>DB: 12. DROP USER 'v-k8s-readonly-xyz'
 
 ```
+
 ---
 
 **🎉 7주차 학습 완료!**

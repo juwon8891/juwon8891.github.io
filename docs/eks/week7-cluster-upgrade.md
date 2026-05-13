@@ -400,6 +400,7 @@ aws eks describe-cluster --name $CLUSTER_NAME | \
 aws iam list-open-id-connect-providers | jq
 
 ```
+
 ---
 
 ## EKS Upgrade Insights
@@ -769,6 +770,7 @@ kubectl get pods --all-namespaces \
 kubectl get pod -A ...
 
 ```
+
 ---
 
 ## Add-on 업그레이드
@@ -839,6 +841,7 @@ eksctl get addon --cluster $CLUSTER_NAME | grep ebs
 # (Terraform에서 관리하는 경우 자동 업그레이드)
 
 ```
+
 ---
 
 ## Nodes 업그레이드
@@ -975,6 +978,7 @@ graph LR
 kubectl rollout restart deployment -n <namespace>
 
 ```
+
 ---
 
 ## 핵심 개념 정리

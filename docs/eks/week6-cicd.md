@@ -263,6 +263,7 @@ gitops-gitea-repo/
     └── application-chart/
 
 ```
+
 ---
 
 ### 1.2 Terraform 및 OpenTofu 컨트롤러
@@ -960,6 +961,7 @@ NAME                    AGE   READY   STATUS
 tenant-releases         5m    True    Applied revision: main@sha1:abc123
 
 ```
+
 ---
 
 ## 실습 2: SaaS 티어 전략
@@ -1106,6 +1108,7 @@ $ kubectl get pod -n tenant-basic
 No resources found in tenant-basic namespace.
 
 ```
+
 ---
 
 ## 실습 3: 자동화된 테넌트 온보딩/오프보딩
@@ -1223,6 +1226,7 @@ SQS 메시지 1개 전송
   → Tofu Controller → AWS 리소스 생성
 
 ```
+
 ---
 
 ## 실습 4: 리소스 확인 및 테스트
@@ -1269,6 +1273,7 @@ $ aws dynamodb scan --table-name tenant-premium-table --region ap-northeast-2 | 
 $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --region ap-northeast-2
 
 ```
+
 ---
 
 ## 참고 자료

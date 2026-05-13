@@ -792,6 +792,7 @@ metadata:
     reloader.stakater.com/auto: "true"  # ConfigMap/Secret 자동 감지
 
 ```
+
 ---
 
 ## Tekton: 클라우드 네이티브 CI/CD
@@ -1364,6 +1365,7 @@ tkn hub search
 tkn hub install task git-clone
 
 ```
+
 ---
 
 **🎉 2주차 학습 완료!**

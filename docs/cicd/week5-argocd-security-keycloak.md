@@ -254,6 +254,7 @@ argocd cluster list
 argocd app list
 
 ```
+
 ---
 
 ## ArgoCD 접근 제어
@@ -401,6 +402,7 @@ KUBE_EDITOR="nano" kubectl edit cm -n argocd argocd-rbac-cm
 kubectl rollout restart deployment argocd-server -n argocd
 
 ```
+
 ---
 
 ## Keycloak 소개
@@ -640,6 +642,7 @@ open http://localhost:8080/realms/myrealm/account
 # 로그인: keycloak / <설정한 암호>
 
 ```
+
 ---
 
 ## ArgoCD와 Keycloak SSO 연동

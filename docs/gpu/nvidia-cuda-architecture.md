@@ -164,6 +164,7 @@ cuobjdump -sass myapp
 ncu --set full --target-processes all myapp
 
 ```
+
 ---
 
 ### 4. fatbin (Fat Binary)
@@ -269,6 +270,7 @@ for arch in sm_70 sm_80 sm_90; do
 done
 
 ```
+
 ---
 
 ## GPU 아키텍처
@@ -370,6 +372,7 @@ nvcc -arch=sm_86 myapp.cu
 nvcc -arch=compute_80 -code=compute_80 myapp.cu
 
 ```
+
 ---
 
 ### 3. 아키텍처 세대별 특징
@@ -413,6 +416,7 @@ with te.fp8_autocast(enabled=True):
     output = model(input)
 
 ```
+
 ---
 
 ## NCCL (NVIDIA Collective Communications Library)
@@ -541,6 +545,7 @@ mpirun -np 4 ./build/all_reduce_perf -b 8 -e 1G -f 2
 # 1GB 2500 400 600
 
 ```
+
 ---
 
 ## Ray와 CUDA 통합
@@ -587,6 +592,7 @@ trainer = TorchTrainer(
 )
 
 ```
+
 ---
 
 ## 핵심 개념 정리
@@ -649,6 +655,7 @@ nvcc -gencode arch=compute_80,code=sm_80 \
      app.cu
 
 ```
+
 ---
 
 ### 4. NCCL 통신 패턴

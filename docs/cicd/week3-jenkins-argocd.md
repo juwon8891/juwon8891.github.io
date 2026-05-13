@@ -440,6 +440,7 @@ git commit -m "Add dev-app"
 git push -u origin main
 
 ```
+
 ---
 
 ## Jenkins CI + K8S
@@ -829,6 +830,7 @@ git push
 # Docker Hub에 이미지 업로드 확인
 
 ```
+
 ---
 
 ## Jenkins CI/CD + Blue-Green 배포
@@ -1045,6 +1047,7 @@ watch -d 'kubectl get deploy -o wide; echo; kubectl get svc,ep echo-server-servi
 # 4. Blue 제거 또는 롤백 선택
 
 ```
+
 ---
 
 ## ArgoCD GitOps 배포
@@ -1685,6 +1688,7 @@ git push
 curl http://127.0.0.1:30000
 
 ```
+
 ---
 
 ## Argo Rollouts - 고급 배포 전략
@@ -2073,6 +2077,7 @@ kubectl argo rollouts restart rollouts-demo
 kubectl argo rollouts dashboard
 
 ```
+
 ---
 
 **🎉 3주차 학습 완료!**

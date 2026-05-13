@@ -429,6 +429,7 @@ kubectl get applications -n argocd -l app.kubernetes.io/instance=matrix-apps-env
 kubectl get ns | grep -E "(dev|staging|prod)-(frontend|backend|database)"
 
 ```
+
 ---
 
 ## Sync Waves와 Resource Hooks
@@ -1248,6 +1249,7 @@ argocd app sync backend-app
 # Error: permission denied
 
 ```
+
 ---
 
 ## ArgoCD Notifications
@@ -1456,6 +1458,7 @@ trigger.on-deployment-updated: |
       })
 
 ```
+
 ---
 
 ## Argo Rollouts 심화 전략
@@ -2191,6 +2194,7 @@ spec:
       property: password
 
 ```
+
 ---
 
 **🎉 4주차 학습 완료!**

@@ -468,25 +468,40 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 | **최적 사용처** | 배치 처리, 다양한 하드웨어 | 멀티턴 대화, RAG, Agent | 워크로드별 |
 
 **선택 기준**:
-- **SGLang 선택**:
-  - 멀티턴 대화 (채팅봇, AI 에이전트)
-  - RAG (공유 prefix 많음)
-  - Structured Output 필요 (JSON, Regex 제약)
-  - NVIDIA/AMD GPU 환경
-- **vLLM 선택**:
-  - 배치 처리 (고유한 프롬프트)
-  - 다양한 하드웨어 (TPU, Trainium)
-  - Encoder-Decoder 모델 (T5, BART)
-  - 성숙한 생태계 필요
 
-### UDP와 RDMA 비교 (분산 추론 관점)
-| 항목 | UDP (Kernel Socket) | RDMA (InfiniBand/RoCE) |
-|------|---------------------|------------------------|
-| **레이턴시** | 10-50μs | 1-5μs |
-| **대역폭** | ~25Gbps (NIC 한계) | 200-400Gbps |
-| **CPU 사용률** | 높음 (커널 처리) | 낮음 (NIC 오프로드) |
-| **구현 난이도** | 낮음 (표준 소켓) | 높음 (Verbs API, QP 관리) |
-| **사용 사례** | Mooncake 초기 프로토타입, 클라우드 | NCCL 프로덕션, HPC |
+| 워크로드 유형 | SGLang 선택 | vLLM 선택 |
+|--------------|------------|-----------|
+| **대화 패턴** | 멀티턴 대화, AI 에이전트 | 배치 처리, 독립 프롬프트 |
+| **Prefix 공유** | RAG, 공유 prefix 많음 | 고유 프롬프트 많음 |
+| **출력 제약** | Structured Output (JSON, Regex) | 자유 형식 생성 |
+| **모델 타입** | Decoder-only LLM | Encoder-Decoder 지원 (T5, BART) |
+| **하드웨어** | NVIDIA/AMD GPU | NVIDIA/AMD/TPU/Trainium/Gaudi |
+| **생태계** | 성장 중 | 성숙 (대규모 커뮤니티) |
+
+**요약**:
+- **SGLang**: 채팅봇, RAG, Agent (prefix 재사용 6.4배 빠름)
+- **vLLM**: 범용 추론, 다양한 하드웨어, 안정성
+
+### Kernel Socket vs RDMA 비교 (분산 추론 관점)
+
+| 항목 | TCP (Kernel Socket) | UDP (Kernel Socket) | RDMA (InfiniBand/RoCE) |
+|------|---------------------|---------------------|------------------------|
+| **레이턴시** | 50-100μs | 10-50μs | 1-5μs |
+| **대역폭** | ~25Gbps | ~25Gbps | 200-400Gbps |
+| **신뢰성** | ✅ 재전송 보장 | ❌ 패킷 손실 가능 | ✅ 보장 (RC) |
+| **CPU 사용률** | 높음 (커널 처리) | 높음 (커널 처리) | 낮음 (NIC 오프로드) |
+| **구현 난이도** | 낮음 (표준 소켓) | 낮음 (표준 소켓) | 높음 (Verbs API, QP) |
+| **커널 경유** | ✅ 커널 스택 | ✅ 커널 스택 | ❌ Kernel Bypass |
+| **사용 사례** | API 서버, DB 복제 | Mooncake KV cache 전송 | NCCL, MPI, 분산 학습 |
+
+**Kernel Socket vs RDMA 핵심 차이**:
+- **Kernel Socket** (TCP/UDP): 표준 소켓 API (`socket()`, `send()`, `recv()`), 커널 스택 경유
+- **RDMA**: Verbs API (`ibv_post_send()`), 커널 우회, NIC가 직접 DMA
+
+**Mooncake가 UDP를 선택한 이유**:
+- 간단한 구현 (표준 UDP 소켓)
+- RDMA 하드웨어 없이도 동작
+- KV Cache 전송 시 일부 패킷 손실 허용 가능 (재생성 비용 낮음)
 
 ---
 

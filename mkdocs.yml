@@ -78,6 +78,7 @@ extra_css:
 nav:
   - Home: index.md
   - GPU:
+    - GPU 클러스터 & 분산 AI 용어 사전: gpu/gpu-cluster-glossary.md
     - NVIDIA CUDA 아키텍처: gpu/nvidia-cuda-architecture.md
     - InfiniBand & GPU 인터커넥트: gpu/infiniband-nvlink-nvswitch.md
   - EKS:

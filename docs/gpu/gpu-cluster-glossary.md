@@ -1,6 +1,6 @@
 # GPU 클러스터 & 분산 AI 용어 사전
 
-> GPU 클러스터 네트워킹, 고성능 인터커넥트, 분산 AI 추론/학습에서 사용되는 핵심 용어를 정리한다. RDMA/InfiniBand, NCCL 통신, vLLM/SGLang, Mooncake 등 최신 기술 스택을 포함한다.
+> GPU 클러스터 네트워킹(RDMA, InfiniBand), GPU 하드웨어(NVIDIA vs AMD), 분산 AI 추론(vLLM, SGLang) 등 핵심 용어를 정리한다.
 
 ## 1. RDMA & InfiniBand 네트워킹
 

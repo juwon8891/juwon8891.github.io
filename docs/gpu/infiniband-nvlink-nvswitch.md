@@ -1,6 +1,6 @@
-# InfiniBand & GPU 인터커넥트 완전 정리 - HCA, NVLink, NVSwitch, Fabric
+# InfiniBand & GPU 인터커넥트
 
-> LLM 학습 등 고성능 컴퓨팅 환경에서 GPU 간 통신을 최적화하는 핵심 기술을 다룬다. CPU-GPU, 서버 내 GPU-GPU, 서버 간 GPU-GPU 통신 경로와 각각의 핵심 기술(NVLink, NVSwitch, InfiniBand)을 정리한다.
+> GPU 클러스터의 고성능 통신 기술. 서버 내 GPU-GPU 통신(NVLink, NVSwitch)과 서버 간 통신(InfiniBand, RDMA)을 다룬다.
 
 ## GPU 클러스터의 3가지 통신 유형
 

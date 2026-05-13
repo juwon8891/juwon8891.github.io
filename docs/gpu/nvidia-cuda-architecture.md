@@ -1,7 +1,7 @@
 
-# NVIDIA CUDA 컴파일 과정 및 GPU 아키텍처 심화
+# NVIDIA CUDA 아키텍처
 
-> CUDA 컴파일 툴체인(nvcc, PTX, SASS, fatbin), GPU 아키텍처(SM, Compute Capability), 다중 GPU 통신(NCCL), 디버깅 도구(cuobjdump)를 학습합니다.
+> CUDA 컴파일 파이프라인(nvcc, PTX, SASS), GPU 아키텍처(SM, Warp), 메모리 계층, NCCL 다중 GPU 통신을 다룬다.
 
 ---
 

@@ -1,5 +1,5 @@
 
-# 3주차 학습정리 - Jenkins CI/CD와 ArgoCD: GitOps 기반 쿠버네티스 배포 완전 정복
+# Jenkins CI/CD와 ArgoCD: GitOps 기반 쿠버네티스 배포 완전 정복
 
 > Jenkins CI/CD와 ArgoCD GitOps 기반 쿠버네티스 배포를 학습합니다.
 

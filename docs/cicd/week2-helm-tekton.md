@@ -1,5 +1,5 @@
 
-# 2주차 학습정리 - Helm과 Tekton: GitOps 패키지 관리 및 CI/CD
+# Helm과 Tekton: GitOps 패키지 관리 및 CI/CD
 
 > Helm 패키지 관리자와 Tekton CI/CD 파이프라인을 학습합니다.
 

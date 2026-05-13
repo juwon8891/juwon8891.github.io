@@ -19,14 +19,13 @@ graph LR
 ```
 ### 1. nvcc (NVIDIA CUDA Compiler)
 
-nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버
-- 내부적으로 여러 단계의 컴파일러를 조율 (host compiler, ptxas, fatbinary)
+nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버로, 여러 단계의 컴파일러를 조율합니다.
 
-1. **코드 분리**:
-   - Host 코드 (CPU) → GCC/Clang/MSVC로 컴파일
-   - Device 코드 (GPU) → PTX 생성
-2. **최적화**: `-O3`, `-use_fast_math` 등 최적화 옵션 적용
-3. **아키텍처 타겟팅**: `-arch=sm_XX` 플래그로 특정 GPU 타겟
+| 단계 | 설명 |
+|------|------|
+| **코드 분리** | Host 코드(CPU) → GCC/Clang, Device 코드(GPU) → PTX |
+| **최적화** | `-O3`, `-use_fast_math` 등 옵션 적용 |
+| **아키텍처 타겟팅** | `-arch=sm_XX` 플래그로 특정 GPU 타겟 |
 
 **컴파일 예시**:
 

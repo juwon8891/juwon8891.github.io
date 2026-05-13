@@ -28,11 +28,13 @@ graph TD
     E --> E1["Actual State → Desired State<br/>Drift 발생 시 자동 복구"]
 
 ```
-**핵심**:
-- **Declarative (선언적)**: 시스템의 원하는 상태(Desired State)를 선언적으로 정의
-- **Versioned and Immutable (버전 관리 및 불변성)**: Git에 저장되어 버전 히스토리 유지, Rollback 가능
-- **Pulled Automatically (자동 Pull)**: Software Agent가 Git 저장소를 주기적으로 감시하여 변경 사항 자동 반영
-- **Continuously Reconciled (지속적 조정)**: 실제 상태(Actual State)와 원하는 상태(Desired State)의 차이(Drift)를 지속적으로 감지하고 조정
+
+| 원칙 | 설명 |
+|------|------|
+| **Declarative** | 원하는 상태(Desired State)를 선언적으로 정의 (YAML) |
+| **Versioned & Immutable** | Git 커밋으로 버전 히스토리 유지, Rollback 가능 |
+| **Pulled Automatically** | Software Agent가 Git 변경 감지, 자동 반영 |
+| **Continuously Reconciled** | Actual State와 Desired State 차이(Drift) 자동 조정 |
 
 ---
 

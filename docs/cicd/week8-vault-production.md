@@ -1,5 +1,5 @@
 
-# 8주차 학습정리 - HashiCorp Vault: VSO와 프로덕션 구성
+# HashiCorp Vault: VSO와 프로덕션 구성
 
 > Vault HA 구성, LDAP 인증, TLS 보안 설정을 학습합니다.
 

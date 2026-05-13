@@ -6,6 +6,10 @@
 
 GPU 클러스터에서 데이터가 이동하는 경로는 크게 세 가지다.
 
+1. **CPU ↔ GPU 통신**: PCIe, NVMe SSD
+2. **서버 내 GPU ↔ GPU 통신**: NVLink, NVSwitch
+3. **서버 간 GPU ↔ GPU 통신**: InfiniBand, RDMA
+
 ```mermaid
 graph TB
     subgraph "스토리지"

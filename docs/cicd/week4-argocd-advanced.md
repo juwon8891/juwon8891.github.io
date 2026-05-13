@@ -510,7 +510,7 @@ data:
   LOG_LEVEL: "info"
 EOF
 
-# Wave 2: Database
+# Wave 2: Database (Deployment + Service)
 cat << 'EOF' > sync-waves-demo/database.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -520,21 +520,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:16
-        env:
-        - name: POSTGRES_PASSWORD
-          value: "password"
+  # ... (Postgres Deployment 설정 생략)
 ---
 apiVersion: v1
 kind: Service
@@ -550,7 +536,7 @@ spec:
   - port: 5432
 EOF
 
-# Wave 3: Backend (DB에 의존)
+# Wave 3: Backend (DB 의존)
 cat << 'EOF' > sync-waves-demo/backend.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -560,38 +546,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      containers:
-      - name: backend
-        image: python:3.12-slim
-        command: ["python", "-m", "http.server", "8080"]
-        envFrom:
-        - configMapRef:
-            name: app-config
+  # ... (Backend Deployment 설정 생략)
 ---
 apiVersion: v1
 kind: Service
-metadata:
-  name: backend
-  namespace: sync-demo
-  annotations:
-    argocd.argoproj.io/sync-wave: "3"
-spec:
-  selector:
-    app: backend
-  ports:
-  - port: 8080
+  # ... (Backend Service 설정 생략)
 EOF
 
-# Wave 4: Frontend (Backend에 의존)
+# Wave 4: Frontend (Backend 의존)
 cat << 'EOF' > sync-waves-demo/frontend.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -601,33 +563,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-      - name: frontend
-        image: nginx:1.26.1
+  # ... (Frontend Deployment 설정 생략)
 ---
 apiVersion: v1
 kind: Service
-metadata:
-  name: frontend
-  namespace: sync-demo
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
-spec:
-  type: NodePort
-  selector:
-    app: frontend
-  ports:
-  - port: 80
-    nodePort: 30004
+  # ... (Frontend Service, NodePort 30004)
 EOF
 
 # Git push

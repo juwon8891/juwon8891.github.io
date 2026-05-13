@@ -1,4 +1,6 @@
 
+# Scaling
+
 ## 들어가며
 
 Week 3에서는 **Amazon EKS 환경에서의 다양한 Auto Scaling 메커니즘**을 학습합니다.

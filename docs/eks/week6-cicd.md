@@ -1,4 +1,6 @@
 
+# CI/CD
+
 ## 개요
 
 Amazon EKS 환경에서 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현하는 방법을 학습합니다.

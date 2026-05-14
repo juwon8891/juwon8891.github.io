@@ -103,7 +103,7 @@ spec:
 | **정적 할당** | Pod 생성 시 한 번만 할당, 실행 중 변경 불가 |
 | **단순 카운팅** | "GPU 1개" 요청만 가능, "VRAM 16GB GPU" 같은 세밀한 요구사항 불가 |
 | **네트워크 토폴로지 무시** | GPU 간 NVLink 연결, NUMA 노드 고려 불가 |
-| **공유 불가** | 하나의 GPU를 여러 Pod가 나눠 쓸 수 없음 (MIG 제외) |
+| **공유 제한적** | Time-slicing, MPS, MIG 가능하지만 ConfigMap 설정 필요 |
 | **재시작 시 재할당** | Pod 재시작 시 다른 GPU 할당될 수 있음 |
 
 ## DRA (Dynamic Resource Allocation)
@@ -119,7 +119,7 @@ spec:
 | **할당 시점** | Pod 생성 시 (정적) | Pod 실행 중에도 가능 (동적) |
 | **리소스 표현** | 단순 카운팅 (`gpu: 1`) | 구조화된 파라미터 (`vram: 16Gi`, `compute: A100`) |
 | **토폴로지 인식** | 없음 | NVLink, PCIe, NUMA 고려 |
-| **공유** | 불가 (MIG 제외) | 가능 (Time-slicing, MPS 등) |
+| **공유** | 가능 (Time-slicing, MPS, MIG) | 가능 (더 세밀한 제어) |
 | **라이프사이클** | Pod 종료 시 해제 | 명시적 해제 가능 |
 
 ### DRA 아키텍처
@@ -298,6 +298,90 @@ kubectl patch configmap gpu-operator-mig-config \
   --type merge \
   -p '{"data":{"config.yaml":"version: v1\nmig-configs:\n  all-1g.10gb:\n    - devices: [0,1,2,3,4,5,6,7]\n      mig-enabled: true\n      mig-devices:\n        \"1g.10gb\": 7"}}'
 ```
+
+### GPU 공유 전략
+
+**NVIDIA GPU Operator는 세 가지 GPU 공유 방식을 지원한다.**
+
+#### Time-slicing
+
+**GPU를 시간 단위로 나눠서 여러 Pod가 번갈아 사용한다.**
+
+**ConfigMap 설정**:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: device-plugin-config
+  namespace: gpu-operator
+data:
+  config: |
+    version: v1
+    flags:
+      migStrategy: none
+    sharing:
+      timeSlicing:
+        replicas: 4  # GPU 1개를 4개 Pod가 공유
+```
+
+**Pod 요청**:
+```yaml
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: app
+    resources:
+      limits:
+        nvidia.com/gpu: 1  # 실제로는 1/4 GPU 할당
+```
+
+**특징**:
+
+| 항목 | 설명 |
+|------|------|
+| **격리** | 메모리는 공유 (서로 영향 가능) |
+| **성능** | Context switching 오버헤드 발생 |
+| **사용 사례** | 추론 워크로드, 개발/테스트 |
+
+#### MPS (Multi-Process Service)
+
+**여러 프로세스가 동시에 GPU를 사용하며, CUDA Context를 공유한다.**
+
+**ConfigMap 설정**:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: device-plugin-config
+  namespace: gpu-operator
+data:
+  config: |
+    version: v1
+    flags:
+      migStrategy: none
+    sharing:
+      mps:
+        replicas: 4
+        defaultActiveThreadPercentage: 50  # 각 클라이언트가 사용할 최대 스레드 비율
+```
+
+**특징**:
+
+| 항목 | 설명 |
+|------|------|
+| **격리** | 메모리 공유 (격리 없음) |
+| **성능** | Time-slicing보다 오버헤드 적음 |
+| **제한** | Volta (V100) 이상 GPU 필요 |
+| **사용 사례** | 소규모 배치 추론, 경량 워크로드 |
+
+#### 공유 전략 비교
+
+| 전략 | 격리 수준 | 성능 오버헤드 | 메모리 보호 | GPU 요구사항 |
+|------|----------|------------|-----------|------------|
+| **MIG** | 높음 (하드웨어) | 없음 | O | A100, H100 |
+| **MPS** | 낮음 | 낮음 | X | Volta+ |
+| **Time-slicing** | 중간 | 중간 | X | 모든 GPU |
 
 ## AMD GPU Operator
 

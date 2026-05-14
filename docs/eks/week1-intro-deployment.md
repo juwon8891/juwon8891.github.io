@@ -314,23 +314,12 @@ graph TB
 
 #### 4.1 Control Plane 컴포넌트 (AWS 관리)
 
-- **API Server** (`kube-apiserver`):
-  - Kubernetes API 노출
-  - 모든 요청의 진입점
-  - Network Load Balancer를 통해 접근
-
-- **etcd**:
-  - 클러스터 상태 저장 (Key-Value 스토어)
-  - Multi-AZ 복제 (Raft consensus)
-  - AWS가 자동 백업 관리
-
-- **Controller Manager** (`kube-controller-manager`):
-  - Deployment, ReplicaSet 등 리소스 관리
-  - Leader Election (단일 active 인스턴스)
-
-- **Scheduler** (`kube-scheduler`):
-  - Pod를 적절한 노드에 스케줄링
-  - Leader Election
+| 컴포넌트 | 역할 | 비고 |
+|---------|------|------|
+| **API Server**<br/>(`kube-apiserver`) | Kubernetes API 노출 | 모든 요청의 진입점<br/>Network Load Balancer를 통해 접근 |
+| **etcd** | 클러스터 상태 저장 (Key-Value) | Multi-AZ 복제 (Raft consensus)<br/>AWS가 자동 백업 관리 |
+| **Controller Manager**<br/>(`kube-controller-manager`) | Deployment, ReplicaSet 등 리소스 관리 | Leader Election (단일 active 인스턴스) |
+| **Scheduler**<br/>(`kube-scheduler`) | Pod를 적절한 노드에 스케줄링 | Leader Election |
 
 #### 4.2 Data Plane 컴포넌트 (Worker 노드)
 

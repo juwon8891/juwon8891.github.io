@@ -429,8 +429,8 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
   ```
 - **성능**: InfiniBand HDR 200Gbps 사용 시 50GB KV Cache 전송 시간 ~2초
 
-### vLLM (Very Large Language Model)
-- **정의**: UC Berkeley가 개발한 LLM 추론 엔진 (PagedAttention 핵심 기술)
+### vLLM (Virtual Large Language Model)
+- **정의**: UC Berkeley가 개발한 LLM 추론 엔진. 'v'는 OS의 가상 메모리(Virtual Memory) 개념에서 착안 — KV Cache를 페이지 단위로 관리하는 PagedAttention이 핵심 기술
 - **핵심 기능**:
   - **PagedAttention**: KV Cache를 페이지 단위로 관리 (메모리 낭비 감소)
   - **Continuous Batching**: 요청 단위가 아닌 토큰 단위 배칭

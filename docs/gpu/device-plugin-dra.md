@@ -557,11 +557,29 @@ spec:
 
 **DRANET**은 Google이 개발한 DRA 기반 Kubernetes 네트워크 드라이버다.
 
+**목적**: AI/ML 분산 학습 시 GPU ↔ NIC 간 데이터 전송 성능 최적화
+
 **핵심 특징**:
-- GPU + NIC **토폴로지 인식 스케줄링**으로 AI/ML 워크로드 최적화
-- all_gather 대역폭 **59.6% 향상**, all_reduce **58.1% 향상**
-- 기존 CNI 플러그인과 함께 작동
-- NRI (Node Resource Interface)를 통한 Container Runtime 통합
+
+| 특징 | 설명 |
+|------|------|
+| **토폴로지 인식 스케줄링** | GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치하여 대역폭 최대화 |
+| **분산 학습 성능 향상** | All-Gather: 100 GB/s → 159.6 GB/s (+59.6%)<br/>All-Reduce: 80 GB/s → 126.5 GB/s (+58.1%) |
+| **CNI 호환성** | Calico, Cilium 등 기존 CNI 플러그인과 함께 작동 |
+| **Container Runtime 통합** | NRI (Node Resource Interface)를 통해 CRI와 통합 |
+
+**AI/ML 분산 학습 용어**:
+
+| 용어 | 설명 | 예시 |
+|------|------|------|
+| **All-Gather** | 모든 GPU가 각자의 데이터를 모아서 전체 GPU에 복사 | GPU 8개가 각자 1GB → 각 GPU가 8GB 보유 |
+| **All-Reduce** | 모든 GPU의 Gradient를 합산하여 전체 GPU에 분배 | GPU 8개의 gradient 평균 → 각 GPU에 결과 전달 |
+| **All-to-All** | 각 GPU가 다른 모든 GPU에 서로 다른 데이터 전송 | GPU 0 → GPU 1,2,3,4,5,6,7 (각각 다른 데이터) |
+
+**성능 향상 핵심**:
+- GPU ↔ NIC 간 PCIe 경로를 최단거리로 배치
+- Cross-NUMA 트래픽 제거 (NUMA 노드 간 이동 최소화)
+- 분산 학습 시 GPU 간 통신 대역폭 증가
 
 ### 아키텍처
 
@@ -643,18 +661,18 @@ spec:
 
 ### 성능 향상
 
-**벤치마크 결과** (NVIDIA Collective Communications Library):
+**벤치마크 결과** (NVIDIA NCCL, 8x A100 GPU 분산 학습):
 
-| 작업 | 기존 (CNI only) | DRANET | 향상률 |
-|------|----------------|--------|--------|
-| **all_gather** | 100 GB/s | 159.6 GB/s | +59.6% |
-| **all_reduce** | 80 GB/s | 126.5 GB/s | +58.1% |
-| **all_to_all** | 90 GB/s | 140 GB/s | +55.6% |
+| 작업 (Collective Operation) | 기존 (CNI only) | DRANET | 향상 |
+|----------------------------|----------------|--------|------|
+| **All-Gather**<br/>(데이터 수집 및 복사) | 100 GB/s | 159.6 GB/s | +59.6 GB/s |
+| **All-Reduce**<br/>(Gradient 합산 및 분배) | 80 GB/s | 126.5 GB/s | +46.5 GB/s |
+| **All-to-All**<br/>(GPU 간 교차 통신) | 90 GB/s | 140 GB/s | +50 GB/s |
 
 **향상 원인**:
-- GPU ↔ NIC 간 PCIe 경로 최적화
-- cross-NUMA 트래픽 제거
-- 토폴로지 인식 리소스 할당
+- GPU ↔ NIC 간 PCIe 경로 최적화 (같은 PCIe Root Complex)
+- Cross-NUMA 트래픽 제거 (NUMA 노드 간 이동 최소화)
+- 토폴로지 인식 리소스 할당 (DRA ResourceClass)
 
 ### RDMA Shared Device Plugin vs DRANET
 
@@ -674,8 +692,8 @@ spec:
 | **NUMA 인식** | X | O |
 | **할당 방식** | ConfigMap (rdma/hca) | ResourceClass (구조화) |
 | **GPU 친화성** | X | O (same PCIe root) |
-| **성능 최적화** | 없음 | +59.6% (all_gather) |
-| **사용 사례** | RDMA 네트워크 | AI/ML 분산 학습 |
+| **성능 최적화** | 없음 | 분산 학습 대역폭 +59.6% |
+| **사용 사례** | RDMA 네트워크 (일반) | AI/ML 분산 학습 (GPU 통신) |
 | **DaemonSet** | `rdma-shared-dp-ds` | `dranet-*` |
 | **리소스 이름** | `rdma/hca`, `rdma/roce` | DRA ResourceClaim |
 
@@ -851,7 +869,7 @@ spec:
 
 **네트워크 리소스**:
 - **RDMA Device Plugin**: RDMA NIC 할당 (InfiniBand, RoCE)
-- **DRANET (DRA)**: GPU + NIC 토폴로지 인식, AI/ML 워크로드 최적화 (+59.6% 대역폭)
+- **DRANET (DRA)**: GPU + NIC 토폴로지 최적화, 분산 학습 대역폭 159.6 GB/s (기존 100 GB/s 대비 59.6% 향상)
 
 **실전 권장**:
 - 단순 GPU 사용: Device Plugin (안정적)

@@ -98,6 +98,8 @@ spec:
 
 ### Device Plugin의 한계
 
+**주요 제약사항**:
+
 | 한계 | 설명 |
 |------|------|
 | **정적 할당** | Pod 생성 시 한 번만 할당, 실행 중 변경 불가 |
@@ -250,10 +252,10 @@ graph TB
     KUBELET --> POD
 ```
 
-### 설치
+### 설치 및 리소스 광고
 
+**Helm 설치**:
 ```bash
-# Helm으로 설치
 helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
 helm install gpu-operator nvidia/gpu-operator \
   --namespace gpu-operator \
@@ -261,9 +263,7 @@ helm install gpu-operator nvidia/gpu-operator \
   --set driver.enabled=true
 ```
 
-### 리소스 광고
-
-설치 후 Node에 자동으로 리소스 추가됨:
+**리소스 광고** (설치 후 Node에 자동 추가):
 ```yaml
 status:
   capacity:
@@ -424,18 +424,17 @@ graph TB
     KUBELET --> POD
 ```
 
-### 설치
+### 설치 및 리소스 광고
 
+**Helm 설치**:
 ```bash
-# Helm으로 설치
 helm repo add amd-gpu-operator https://amd.github.io/amd-gpu-operator
 helm install amd-gpu-operator amd-gpu-operator/amd-gpu-operator \
   --namespace kube-amd-gpu \
   --create-namespace
 ```
 
-### 리소스 광고
-
+**리소스 광고**:
 ```yaml
 status:
   capacity:
@@ -567,6 +566,7 @@ spec:
 | **분산 학습 성능 향상** | All-Gather: 100 GB/s → 159.6 GB/s (+59.6%)<br/>All-Reduce: 80 GB/s → 126.5 GB/s (+58.1%) |
 | **CNI 호환성** | Calico, Cilium 등 기존 CNI 플러그인과 함께 작동 |
 | **Container Runtime 통합** | NRI (Node Resource Interface)를 통해 CRI와 통합 |
+| **성능 향상 원리** | GPU ↔ NIC 간 PCIe 최단거리 배치<br/>Cross-NUMA 트래픽 제거<br/>GPU 통신 대역폭 증가 |
 
 **AI/ML 분산 학습 용어**:
 
@@ -575,11 +575,6 @@ spec:
 | **All-Gather** | 모든 GPU가 각자의 데이터를 모아서 전체 GPU에 복사 | GPU 8개가 각자 1GB → 각 GPU가 8GB 보유 |
 | **All-Reduce** | 모든 GPU의 Gradient를 합산하여 전체 GPU에 분배 | GPU 8개의 gradient 평균 → 각 GPU에 결과 전달 |
 | **All-to-All** | 각 GPU가 다른 모든 GPU에 서로 다른 데이터 전송 | GPU 0 → GPU 1,2,3,4,5,6,7 (각각 다른 데이터) |
-
-**성능 향상 핵심**:
-- GPU ↔ NIC 간 PCIe 경로를 최단거리로 배치
-- Cross-NUMA 트래픽 제거 (NUMA 노드 간 이동 최소화)
-- 분산 학습 시 GPU 간 통신 대역폭 증가
 
 ### 아키텍처
 
@@ -617,12 +612,12 @@ graph TB
 
 ### 토폴로지 인식 스케줄링
 
-**문제**: GPU와 NIC가 서로 다른 NUMA 노드에 있으면 PCIe 대역폭 저하
+**토폴로지 최적화**:
 
-**DRANET 해결**:
-- GPU와 NIC를 **같은 PCIe 루트 컴플렉스**에 배치
-- NUMA 노드 인식으로 cross-NUMA 트래픽 최소화
-- 토폴로지 정보를 DRA ResourceClaim에 포함
+| 항목 | 설명 |
+|------|------|
+| **문제** | GPU와 NIC가 서로 다른 NUMA 노드에 있으면 PCIe 대역폭 저하 |
+| **DRANET 해결** | GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치<br/>NUMA 노드 인식으로 cross-NUMA 트래픽 최소화<br/>토폴로지 정보를 DRA ResourceClaim에 포함 |
 
 **ResourceClass 예시**:
 ```yaml
@@ -669,10 +664,13 @@ spec:
 | **All-Reduce**<br/>(Gradient 합산 및 분배) | 80 GB/s | 126.5 GB/s | +46.5 GB/s |
 | **All-to-All**<br/>(GPU 간 교차 통신) | 90 GB/s | 140 GB/s | +50 GB/s |
 
-**향상 원인**:
-- GPU ↔ NIC 간 PCIe 경로 최적화 (같은 PCIe Root Complex)
-- Cross-NUMA 트래픽 제거 (NUMA 노드 간 이동 최소화)
-- 토폴로지 인식 리소스 할당 (DRA ResourceClass)
+**성능 향상 원인**:
+
+| 요소 | 설명 |
+|------|------|
+| **PCIe 경로 최적화** | GPU ↔ NIC를 같은 PCIe Root Complex에 배치 |
+| **Cross-NUMA 제거** | NUMA 노드 간 이동 최소화 |
+| **토폴로지 인식 할당** | DRA ResourceClass로 토폴로지 정보 활용 |
 
 ### RDMA Shared Device Plugin vs DRANET
 
@@ -860,23 +858,35 @@ spec:
 ## 핵심 요약
 
 **Kubernetes 하드웨어 리소스 관리 진화**:
-1. **Device Plugin (1.8+)**: 단순 카운팅, 정적 할당
-2. **DRA (1.26+)**: 동적 할당, 토폴로지 인식, 세밀한 제어
 
-**GPU 벤더별 접근**:
-- **NVIDIA**: GPU Operator + CUDA + DCGM + MIG
-- **AMD**: GPU Operator + ROCm + AMD SMI
+| 단계 | 메커니즘 | 특징 |
+|------|----------|------|
+| **1단계 (1.8+)** | Device Plugin | 단순 카운팅, 정적 할당 |
+| **2단계 (1.26+)** | DRA | 동적 할당, 토폴로지 인식, 세밀한 제어 |
+
+**벤더별 GPU 관리**:
+
+| 벤더 | 구성 요소 |
+|------|----------|
+| **NVIDIA** | GPU Operator + CUDA + DCGM + MIG |
+| **AMD** | GPU Operator + ROCm + AMD SMI |
 
 **네트워크 리소스**:
-- **RDMA Device Plugin**: RDMA NIC 할당 (InfiniBand, RoCE)
-- **DRANET (DRA)**: GPU + NIC 토폴로지 최적화, 분산 학습 대역폭 159.6 GB/s (기존 100 GB/s 대비 59.6% 향상)
+
+| 도구 | 용도 | 성능 |
+|------|------|------|
+| **RDMA Device Plugin** | RDMA NIC 할당 (InfiniBand, RoCE) | 기본 성능 |
+| **DRANET (DRA)** | GPU + NIC 토폴로지 최적화 | 분산 학습 대역폭 159.6 GB/s (+59.6%) |
 
 **실전 권장**:
-- 단순 GPU 사용: Device Plugin (안정적)
-- 멀티 GPU 학습 (NVLink 필요): DRA + NVIDIA GPU Operator
-- **GPU + NIC 토폴로지 최적화 (AI/ML)**: DRANET + DRA
-- RDMA 네트워크 (기본): RDMA Device Plugin
-- AMD GPU: AMD GPU Operator + Device Plugin
+
+| 사용 사례 | 권장 도구 |
+|----------|----------|
+| 단순 GPU 사용 | Device Plugin (안정적) |
+| 멀티 GPU 학습 (NVLink) | DRA + NVIDIA GPU Operator |
+| GPU + NIC 토폴로지 최적화 | DRANET + DRA |
+| RDMA 네트워크 (기본) | RDMA Device Plugin |
+| AMD GPU | AMD GPU Operator + Device Plugin |
 
 ## 참고 자료
 

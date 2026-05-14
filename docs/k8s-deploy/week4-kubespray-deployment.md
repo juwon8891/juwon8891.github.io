@@ -271,18 +271,20 @@ graph TD
 ```
 **Role 실행 순서**:
 
-1. **kubespray_defaults**: 기본 변수 로드
-2. **bootstrap_os**: OS 사전 설정 (패키지 업데이트, Python 설치)
-3. **network_facts**: 네트워크 정보 수집
-4. **kubernetes/preinstall**: K8s 설치 전 준비 (Swap 비활성화, 커널 파라미터)
-5. **container-engine**: Containerd, Runc, CNI Plugins 설치
-6. **download**: 필요한 바이너리/이미지 다운로드
-7. **etcd**: etcd 클러스터 구성
-8. **kubernetes/node**: kubelet, kubectl 설치
-9. **kubernetes/control-plane**: kubeadm init 실행
-10. **kubernetes/kubeadm**: kubeadm join 실행
-11. **network_plugin**: CNI 플러그인 설치
-12. **kubernetes-apps**: 애드온 설치
+| 순서 | Role | 설명 |
+|------|------|------|
+| 1 | kubespray_defaults | 기본 변수 로드 |
+| 2 | bootstrap_os | OS 사전 설정 (패키지 업데이트, Python 설치) |
+| 3 | network_facts | 네트워크 정보 수집 |
+| 4 | kubernetes/preinstall | K8s 설치 전 준비 (Swap 비활성화, 커널 파라미터) |
+| 5 | container-engine | Containerd, Runc, CNI Plugins 설치 |
+| 6 | download | 필요한 바이너리/이미지 다운로드 |
+| 7 | etcd | etcd 클러스터 구성 |
+| 8 | kubernetes/node | kubelet, kubectl 설치 |
+| 9 | kubernetes/control-plane | kubeadm init 실행 |
+| 10 | kubernetes/kubeadm | kubeadm join 실행 |
+| 11 | network_plugin | CNI 플러그인 설치 |
+| 12 | kubernetes-apps | 애드온 설치 |
 
 ---
 
@@ -764,12 +766,14 @@ cert_manager_enabled: false
 ```
 **설치되는 애드온**:
 
-1. **CoreDNS**: 클러스터 DNS (기본 설치)
-2. **Metrics Server**: 리소스 메트릭 수집
-3. **Node Feature Discovery**: 노드 하드웨어 정보 자동 라벨링
-4. **Helm**: 패키지 관리자
-5. **Ingress NGINX**: Ingress Controller (선택)
-6. **Cert Manager**: 인증서 자동 관리 (선택)
+| 애드온 | 설명 | 설치 여부 |
+|--------|------|----------|
+| CoreDNS | 클러스터 DNS | 기본 설치 |
+| Metrics Server | 리소스 메트릭 수집 | 기본 설치 |
+| Node Feature Discovery | 노드 하드웨어 정보 자동 라벨링 | 기본 설치 |
+| Helm | 패키지 관리자 | 기본 설치 |
+| Ingress NGINX | Ingress Controller | 선택 |
+| Cert Manager | 인증서 자동 관리 | 선택 |
 
 **애드온 확인**:
 
@@ -1162,18 +1166,22 @@ ansible-playbook -i inventory/mycluster/inventory.ini upgrade-cluster.yml \
 ```
 **업그레이드 순서**:
 
-1. etcd 업그레이드 (필요 시)
-2. Control Plane 노드 순차 업그레이드
-3. Worker 노드 순차 업그레이드
-4. CNI 플러그인 업그레이드 (필요 시)
-5. 애드온 업그레이드
+| 순서 | 대상 | 설명 |
+|------|------|------|
+| 1 | etcd | 필요 시 업그레이드 |
+| 2 | Control Plane | 순차 업그레이드 |
+| 3 | Worker 노드 | 순차 업그레이드 |
+| 4 | CNI 플러그인 | 필요 시 업그레이드 |
+| 5 | 애드온 | 업그레이드 |
 
 **업그레이드 주의사항**:
 
-- **Version Skew Policy 준수**: K8s 버전 호환성 확인
-- **백업 필수**: etcd snapshot 백업
-- **순차 업그레이드**: 한 번에 하나의 마이너 버전씩
-- **테스트**: Dev 환경에서 먼저 테스트
+| 항목 | 설명 |
+|------|------|
+| Version Skew Policy 준수 | K8s 버전 호환성 확인 |
+| 백업 필수 | etcd snapshot 백업 |
+| 순차 업그레이드 | 한 번에 하나의 마이너 버전씩 |
+| 테스트 | Dev 환경에서 먼저 테스트 |
 
 ### 2. 노드 스케일링
 
@@ -1273,16 +1281,22 @@ find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
 | **설정 관리** | Inventory 기반 | 각 노드별 설정 파일 |
 
 **Kubespray 장점**:
-- 프로덕션급 클러스터 빠른 배포
-- Best Practice 자동 적용
-- 멀티 노드 동시 배포
-- IaC(Infrastructure as Code)
-- 일관된 설정 관리
+
+| 장점 | 설명 |
+|------|------|
+| 프로덕션급 클러스터 빠른 배포 | 자동화된 배포 프로세스 |
+| Best Practice 자동 적용 | 검증된 설정 기본 제공 |
+| 멀티 노드 동시 배포 | 병렬 처리로 빠른 구축 |
+| IaC (Infrastructure as Code) | Git 기반 설정 관리 |
+| 일관된 설정 관리 | Ansible Inventory 기반 |
 
 **Kubeadm 장점**:
-- 간단한 사용법
-- 공식 도구 (Kubernetes 프로젝트)
-- 작은 클러스터에 적합
+
+| 장점 | 설명 |
+|------|------|
+| 간단한 사용법 | 최소한의 명령으로 클러스터 구축 |
+| 공식 도구 | Kubernetes 프로젝트 공식 지원 |
+| 작은 클러스터에 적합 | 간단한 환경에서 효율적 |
 
 ### 2. Ansible Role 기반 구조
 

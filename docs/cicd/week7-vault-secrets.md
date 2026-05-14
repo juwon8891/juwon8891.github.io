@@ -1868,9 +1868,12 @@ sequenceDiagram
 이제 **프로덕션급 GitOps + Vault 플랫폼을 구축하고 운영**할 수 있는 역량을 갖추게 되었습니다! 🚀
 
 다음 단계로는:
-- **플랫폼 엔지니어링**: Backstage.io, Internal Developer Portal
-- **FinOps**: Kubecost, Cloud Cost Optimization
-- **고급 보안**: OPA, Kyverno, Falco
-- **Observability**: OpenTelemetry, Tempo, Loki
+
+| 분야 | 주요 기술 |
+|------|----------|
+| 플랫폼 엔지니어링 | Backstage.io, Internal Developer Portal |
+| FinOps | Kubecost, Cloud Cost Optimization |
+| 고급 보안 | OPA, Kyverno, Falco |
+| Observability | OpenTelemetry, Tempo, Loki |
 
 계속해서 학습하고 발전해 나가시기 바랍니다! 💪

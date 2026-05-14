@@ -9,11 +9,13 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 
 ### 학습 목표
 
-- **Pod 레벨 스케일링**: HPA, VPA, KEDA, CPA
-- **노드 레벨 스케일링**: Cluster Autoscaler, Karpenter
-- **서버리스 컴퓨팅**: AWS Fargate
-- 각 스케일링 메커니즘의 동작 원리 및 적용 시나리오 이해
-- 실전 환경에서의 Auto Scaling 전략 수립
+| 카테고리 | 세부 내용 |
+|---------|----------|
+| **Pod 레벨 스케일링** | HPA, VPA, KEDA, CPA |
+| **노드 레벨 스케일링** | Cluster Autoscaler, Karpenter |
+| **서버리스 컴퓨팅** | AWS Fargate |
+| **동작 원리 이해** | 각 스케일링 메커니즘의 동작 원리 및 적용 시나리오 이해 |
+| **전략 수립** | 실전 환경에서의 Auto Scaling 전략 수립 |
 
 ---
 

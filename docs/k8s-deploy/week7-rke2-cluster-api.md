@@ -40,11 +40,14 @@
 
 ```
 #### 3.2 내장 컴포넌트
-- **CNI**: Canal (Calico + Flannel) 기본, Cilium/Calico/Multus 선택 가능
-- **Ingress Controller**: Nginx Ingress Controller
-- **Service Load Balancer**: Klipper LB (개발 환경용)
-- **Metrics Server**: 기본 포함
-- **CoreDNS**: DNS 서버
+
+| 컴포넌트 | 설명 |
+|----------|------|
+| CNI | Canal (Calico + Flannel) 기본, Cilium/Calico/Multus 선택 가능 |
+| Ingress Controller | Nginx Ingress Controller |
+| Service Load Balancer | Klipper LB (개발 환경용) |
+| Metrics Server | 기본 포함 |
+| CoreDNS | DNS 서버 |
 
 #### 3.3 간편한 설치
 
@@ -814,10 +817,12 @@ systemctl start rke2-server
 
 **Cluster API (CAPI)** = Kubernetes를 사용하여 Kubernetes 클러스터를 관리하는 프로젝트
 
-- **선언적 API**: Kubernetes 리소스로 클러스터 정의
-- **GitOps 친화적**: YAML 기반 Infrastructure as Code
-- **멀티 클라우드**: AWS, Azure, GCP, vSphere, OpenStack 등 지원
-- **일관된 경험**: 모든 인프라에서 동일한 API 사용
+| 특징 | 설명 |
+|------|------|
+| 선언적 API | Kubernetes 리소스로 클러스터 정의 |
+| GitOps 친화적 | YAML 기반 Infrastructure as Code |
+| 멀티 클라우드 | AWS, Azure, GCP, vSphere, OpenStack 등 지원 |
+| 일관된 경험 | 모든 인프라에서 동일한 API 사용 |
 
 ### 2. CAPI 주요 개념
 
@@ -919,15 +924,19 @@ graph TB
 
 #### 4.2 Bootstrap Providers
 
-- **Kubeadm**: kubeadm을 사용한 클러스터 부트스트랩 (기본)
-- **Talos**: Talos Linux 사용
+| Provider | 설명 |
+|----------|------|
+| Kubeadm | kubeadm을 사용한 클러스터 부트스트랩 (기본) |
+| Talos | Talos Linux 사용 |
 
 #### 4.3 Control Plane Providers
 
-- **Kubeadm**: kubeadm 기반 Control Plane 관리 (기본)
-- **Kamaji**: 멀티 테넌트 Control Plane
-- **K3s**: K3s Control Plane
-- **RKE2**: RKE2 Control Plane
+| Provider | 설명 |
+|----------|------|
+| Kubeadm | kubeadm 기반 Control Plane 관리 (기본) |
+| Kamaji | 멀티 테넌트 Control Plane |
+| K3s | K3s Control Plane |
+| RKE2 | RKE2 Control Plane |
 
 ---
 
@@ -1186,10 +1195,13 @@ graph LR
 
 ```
 **준수 항목**:
-- NIST 승인 암호화 알고리즘만 사용
-- FIPS 140-2 인증 암호화 라이브러리 (BoringCrypto)
-- TLS 1.2 이상 강제
-- 안전하지 않은 암호화 비활성화
+
+| 항목 | 설명 |
+|------|------|
+| NIST 승인 알고리즘 | 승인된 암호화 알고리즘만 사용 |
+| FIPS 140-2 라이브러리 | BoringCrypto 인증 암호화 라이브러리 |
+| TLS 1.2+ 강제 | TLS 1.2 이상만 허용 |
+| 안전하지 않은 암호화 비활성화 | 취약한 알고리즘 차단 |
 
 #### 1.2 CIS Benchmark 기본 준수
 
@@ -1246,10 +1258,13 @@ spec:
 
 ```
 **장점**:
-- GitOps 친화적 (Git = Single Source of Truth)
-- 재현 가능 (동일한 YAML = 동일한 클러스터)
-- 버전 관리 (Git History)
-- 자동화 (CI/CD 통합)
+
+| 장점 | 설명 |
+|------|------|
+| GitOps 친화적 | Git = Single Source of Truth |
+| 재현 가능 | 동일한 YAML = 동일한 클러스터 |
+| 버전 관리 | Git History |
+| 자동화 | CI/CD 통합 |
 
 #### 2.2 멀티 클라우드 일관성
 
@@ -1266,9 +1281,12 @@ graph TB
 
 ```
 **장점**:
-- 동일한 API로 모든 클라우드 관리
-- 멀티 클라우드 전략 용이
-- Vendor Lock-in 회피
+
+| 장점 | 설명 |
+|------|------|
+| 동일한 API | 모든 클라우드를 하나의 API로 관리 |
+| 멀티 클라우드 전략 | 클라우드 간 이동 용이 |
+| Vendor Lock-in 회피 | 특정 클라우드 종속성 제거 |
 
 #### 2.3 Self-Healing
 
@@ -1292,9 +1310,12 @@ spec:
 
 ```
 **자동 복구**:
-- Unhealthy 노드 자동 감지
-- 새 노드로 자동 교체
-- Workload 자동 재스케줄링
+
+| 기능 | 설명 |
+|------|------|
+| Unhealthy 노드 감지 | 자동으로 비정상 노드 탐지 |
+| 새 노드 교체 | 자동으로 새 노드 생성 및 교체 |
+| Workload 재스케줄링 | 자동으로 워크로드 이동 |
 
 ### 3. RKE2 vs K3s vs kubeadm
 
@@ -1311,9 +1332,12 @@ spec:
 | **업그레이드** | 쉬움 (SUC) | 쉬움 | 수동 |
 
 **선택 가이드**:
-- **RKE2**: 보안 준수, 프로덕션, Enterprise
-- **K3s**: Edge, 리소스 제약, 빠른 배포
-- **kubeadm**: 완전한 제어, 커스터마이징, 학습
+
+| 도구 | 적합한 환경 |
+|------|-----------|
+| RKE2 | 보안 준수, 프로덕션, Enterprise |
+| K3s | Edge, 리소스 제약, 빠른 배포 |
+| kubeadm | 완전한 제어, 커스터마이징, 학습 |
 
 ---
 

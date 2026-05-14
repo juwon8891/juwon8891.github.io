@@ -39,10 +39,13 @@ graph TB
 
 ```
 **VPC CNI의 장점**:
-1. **Native 성능**: Overlay Network Overhead 없음
-2. **AWS 통합**: Security Group, NACLmichael 직접 적용
-3. **간편한 관리**: VPC Flow Logs로 Pod 트래픽 모니터링
-4. **보안**: Pod별 Security Group 적용 가능
+
+| 장점 | 설명 |
+|------|------|
+| **Native 성능** | Overlay Network Overhead 없음 |
+| **AWS 통합** | Security Group, NACLmichael 직접 적용 |
+| **간편한 관리** | VPC Flow Logs로 Pod 트래픽 모니터링 |
+| **보안** | Pod별 Security Group 적용 가능 |
 
 ### 2. CNI Plugin 동작 원리
 

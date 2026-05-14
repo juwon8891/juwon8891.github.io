@@ -21,6 +21,8 @@ graph LR
 
 nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버로, 여러 단계의 컴파일러를 조율합니다.
 
+**nvcc의 역할**:
+
 | 단계 | 설명 |
 |------|------|
 | **코드 분리** | Host 코드(CPU) → GCC/Clang, Device 코드(GPU) → PTX |
@@ -63,13 +65,12 @@ PTX는 CUDA의 **중간 표현(IR, Intermediate Representation)**
 - 아키텍처 독립적 (portable across GPU architectures)
 
 **PTX의 역할**:
-1. **포워드 호환성**:
-   - 새로운 GPU에서 **JIT(Just-In-Time) 컴파일**로 SASS 생성
-   - 예: SM 8.0 PTX → SM 9.0 GPU에서 자동 컴파일
-2. **최적화 기회**:
-   - 드라이버가 런타임에 GPU별 최적화 적용
-3. **인라인 어셈블리**:
-   - CUDA 커널에서 `asm()` 구문으로 PTX 직접 작성 가능
+
+| 역할 | 설명 |
+|------|------|
+| **포워드 호환성** | 새로운 GPU에서 JIT(Just-In-Time) 컴파일로 SASS 생성<br/>예: SM 8.0 PTX → SM 9.0 GPU에서 자동 컴파일 |
+| **최적화 기회** | 드라이버가 런타임에 GPU별 최적화 적용 |
+| **인라인 어셈블리** | CUDA 커널에서 `asm()` 구문으로 PTX 직접 작성 가능 |
 
 **PTX 예시**:
 
@@ -133,12 +134,12 @@ SASS는 GPU의 **실제 기계어 코드** (native machine code)
 - PTX보다 **성능 최적화**, 하지만 **포팅 불가**
 
 **SASS의 특징**:
-1. **아키텍처 종속성**:
-   - SM 8.0 SASS ≠ SM 9.0 SASS (호환 불가)
-2. **최대 성능**:
-   - GPU의 모든 하드웨어 기능 활용 (Tensor Core, RT Core 등)
-3. **디버깅 어려움**:
-   - 16진수 인코딩, 공식 문서 없음 (역공학 필요)
+
+| 특징 | 설명 |
+|------|------|
+| **아키텍처 종속성** | SM 8.0 SASS ≠ SM 9.0 SASS (호환 불가) |
+| **최대 성능** | GPU의 모든 하드웨어 기능 활용 (Tensor Core, RT Core 등) |
+| **디버깅 어려움** | 16진수 인코딩, 공식 문서 없음 (역공학 필요) |
 
 **SASS 예시** (cuobjdump로 추출):
 
@@ -377,20 +378,29 @@ nvcc -arch=compute_80 -code=compute_80 myapp.cu
 ### 3. 아키텍처 세대별 특징
 
 #### Volta (SM 7.0) - 2017년
-- **Tensor Core 1세대** 도입 (혼합 정밀도 행렬 연산)
-- **독립 Thread Scheduling**: warp 내 개별 스레드 독립 실행
-- **NVLink 2.0**: 300GB/s GPU 간 통신
+
+| 주요 기능 | 설명 |
+|----------|------|
+| **Tensor Core 1세대** | 혼합 정밀도 행렬 연산 |
+| **독립 Thread Scheduling** | warp 내 개별 스레드 독립 실행 |
+| **NVLink 2.0** | 300GB/s GPU 간 통신 |
 
 #### Turing (SM 7.5) - 2018년
-- **RT Core** 도입 (실시간 Ray Tracing)
-- **Tensor Core 2세대**: INT8/INT4 지원
-- **Mesh Shading**: 기하 처리 최적화
+
+| 주요 기능 | 설명 |
+|----------|------|
+| **RT Core** | 실시간 Ray Tracing |
+| **Tensor Core 2세대** | INT8/INT4 지원 |
+| **Mesh Shading** | 기하 처리 최적화 |
 
 #### Ampere (SM 8.0/8.6) - 2020년
-- **Tensor Core 3세대**: TF32 (AI 학습 가속), BF16, FP64
-- **MIG (Multi-Instance GPU)**: A100을 최대 7개 GPU로 분할
-- **3세대 NVLink**: 600GB/s
-- **Sparse Tensor Core**: 2:4 구조화 희소성 지원
+
+| 주요 기능 | 설명 |
+|----------|------|
+| **Tensor Core 3세대** | TF32 (AI 학습 가속), BF16, FP64 |
+| **MIG** | A100을 최대 7개 GPU로 분할 |
+| **NVLink 3.0** | 600GB/s |
+| **Sparse Tensor Core** | 2:4 구조화 희소성 지원 |
 
 ```python
 # PyTorch에서 TF32 활성화 (Ampere 전용)
@@ -400,11 +410,14 @@ torch.backends.cudnn.allow_tf32 = True
 
 ```
 #### Hopper (SM 9.0) - 2022년
-- **Transformer Engine**: FP8 지원 (8bit 학습)
-- **Tensor Core 4세대**: FP8, FP16, BF16, TF32, FP64
-- **Thread Block Clusters**: 여러 SM에 걸친 스레드 블록 협업
-- **4세대 NVLink**: 900GB/s
-- **DPX Instructions**: Dynamic Programming 가속
+
+| 주요 기능 | 설명 |
+|----------|------|
+| **Transformer Engine** | FP8 지원 (8bit 학습) |
+| **Tensor Core 4세대** | FP8, FP16, BF16, TF32, FP64 |
+| **Thread Block Clusters** | 여러 SM에 걸친 스레드 블록 협업 |
+| **NVLink 4.0** | 900GB/s |
+| **DPX Instructions** | Dynamic Programming 가속 |
 
 ```python
 # PyTorch 2.0+ Transformer Engine (Hopper 전용)
@@ -442,9 +455,12 @@ NCCL이는 **다중 GPU 통신 최적화 라이브러리**
 - PyTorch, TensorFlow의 분산 학습 백엔드로 사용
 
 **NCCL의 역할**:
-1. **GPU 간 통신**: NVLink, PCIe, InfiniBand 자동 선택
-2. **Topology 최적화**: GPU 물리 배치에 따른 최적 경로 계산
-3. **중복 제거**: 네트워크 대역폭 최대화
+
+| 역할 | 설명 |
+|------|------|
+| **GPU 간 통신** | NVLink, PCIe, InfiniBand 자동 선택 |
+| **Topology 최적화** | GPU 물리 배치에 따른 최적 경로 계산 |
+| **중복 제거** | 네트워크 대역폭 최대화 |
 
 **NCCL vs 대안**:
 

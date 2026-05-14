@@ -21,10 +21,12 @@
 
 Ansible은 **오픈소스 자동화 도구**로, 서버 구성, 애플리케이션 배포, 태스크 자동화를 간편하게 수행할 수 있습니다.
 
-- **Agentless**: Managed Node에 에이전트 설치 불필요 (SSH 기반)
-- **Idempotent**: 동일한 플레이북을 여러 번 실행해도 결과가 동일
-- **Easy to Use**: YAML 문법으로 선언적 구성
-- **Powerful**: 모듈과 플러그인을 통한 확장성
+| 특징 | 설명 |
+|------|------|
+| Agentless | Managed Node에 에이전트 설치 불필요 (SSH 기반) |
+| Idempotent | 동일한 플레이북을 여러 번 실행해도 결과가 동일 |
+| Easy to Use | YAML 문법으로 선언적 구성 |
+| Powerful | 모듈과 플러그인을 통한 확장성 |
 
 ```mermaid
 graph LR
@@ -228,13 +230,14 @@ sequenceDiagram
 
 Ansible은 다양한 곳에서 변수를 정의할 수 있으며, 우선순위가 있습니다.
 
-**우선순위 (낮음 → 높음)**:
-1. Role defaults (`defaults/main.yml`)
-2. Inventory group_vars
-3. Inventory host_vars
-4. Playbook vars
-5. Task vars (include_vars, set_fact)
-6. Extra vars (`-e` 옵션)
+| 우선순위 | 변수 위치 | 설명 |
+|---------|----------|------|
+| 1 (낮음) | Role defaults | `defaults/main.yml` |
+| 2 | Inventory group_vars | 그룹별 변수 |
+| 3 | Inventory host_vars | 호스트별 변수 |
+| 4 | Playbook vars | Playbook 내 변수 |
+| 5 | Task vars | include_vars, set_fact |
+| 6 (높음) | Extra vars | `-e` 옵션 |
 
 ```yaml
 ---
@@ -329,9 +332,12 @@ fact_caching_timeout = 86400
 
 ```
 **Gathering 정책** (DEFAULT_GATHERING):
-- **implicit** (기본값): 모든 Play 시작 시 자동으로 Facts 수집
-- **explicit**: `gather_facts: yes`로 명시한 경우에만 수집
-- **smart**: 캐시가 유효하면 수집 생략, 만료 시에만 수집
+
+| 정책 | 설명 |
+|------|------|
+| implicit (기본값) | 모든 Play 시작 시 자동으로 Facts 수집 |
+| explicit | `gather_facts: yes`로 명시한 경우에만 수집 |
+| smart | 캐시가 유효하면 수집 생략, 만료 시에만 수집 |
 
 ### 커스텀 팩트 (Custom Facts)
 

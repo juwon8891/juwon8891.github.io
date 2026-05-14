@@ -185,12 +185,14 @@ Git이 단일 소스로 적합한 이유:
 
 GitOps는 단순히 인프라만이 아니라 **모든 것**을 코드로 관리합니다:
 
-- **애플리케이션 매니페스트**: Deployment, Service, ConfigMap 등
-- **인프라 리소스**: VPC, 서브넷, 로드밸런서 (Terraform, Crossplane 등)
-- **보안 정책**: NetworkPolicy, RBAC, Pod Security Standards
-- **모니터링 설정**: Prometheus 규칙, Grafana 대시보드
-- **CI/CD 파이프라인**: Jenkins 파일, GitHub Actions 워크플로
-- **백업 정책**: Velero 스케줄, 보관 기간 설정
+| 구성 요소 | 설명 |
+|----------|------|
+| 애플리케이션 매니페스트 | Deployment, Service, ConfigMap 등 |
+| 인프라 리소스 | VPC, 서브넷, 로드밸런서 (Terraform, Crossplane 등) |
+| 보안 정책 | NetworkPolicy, RBAC, Pod Security Standards |
+| 모니터링 설정 | Prometheus 규칙, Grafana 대시보드 |
+| CI/CD 파이프라인 | Jenkins 파일, GitHub Actions 워크플로 |
+| 백업 정책 | Velero 스케줄, 보관 기간 설정 |
 
 ```mermaid
 graph TB

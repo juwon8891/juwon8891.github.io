@@ -257,15 +257,12 @@ InfiniBand는 세대마다 약 2배씩 대역폭이 증가한다.
 
 ### 3. 핵심 컴포넌트
 
-**HCA (Host Channel Adapter)**:
-- 서버에 장착되는 InfiniBand NIC
-- 주요 제품: Mellanox ConnectX-7 (NDR, 400Gbps)
-- RDMA 엔진 내장, GPUDirect 지원
+**핵심 컴포넌트**:
 
-**Switch**:
-- 여러 HCA를 연결하는 InfiniBand 스위치
-- Mellanox QM9700 (NDR 64포트)
-- Fat-Tree 토폴로지로 구성
+| 컴포넌트 | 설명 |
+|---------|------|
+| **HCA (Host Channel Adapter)** | 서버에 장착되는 InfiniBand NIC<br/>주요 제품: Mellanox ConnectX-7 (NDR, 400Gbps)<br/>RDMA 엔진 내장, GPUDirect 지원 |
+| **Switch** | 여러 HCA를 연결하는 InfiniBand 스위치<br/>Mellanox QM9700 (NDR 64포트)<br/>Fat-Tree 토폴로지로 구성 |
 
 
 ## 핵심 개념 정리

@@ -502,11 +502,14 @@ vault write auth/kubernetes/role/webapp \
 
 ```
 **Role 설명**:
-- **bound_service_account_names**: `vault` (허용할 SA 이름)
-- **bound_service_account_namespaces**: `default` (허용할 네임스페이스)
-- **policies**: `webapp` (적용할 정책)
-- **ttl**: `24h` (토큰 유효 기간)
-- **audience**: Vault 서버 주소
+
+| 설정 항목 | 값 |
+|----------|-----|
+| bound_service_account_names | `vault` (허용할 SA 이름) |
+| bound_service_account_namespaces | `default` (허용할 네임스페이스) |
+| policies | `webapp` (적용할 정책) |
+| ttl | `24h` (토큰 유효 기간) |
+| audience | Vault 서버 주소 |
 
 ### 2. Service Account 권한 확인
 
@@ -626,10 +629,13 @@ graph TB
 
 ```
 **HA 동작 방식**:
-- **Active**: 모든 쓰기 요청 처리, 읽기 요청도 처리 가능
-- **Standby**: 읽기 요청만 처리 가능, Active 장애 시 자동 승격
-- **Raft Consensus**: 리더 선출 및 데이터 복제 (최소 3대 권장)
-- **자동 Failover**: Active 장애 시 Standby 중 하나가 자동으로 Active로 승격
+
+| 역할/메커니즘 | 설명 |
+|--------------|------|
+| Active | 모든 쓰기 요청 처리, 읽기 요청도 처리 가능 |
+| Standby | 읽기 요청만 처리 가능, Active 장애 시 자동 승격 |
+| Raft Consensus | 리더 선출 및 데이터 복제 (최소 3대 권장) |
+| 자동 Failover | Active 장애 시 Standby 중 하나가 자동으로 Active로 승격 |
 
 ### 2. Raft 스토리지 백엔드
 
@@ -638,10 +644,13 @@ graph TB
 **Raft**는 분산 합의 알고리즘으로, Vault HA의 핵심 스토리지 백엔드입니다.
 
 **Raft의 장점**:
-- **외부 의존성 없음**: Consul 불필요 (Vault 자체에 내장)
-- **강력한 일관성**: Leader-based consensus
-- **자동 Failover**: Leader 장애 시 자동 선출
-- **Snapshot 지원**: 백업 및 복구 용이
+
+| 장점 | 설명 |
+|------|------|
+| 외부 의존성 없음 | Consul 불필요 (Vault 자체에 내장) |
+| 강력한 일관성 | Leader-based consensus |
+| 자동 Failover | Leader 장애 시 자동 선출 |
+| Snapshot 지원 | 백업 및 복구 용이 |
 
 **Raft Quorum**:
 - **3노드**: 1대 장애 허용
@@ -968,13 +977,16 @@ vault read auth/ldap/config
 
 ```
 **설정 파라미터**:
-- **url**: LDAP 서버 주소
-- **userdn**: 사용자 검색 Base DN
-- **groupdn**: 그룹 검색 Base DN
-- **binddn**: Vault가 LDAP에 연결할 때 사용할 DN
-- **bindpass**: Bind Password
-- **userattr**: 사용자 속성 (uid, sAMAccountName 등)
-- **groupattr**: 그룹 속성 (cn, memberOf 등)
+
+| 파라미터 | 설명 |
+|----------|------|
+| url | LDAP 서버 주소 |
+| userdn | 사용자 검색 Base DN |
+| groupdn | 그룹 검색 Base DN |
+| binddn | Vault가 LDAP에 연결할 때 사용할 DN |
+| bindpass | Bind Password |
+| userattr | 사용자 속성 (uid, sAMAccountName 등) |
+| groupattr | 그룹 속성 (cn, memberOf 등) |
 
 ### 3. 정책 매핑 및 테스트
 

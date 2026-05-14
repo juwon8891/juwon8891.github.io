@@ -43,10 +43,13 @@ graph TB
 
 ```
 **ApplicationSet의 이점**:
-- **자동화**: 새 환경/클러스터 추가 시 자동으로 Application 생성
-- **일관성**: 모든 환경에 동일한 템플릿 적용
-- **확장성**: 수십~수백 개의 Application 관리 가능
-- **유지보수성**: 중앙 집중식 템플릿 관리
+
+| 이점 | 설명 |
+|------|------|
+| 자동화 | 새 환경/클러스터 추가 시 자동으로 Application 생성 |
+| 일관성 | 모든 환경에 동일한 템플릿 적용 |
+| 확장성 | 수십~수백 개의 Application 관리 가능 |
+| 유지보수성 | 중앙 집중식 템플릿 관리 |
 
 #### Generator 종류
 
@@ -472,13 +475,16 @@ metadata:
 
 ```
 **일반적인 Wave 순서**:
-- **Wave -5**: PreSync Hook (DB 백업)
-- **Wave 0**: Namespace, ConfigMap, Secret
-- **Wave 1**: Database, PVC
-- **Wave 2**: Backend Services
-- **Wave 3**: Frontend Services
-- **Wave 4**: Ingress
-- **Wave 5**: PostSync Hook (헬스체크)
+
+| Wave | 리소스 |
+|------|--------|
+| Wave -5 | PreSync Hook (DB 백업) |
+| Wave 0 | Namespace, ConfigMap, Secret |
+| Wave 1 | Database, PVC |
+| Wave 2 | Backend Services |
+| Wave 3 | Frontend Services |
+| Wave 4 | Ingress |
+| Wave 5 | PostSync Hook (헬스체크) |
 
 #### 실습: 의존성 있는 앱 배포
 

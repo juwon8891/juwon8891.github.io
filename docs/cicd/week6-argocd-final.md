@@ -459,10 +459,13 @@ spec:
 
 ```
 **IgnoreDifferences 사용 사례**:
-- **HPA 관리 replicas**: HPA가 동적으로 조정하는 replicas 무시
-- **Cluster Autoscaler annotations**: CA가 추가하는 annotation 무시
-- **Istio sidecar injected fields**: Istio가 주입하는 필드 무시
-- **동적 생성 Secret**: cert-manager가 생성하는 인증서 무시
+
+| 사용 사례 | 설명 |
+|----------|------|
+| HPA 관리 replicas | HPA가 동적으로 조정하는 replicas 무시 |
+| Cluster Autoscaler annotations | CA가 추가하는 annotation 무시 |
+| Istio sidecar injected fields | Istio가 주입하는 필드 무시 |
+| 동적 생성 Secret | cert-manager가 생성하는 인증서 무시 |
 
 ---
 
@@ -1069,11 +1072,14 @@ dc=example,dc=org          # Base DN (Root DN)
         └── member: uid=alice,ou=people,dc=example,dc=org
 
 ```
-- **DN (Distinguished Name)**: `uid=alice,ou=people,dc=example,dc=org`
-- **RDN (Relative Distinguished Name)**: `uid=alice`
-- **Base DN**: `dc=example,dc=org`
-- **Entry**: 디렉터리의 기본 단위 (다수의 Attribute로 구성)
-- **Attribute**: Entry의 각 속성 (cn, sn, uid, mail 등)
+
+| 용어 | 설명 |
+|------|------|
+| DN (Distinguished Name) | `uid=alice,ou=people,dc=example,dc=org` |
+| RDN (Relative Distinguished Name) | `uid=alice` |
+| Base DN | `dc=example,dc=org` |
+| Entry | 디렉터리의 기본 단위 (다수의 Attribute로 구성) |
+| Attribute | Entry의 각 속성 (cn, sn, uid, mail 등) |
 
 #### OpenLDAP 서버 배포
 

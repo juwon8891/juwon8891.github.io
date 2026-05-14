@@ -56,21 +56,18 @@ Week 1에서 "The Hard Way"로 모든 컴포넌트를 수동 설치하며 K8s의
 
 #### Kubeadm의 특징
 
-1. **Control Plane as Static Pod**: Control Plane 컴포넌트를 Static Pod로 구성
-2. **사전 설치 필요**: CRI(containerd)와 kubelet은 별도로 설치 필요
-3. **광범위한 활용**: minikube, kind, ClusterAPI, kubespray 등에서 사용
+| 특징 | 설명 |
+|------|------|
+| Control Plane as Static Pod | Control Plane 컴포넌트를 Static Pod로 구성 |
+| 사전 설치 필요 | CRI(containerd)와 kubelet은 별도로 설치 필요 |
+| 광범위한 활용 | minikube, kind, ClusterAPI, kubespray 등에서 사용 |
 
 #### Kubeadm이 배포하는 컴포넌트
 
-**Static Pod로 배포**:
-- etcd
-- kube-apiserver
-- kube-controller-manager
-- kube-scheduler
-
-**애드온으로 배포**:
-- CoreDNS (Deployment)
-- kube-proxy (DaemonSet)
+| 배포 방식 | 컴포넌트 |
+|----------|---------|
+| **Static Pod로 배포** | etcd, kube-apiserver, kube-controller-manager, kube-scheduler |
+| **애드온으로 배포** | CoreDNS (Deployment), kube-proxy (DaemonSet) |
 
 ---
 
@@ -253,9 +250,12 @@ systemctl disable --now zram-swap.service
 
 ```
 **Swap 비활성화 이유**:
-1. **리소스 예측 불가능**: Pod가 메모리를 초과해도 죽지 않고 디스크를 사용하게 됨
-2. **K8s 관리 철학 위배**: 메모리 부족 시 즉시 OOMKilled 후 재시작하는 것이 K8s 철학
-3. **클러스터 성능 저하**: 스케줄링 판단에 오류 발생 가능
+
+| 이유 | 설명 |
+|------|------|
+| 리소스 예측 불가능 | Pod가 메모리를 초과해도 죽지 않고 디스크를 사용하게 됨 |
+| K8s 관리 철학 위배 | 메모리 부족 시 즉시 OOMKilled 후 재시작하는 것이 K8s 철학 |
+| 클러스터 성능 저하 | 스케줄링 판단에 오류 발생 가능 |
 
 #### 커널 모듈 로드
 
@@ -449,9 +449,12 @@ graph TB
 - 빠른 컨테이너 시작: 레이어 재사용
 
 **동작 방식**:
-- **Lower Layer**: 읽기 전용 이미지 레이어 (여러 개 가능)
-- **Upper Layer**: 쓰기 가능한 컨테이너 레이어
-- **Merged View**: 사용자에게 보이는 통합된 파일시스템
+
+| Layer | 설명 |
+|-------|------|
+| Lower Layer | 읽기 전용 이미지 레이어 (여러 개 가능) |
+| Upper Layer | 쓰기 가능한 컨테이너 레이어 |
+| Merged View | 사용자에게 보이는 통합된 파일시스템 |
 
 ### Snapshotter란?
 
@@ -654,16 +657,18 @@ helm install kube-prometheus-stack \
 ```
 #### 접속 정보
 
-- **Prometheus**: http://192.168.10.100:30001
-- **Grafana**: http://192.168.10.100:30002
-  - 사용자: admin
-  - 비밀번호: prom-operator
+| 서비스 | URL | 인증 정보 |
+|--------|-----|----------|
+| Prometheus | http://192.168.10.100:30001 | - |
+| Grafana | http://192.168.10.100:30002 | 사용자: admin<br/>비밀번호: prom-operator |
 
 #### 권장 Grafana 대시보드
 
-- **15661**: Kubernetes Cluster Monitoring (Prometheus)
-- **15757**: Kubernetes / Views / Global
-- **13922**: x509 Certificate Exporter (인증서 만료 모니터링)
+| 대시보드 ID | 설명 |
+|------------|------|
+| 15661 | Kubernetes Cluster Monitoring (Prometheus) |
+| 15757 | Kubernetes / Views / Global |
+| 13922 | x509 Certificate Exporter (인증서 만료 모니터링) |
 
 ---
 
@@ -746,8 +751,11 @@ helm install x509-certificate-exporter enix/x509-certificate-exporter \
 
 ```
 **DaemonSet 2종류**:
-- **cp**: Control Plane 노드 (`/etc/kubernetes/pki`)
-- **nodes**: Worker 노드 (`/var/lib/kubelet/pki`)
+
+| DaemonSet | 대상 노드 | 감시 디렉터리 |
+|-----------|----------|--------------|
+| cp | Control Plane | `/etc/kubernetes/pki` |
+| nodes | Worker | `/var/lib/kubelet/pki` |
 
 #### Grafana 대시보드 13922
 

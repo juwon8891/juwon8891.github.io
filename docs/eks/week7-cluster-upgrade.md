@@ -419,12 +419,15 @@ graph LR
 
 ```
 **점검 항목** (6가지):
-1. **kube-proxy version skew**: kube-proxy 버전이 Control Plane 버전과 일치하는지 확인
-2. **Cluster health issues**: 클러스터 헬스 체크 (Node NotReady 등)
-3. **EKS add-ons compatibility**: 설치된 EKS Add-on이 새 버전과 호환되는지 확인
-4. **Amazon Linux expiration**: AL 노드가 2025년 11월 26일 이후 지원 종료 (AL2023으로 마이그레이션 필요)
-5. **kubelet version skew**: Worker 노드의 kubelet 버전이 Kubernetes kubelet version skew policy를 준수하는지 확인
-6. **Deprecated APIs**: v1.32에서 제거될 예정인 Deprecated API 사용 여부 확인
+
+| 항목 | 설명 |
+|------|------|
+| **kube-proxy version skew** | kube-proxy 버전이 Control Plane 버전과 일치하는지 확인 |
+| **Cluster health issues** | 클러스터 헬스 체크 (Node NotReady 등) |
+| **EKS add-ons compatibility** | 설치된 EKS Add-on이 새 버전과 호환되는지 확인 |
+| **Amazon Linux expiration** | AL 노드가 2025년 11월 26일 이후 지원 종료 (AL2023으로 마이그레이션 필요) |
+| **kubelet version skew** | Worker 노드의 kubelet 버전이 Kubernetes kubelet version skew policy를 준수하는지 확인 |
+| **Deprecated APIs** | v1.32에서 제거될 예정인 Deprecated API 사용 여부 확인 |
 
 ### 2. Insights 확인
 
@@ -1025,15 +1028,17 @@ graph TB
 
 **업그레이드 체크리스트**:
 
-1. **Upgrade Insights 사전 점검** (kube-proxy, Add-on, Deprecated API 등)
-2. **백업 생성** (etcd 스냅샷, PV 스냅샷)
-3. **PDB 설정** (minAvailable로 가용성 보장)
-4. **TopologySpreadConstraints 적용** (AZ 분산 배치)
-5. **모니터링 도구 활성화** (kube-ops-view, CloudWatch)
-6. **순차 업그레이드** (Control Plane → Add-on → Nodes)
-7. **한 버전씩 업그레이드** (1.30 → 1.31, 두 버전 점프 불가)
-8. **업그레이드 후 검증** (Pod 상태, 애플리케이션 헬스 체크)
-9. **Terraform 사용 권장** (IaC로 재현 가능한 업그레이드)
+| 순서 | 항목 | 설명 |
+|------|------|------|
+| 1 | **Upgrade Insights 사전 점검** | kube-proxy, Add-on, Deprecated API 등 |
+| 2 | **백업 생성** | etcd 스냅샷, PV 스냅샷 |
+| 3 | **PDB 설정** | minAvailable로 가용성 보장 |
+| 4 | **TopologySpreadConstraints 적용** | AZ 분산 배치 |
+| 5 | **모니터링 도구 활성화** | kube-ops-view, CloudWatch |
+| 6 | **순차 업그레이드** | Control Plane → Add-on → Nodes |
+| 7 | **한 버전씩 업그레이드** | 1.30 → 1.31, 두 버전 점프 불가 |
+| 8 | **업그레이드 후 검증** | Pod 상태, 애플리케이션 헬스 체크 |
+| 9 | **Terraform 사용 권장** | IaC로 재현 가능한 업그레이드 |
 
 **주의사항**:
 - **주의** **업그레이드는 되돌릴 수 없음** (Rollback 불가)

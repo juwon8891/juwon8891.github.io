@@ -9,13 +9,15 @@ Week 1에서 EKS 클러스터 배포, Week 2에서 네트워킹, Week 3에서 Au
 
 ### 학습 목표
 
-- **Authentication (인증)**: K8S API 접근 주체 확인
-- **Authorization (인가)**: RBAC 기반 권한 관리
-- **Admission Control**: 요청 검증 및 변경
-- **IRSA (IAM Roles for Service Accounts)**: Pod에 AWS 권한 부여
-- **EKS Pod Identity**: 차세대 Pod 인증 메커니즘
-- **OIDC (OpenID Connect)**: 외부 IdP 연동
-- **OAuth 2.0**: 위임 인증 프로토콜 이해
+| 주제 | 설명 |
+|------|------|
+| **Authentication (인증)** | K8S API 접근 주체 확인 |
+| **Authorization (인가)** | RBAC 기반 권한 관리 |
+| **Admission Control** | 요청 검증 및 변경 |
+| **IRSA** | IAM Roles for Service Accounts, Pod에 AWS 권한 부여 |
+| **EKS Pod Identity** | 차세대 Pod 인증 메커니즘 |
+| **OIDC** | OpenID Connect, 외부 IdP 연동 |
+| **OAuth 2.0** | 위임 인증 프로토콜 이해 |
 
 ---
 

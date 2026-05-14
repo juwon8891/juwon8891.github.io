@@ -893,11 +893,14 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 **🎉 5주차 학습 완료!**
 
 5주차에서는 ArgoCD의 **보안 및 인증**을 학습했습니다:
-- **실습 환경 구성**: kind + Ingress-Nginx + ArgoCD with TLS
-- **접근 제어**: 로컬 사용자, RBAC, 서비스 어카운트
-- **Keycloak SSO**: Realm, User, Group, Role 관리
-- **OIDC 연동**: ArgoCD와 Keycloak SSO 통합
-- **OAuth 2.0 & OIDC**: 인증 및 권한 부여 프로토콜 이해
+
+| 주제 | 내용 |
+|------|------|
+| 실습 환경 구성 | kind + Ingress-Nginx + ArgoCD with TLS |
+| 접근 제어 | 로컬 사용자, RBAC, 서비스 어카운트 |
+| Keycloak SSO | Realm, User, Group, Role 관리 |
+| OIDC 연동 | ArgoCD와 Keycloak SSO 통합 |
+| OAuth 2.0 & OIDC | 인증 및 권한 부여 프로토콜 이해 |
 
 이제 **엔터프라이즈급 인증 및 권한 관리**를 구현할 수 있는 역량을 갖추게 되었습니다! 🚀
 

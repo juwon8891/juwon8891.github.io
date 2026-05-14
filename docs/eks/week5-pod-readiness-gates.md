@@ -6,10 +6,13 @@
 Kubernetes 롤링 업데이트 중 발생하는 간헐적 502/503 에러는 대부분의 클라우드 환경에서 공통적으로 관찰되는 문제입니다. 이 글에서는 EKS와 GKE 환경에서 **Kubernetes Pod 라이프사이클과 클라우드 LoadBalancer 라이프사이클 간 불일치**를 분석하고, Pod Readiness Gates를 통한 해결 방법을 비교합니다.
 
 ### 핵심 질문
-- 왜 Pod는 Ready인데 사용자는 502를 받는가?
-- Kubernetes와 클라우드 LoadBalancer는 어떻게 다른 시간축에서 움직이는가?
-- Pod Readiness Gates는 어떻게 두 시스템을 동기화하는가?
-- EKS와 GKE의 구현은 어떻게 다른가?
+
+| 질문 |
+|------|
+| 왜 Pod는 Ready인데 사용자는 502를 받는가? |
+| Kubernetes와 클라우드 LoadBalancer는 어떻게 다른 시간축에서 움직이는가? |
+| Pod Readiness Gates는 어떻게 두 시스템을 동기화하는가? |
+| EKS와 GKE의 구현은 어떻게 다른가? |
 
 ---
 

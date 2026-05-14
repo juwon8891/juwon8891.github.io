@@ -630,10 +630,13 @@ graph TB
 
 ```
 **Service 주요 기능**:
-- **고정 진입점**: ClusterIP, NodePort, LoadBalancer
-- **로드 밸런싱**: Pod 간 트래픽 분산
-- **서비스 디스커버리**: DNS 이름으로 접근 가능
-- **헬스 체크**: 비정상 Pod는 자동 제외
+
+| 기능 | 설명 |
+|------|------|
+| 고정 진입점 | ClusterIP, NodePort, LoadBalancer |
+| 로드 밸런싱 | Pod 간 트래픽 분산 |
+| 서비스 디스커버리 | DNS 이름으로 접근 가능 |
+| 헬스 체크 | 비정상 Pod는 자동 제외 |
 
 #### Service 생성 및 테스트
 
@@ -751,11 +754,13 @@ docker compose restart gogs
 **Jenkins Item**: `SCM-Pipeline` (Pipeline from SCM)
 
 **Pipeline 설정**:
-- **GitHub project**: `http://<PC IP>:3000/devops/dev-app`
-- **Build Triggers**: ✓ Build when a change is pushed to Gogs
-- **Use Gogs secret**: `qwe123`
-- **SCM**: Git
-  - Repository URL: `http://<PC IP>:3000/devops/dev-app`
+
+| 설정 항목 | 값 |
+|-----------|-----|
+| GitHub project | `http://<PC IP>:3000/devops/dev-app` |
+| Build Triggers | ✓ Build when a change is pushed to Gogs |
+| Use Gogs secret | `qwe123` |
+| SCM | Git<br/>- Repository URL: `http://<PC IP>:3000/devops/dev-app` |
   - Credentials: `devops/***`
   - Branch: `*/main`
   - Script Path: `Jenkinsfile`
@@ -867,10 +872,13 @@ graph TB
 
 ```
 **Blue-Green 배포 장점**:
-- **무중단 배포**: 서비스 다운타임 없음
-- **빠른 롤백**: Service selector만 변경하면 즉시 롤백
-- **안전한 테스트**: 프로덕션 트래픽 전환 전 테스트 가능
-- **위험 최소화**: 문제 발생 시 즉시 이전 버전으로 복구
+
+| 특징 | 설명 |
+|------|------|
+| 무중단 배포 | 서비스 다운타임 없음 |
+| 빠른 롤백 | Service selector만 변경하면 즉시 롤백 |
+| 안전한 테스트 | 프로덕션 트래픽 전환 전 테스트 가능 |
+| 위험 최소화 | 문제 발생 시 즉시 이전 버전으로 복구 |
 
 **Blue-Green 배포 단점**:
 - **리소스 2배**: 동일한 환경 2개 유지 필요

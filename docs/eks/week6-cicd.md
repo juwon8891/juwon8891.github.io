@@ -6,10 +6,13 @@
 Amazon EKS 환경에서 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현하는 방법을 학습합니다.
 
 이번 실습에서는 다음 도구들을 사용합니다:
-- **Flux v2**: Git 저장소 변경 사항을 Kubernetes 클러스터에 자동 동기화
-- **Argo Workflows**: 테넌트 온보딩/오프보딩 자동화
-- **Tofu 컨트롤러**: Terraform을 GitOps 방식으로 실행
-- **Helm 차트**: Kubernetes 애플리케이션 패키징 및 배포
+
+| 도구 | 역할 |
+|------|------|
+| **Flux v2** | Git 저장소 변경 사항을 Kubernetes 클러스터에 자동 동기화 |
+| **Argo Workflows** | 테넌트 온보딩/오프보딩 자동화 |
+| **Tofu 컨트롤러** | Terraform을 GitOps 방식으로 실행 |
+| **Helm 차트** | Kubernetes 애플리케이션 패키징 및 배포 |
 
 ---
 
@@ -58,9 +61,12 @@ graph LR
 
 ```
 **Platform Engineering 3대 가치**:
-1. **Velocity (속도)**: 빠른 서비스 배포 기능 제공
-2. **Governance (거버넌스)**: 정의, 인정, 확정 등의 요구 사항을 플랫폼 차원에서 자동화
-3. **Efficiency (효율성)**: 반복 대신 구성을 통해 인프라 비용을 절감하고, 인적 자원의 전문성을 더 섬세하게 활용
+
+| 가치 | 설명 |
+|------|------|
+| **Velocity (속도)** | 빠른 서비스 배포 기능 제공 |
+| **Governance (거버넌스)** | 정의, 인정, 확정 등의 요구 사항을 플랫폼 차원에서 자동화 |
+| **Efficiency (효율성)** | 반복 대신 구성을 통해 인프라 비용을 절감하고, 인적 자원의 전문성을 더 섬세하게 활용 |
 
 ---
 

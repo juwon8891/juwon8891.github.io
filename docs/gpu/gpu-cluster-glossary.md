@@ -5,10 +5,13 @@
 ## 1. RDMA & InfiniBand 네트워킹
 
 ### RDMA (Remote Direct Memory Access)
-- **정의**: CPU를 거치지 않고 네트워크 카드(NIC)가 원격 서버의 메모리에 직접 접근하는 기술
-- **핵심 특징**: Zero-copy, Kernel bypass, CPU offload
-- **레이턴시**: ~1μs (TCP/IP는 ~100μs)
-- **사용 사례**: GPU AllReduce, 분산 스토리지, HPC
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | CPU를 거치지 않고 네트워크 카드(NIC)가 원격 서버의 메모리에 직접 접근하는 기술 |
+| **핵심 특징** | Zero-copy, Kernel bypass, CPU offload |
+| **레이턴시** | ~1μs (TCP/IP는 ~100μs) |
+| **사용 사례** | GPU AllReduce, 분산 스토리지, HPC |
 
 **RDMA 프로토콜 종류**:
 
@@ -20,25 +23,31 @@
 | **iWARP** | 이더넷 | 중간 | TCP/IP 기반, 라우팅 가능 |
 
 ### RoCE (RDMA over Converged Ethernet)
-- **정의**: 이더넷 네트워크에서 RDMA를 구현하는 프로토콜
-- **v1 vs v2**: v1은 Layer 2 전용 (VLAN 내부), v2는 Layer 3 지원 (IP 라우팅, UDP 캡슐화)
-- **장점**: 기존 이더넷 인프라 재사용, InfiniBand 대비 저렴
-- **단점**: PFC(Priority Flow Control), ECN(Explicit Congestion Notification) 등 네트워크 튜닝 필수
-- **주요 사용처**: 클라우드 GPU 클러스터 (AWS EFA, Azure InfiniBand)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | 이더넷 네트워크에서 RDMA를 구현하는 프로토콜 |
+| **v1 vs v2** | v1은 Layer 2 전용 (VLAN 내부), v2는 Layer 3 지원 (IP 라우팅, UDP 캡슐화) |
+| **장점** | 기존 이더넷 인프라 재사용, InfiniBand 대비 저렴 |
+| **단점** | PFC(Priority Flow Control), ECN(Explicit Congestion Notification) 등 네트워크 튜닝 필수 |
+| **주요 사용처** | 클라우드 GPU 클러스터 (AWS EFA, Azure InfiniBand) |
 
 ### RoCEv2 (RDMA over Converged Ethernet v2)
-- **정의**: RoCE의 개선 버전, IP/UDP 위에서 동작
-- **프로토콜 스택**: `RDMA → IB Transport → UDP → IP → Ethernet`
-- **UDP 포트**: 4791 (기본값)
-- **핵심 개선**:
-  - IP 라우팅 지원 → 서브넷 간 통신 가능
-  - ECMP(Equal-Cost Multi-Path) 로드밸런싱 활용
-  - VLAN, ACL 등 이더넷 기능 사용 가능
-- **요구사항**: DCB(Data Center Bridging), PFC, ECN
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | RoCE의 개선 버전, IP/UDP 위에서 동작 |
+| **프로토콜 스택** | `RDMA → IB Transport → UDP → IP → Ethernet` |
+| **UDP 포트** | 4791 (기본값) |
+| **핵심 개선** | IP 라우팅 지원 → 서브넷 간 통신 가능<br/>ECMP(Equal-Cost Multi-Path) 로드밸런싱 활용<br/>VLAN, ACL 등 이더넷 기능 사용 가능 |
+| **요구사항** | DCB(Data Center Bridging), PFC, ECN |
 
 ### QP (Queue Pair)
-- **정의**: RDMA 통신의 기본 단위. 송신 큐(Send Queue)와 수신 큐(Receive Queue)로 구성
-- **역할**: 각 통신 세션마다 하나의 QP 생성 (TCP 소켓과 유사)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | RDMA 통신의 기본 단위. 송신 큐(Send Queue)와 수신 큐(Receive Queue)로 구성 |
+| **역할** | 각 통신 세션마다 하나의 QP 생성 (TCP 소켓과 유사) |
 
 **Transport 타입 비교**:
 
@@ -64,41 +73,33 @@
 **예시**: NCCL AllReduce 시 각 GPU 쌍마다 RC QP 생성 (RDMA Write + Read 사용)
 
 ### GID (Global Identifier)
-- **정의**: InfiniBand/RoCE에서 각 포트를 식별하는 128비트 주소
-- **형식**: IPv6 주소와 유사 (예: `fe80::7a2b:cbff:fe9e:3d4f`)
-- **타입**:
-  - **GID 0 (Link-Local)**: `fe80::/64`, Layer 2 전용, 라우팅 불가
-  - **GID 1+ (Routable)**: IP 기반 GID, Layer 3 라우팅 가능
-- **확인 방법**:
-  ```bash
-  ibv_devinfo -v | grep GID
-  # 또는
-  show_gids
-  ```
-- **용도**: QP 생성 시 로컬/원격 GID 지정, RoCEv2 통신 엔드포인트
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | InfiniBand/RoCE에서 각 포트를 식별하는 128비트 주소 |
+| **형식** | IPv6 주소와 유사 (예: `fe80::7a2b:cbff:fe9e:3d4f`) |
+| **타입** | **GID 0 (Link-Local)**: `fe80::/64`, Layer 2 전용, 라우팅 불가<br/>**GID 1+ (Routable)**: IP 기반 GID, Layer 3 라우팅 가능 |
+| **확인 방법** | `ibv_devinfo -v \| grep GID` 또는 `show_gids` |
+| **용도** | QP 생성 시 로컬/원격 GID 지정, RoCEv2 통신 엔드포인트 |
 
 ### HCA (Host Channel Adapter)
-- **정의**: InfiniBand 네트워크 인터페이스 카드 (NIC의 InfiniBand 버전)
-- **역할**:
-  - RDMA 오프로드 (CPU 대신 DMA 수행)
-  - QP, CQ(Completion Queue), Memory Registration 관리
-  - Verbs API 제공 (ibv_post_send, ibv_post_recv 등)
-- **주요 제조사**: NVIDIA/Mellanox (ConnectX 시리즈), Intel
-- **모델 예시**:
-  - ConnectX-7: NDR InfiniBand 400Gbps
-  - ConnectX-6 Dx: HDR InfiniBand 200Gbps, RoCEv2 지원
-- **GPU와 연결**: PCIe 또는 NVLink 직결 (GPUDirect RDMA)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | InfiniBand 네트워크 인터페이스 카드 (NIC의 InfiniBand 버전) |
+| **역할** | RDMA 오프로드 (CPU 대신 DMA 수행)<br/>QP, CQ(Completion Queue), Memory Registration 관리<br/>Verbs API 제공 (ibv_post_send, ibv_post_recv 등) |
+| **주요 제조사** | NVIDIA/Mellanox (ConnectX 시리즈), Intel |
+| **모델 예시** | ConnectX-7: NDR InfiniBand 400Gbps<br/>ConnectX-6 Dx: HDR InfiniBand 200Gbps, RoCEv2 지원 |
+| **GPU와 연결** | PCIe 또는 NVLink 직결 (GPUDirect RDMA) |
 
 ### Fabric
-- **정의**: 네트워크 스위치와 HCA로 구성된 전체 상호연결 네트워크
-- **토폴로지**:
-  - **Fat-Tree**: Leaf-Spine 구조, 서버 간 풀 대역폭 (non-blocking)
-  - **Dragonfly**: 계층적 구조, 장거리 링크 최소화
-  - **Rail-Optimized**: GPU 단위로 전용 스위치 할당 (NVIDIA Quantum-X)
-- **주요 스위치**: NVIDIA Quantum-2 (NDR 400Gbps), Arista 7800R4
-- **성능 지표**:
-  - **Bisection Bandwidth**: 클러스터를 반으로 나눴을 때 대역폭
-  - **Hop Count**: 노드 간 스위치 경유 횟수
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | 네트워크 스위치와 HCA로 구성된 전체 상호연결 네트워크 |
+| **토폴로지** | **Fat-Tree**: Leaf-Spine 구조, 서버 간 풀 대역폭 (non-blocking)<br/>**Dragonfly**: 계층적 구조, 장거리 링크 최소화<br/>**Rail-Optimized**: GPU 단위로 전용 스위치 할당 (NVIDIA Quantum-X) |
+| **주요 스위치** | NVIDIA Quantum-2 (NDR 400Gbps), Arista 7800R4 |
+| **성능 지표** | **Bisection Bandwidth**: 클러스터를 반으로 나눴을 때 대역폭<br/>**Hop Count**: 노드 간 스위치 경유 횟수 |
 
 ---
 
@@ -200,72 +201,30 @@
 ### CUDA vs ROCm
 
 #### CUDA (Compute Unified Device Architecture)
-- **정의**: NVIDIA GPU 프로그래밍을 위한 병렬 컴퓨팅 플랫폼 및 프로그래밍 모델
-- **개발사**: NVIDIA (2006년 출시)
-- **지원 하드웨어**: NVIDIA GPU 전용 (GeForce, Quadro, Tesla, A100, H100, B200)
-- **언어**: CUDA C/C++ (확장 문법), Python (CuPy, Numba), Fortran
-- **아키텍처**:
-  ```
-  [Application]
-       ↓
-  [CUDA Libraries: cuBLAS, cuDNN, NCCL, cuSPARSE]
-       ↓
-  [CUDA Runtime API]
-       ↓
-  [CUDA Driver API]
-       ↓
-  [NVIDIA GPU Driver]
-       ↓
-  [NVIDIA GPU Hardware]
-  ```
-- **주요 라이브러리**:
-  - **cuBLAS**: 선형대수 (GEMM, GEMV)
-  - **cuDNN**: 딥러닝 기본 연산 (Convolution, Pooling, Activation)
-  - **NCCL**: 다중 GPU 통신 (AllReduce, Broadcast)
-  - **cuSPARSE**: 희소 행렬 연산
-  - **TensorRT**: AI 추론 최적화 엔진
-- **장점**:
-  - 압도적인 생태계 (PyTorch, TensorFlow, JAX 모두 CUDA 우선 지원)
-  - 성숙한 툴체인 (Nsight, CUDA-GDB, nvprof)
-  - 광범위한 문서 및 커뮤니티
-  - 최신 GPU 기능 즉시 지원 (Tensor Core, FP8, Transformer Engine)
-- **단점**: NVIDIA GPU에만 종속 (벤더 락인)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | NVIDIA GPU 프로그래밍을 위한 병렬 컴퓨팅 플랫폼 및 프로그래밍 모델 |
+| **개발사** | NVIDIA (2006년 출시) |
+| **지원 하드웨어** | NVIDIA GPU 전용 (GeForce, Quadro, Tesla, A100, H100, B200) |
+| **언어** | CUDA C/C++ (확장 문법), Python (CuPy, Numba), Fortran |
+| **아키텍처** | Application → CUDA Libraries (cuBLAS, cuDNN, NCCL) → CUDA Runtime API → CUDA Driver API → NVIDIA GPU Driver → Hardware |
+| **주요 라이브러리** | cuBLAS (선형대수), cuDNN (딥러닝 연산), NCCL (다중 GPU 통신), cuSPARSE (희소 행렬), TensorRT (추론 최적화) |
+| **장점** | 압도적인 생태계 (PyTorch, TensorFlow, JAX)<br/>성숙한 툴체인 (Nsight, CUDA-GDB, nvprof)<br/>광범위한 문서 및 커뮤니티<br/>최신 GPU 기능 즉시 지원 (Tensor Core, FP8) |
+| **단점** | NVIDIA GPU에만 종속 (벤더 락인) |
 
 #### ROCm (Radeon Open Compute platform)
-- **정의**: AMD GPU 및 CPU를 위한 오픈소스 병렬 컴퓨팅 플랫폼
-- **개발사**: AMD (2016년 출시, 오픈소스)
-- **지원 하드웨어**: AMD GPU (Instinct MI 시리즈, Radeon Pro), AMD CPU (부분 지원)
-- **언어**: HIP (Heterogeneous-compute Interface for Portability), OpenCL, OpenMP
-- **아키텍처**:
-  ```
-  [Application]
-       ↓
-  [ROCm Libraries: rocBLAS, MIOpen, RCCL]
-       ↓
-  [HIP Runtime API] ← CUDA 코드를 HIP으로 자동 변환 (hipify-perl)
-       ↓
-  [ROCm Runtime (ROCr)]
-       ↓
-  [AMD GPU Driver (AMDGPU)]
-       ↓
-  [AMD GPU Hardware]
-  ```
-- **주요 라이브러리**:
-  - **rocBLAS**: cuBLAS 대응, 선형대수
-  - **MIOpen**: cuDNN 대응, 딥러닝 기본 연산
-  - **RCCL**: NCCL 대응, 다중 GPU 통신
-  - **rocFFT**: cuFFT 대응, 고속 푸리에 변환
-  - **hipify-perl**: CUDA 코드를 HIP으로 자동 변환
-- **장점**:
-  - 오픈소스 (Apache 2.0 라이선스)
-  - CUDA 코드 포팅 가능 (HIP으로 90%+ 자동 변환)
-  - AMD + Intel GPU 지원 계획 (멀티벤더)
-  - 클라우드 가성비 (MI300X가 H100 대비 50% 저렴)
-- **단점**:
-  - CUDA 대비 낮은 성숙도 (버그, 누락된 기능)
-  - 제한된 프레임워크 지원 (PyTorch는 양호, TensorFlow는 부족)
-  - 문서/커뮤니티 규모 작음
-  - 최신 기능 지연 (FP8 지원이 CUDA보다 1-2년 늦음)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | AMD GPU 및 CPU를 위한 오픈소스 병렬 컴퓨팅 플랫폼 |
+| **개발사** | AMD (2016년 출시, 오픈소스) |
+| **지원 하드웨어** | AMD GPU (Instinct MI 시리즈, Radeon Pro), AMD CPU (부분 지원) |
+| **언어** | HIP (Heterogeneous-compute Interface for Portability), OpenCL, OpenMP |
+| **아키텍처** | Application → ROCm Libraries (rocBLAS, MIOpen, RCCL) → HIP Runtime API → ROCm Runtime → AMD GPU Driver → Hardware |
+| **주요 라이브러리** | rocBLAS (cuBLAS 대응), MIOpen (cuDNN 대응), RCCL (NCCL 대응), rocFFT (cuFFT 대응), hipify-perl (CUDA 변환) |
+| **장점** | 오픈소스 (Apache 2.0)<br/>CUDA 코드 포팅 가능 (HIP으로 90%+ 자동 변환)<br/>멀티벤더 지원<br/>클라우드 가성비 (MI300X가 H100 대비 50% 저렴) |
+| **단점** | CUDA 대비 낮은 성숙도 (버그, 누락 기능)<br/>제한된 프레임워크 지원<br/>작은 문서/커뮤니티<br/>최신 기능 지연 (FP8 지원 1-2년 늦음) |
 
 #### CUDA vs ROCm 직접 비교
 
@@ -319,100 +278,69 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 ```
 
 ### NIC (Network Interface Card)
-- **정의**: 서버를 네트워크에 연결하는 하드웨어 인터페이스
-- **NIC 분류 (RDMA 지원 여부)**:
-  - **RDMA 지원 NIC**:
-    - **InfiniBand HCA**: Mellanox ConnectX-7 (NDR 400Gbps), ConnectX-6 Dx (HDR 200Gbps)
-    - **RoCE NIC**: Broadcom P2100G (100Gbps), Marvell FastLinQ (25/100Gbps)
-    - **iWARP NIC**: Intel E810 (100Gbps, TCP/IP 기반 RDMA)
-  - **일반 이더넷 NIC** (RDMA 미지원):
-    - Intel X710 (10Gbps), Mellanox ConnectX-4 Lx (25Gbps, RDMA 기능 비활성화)
-    - 표준 TCP/UDP 소켓 사용 (커널 스택 경유)
-- **통신 프로토콜별 비교**:
-  - **RDMA (InfiniBand/RoCE/iWARP)**: 레이턴시 1-5μs, CPU 사용률 낮음, 커널 우회
-  - **TCP**: 레이턴시 50-100μs, 신뢰성 보장, 재전송 메커니즘
-  - **UDP**: 레이턴시 10-50μs, 비연결형, 패킷 손실 가능
-- **사용 사례**:
-  - **RDMA**: NCCL AllReduce, 분산 학습 (GPU 간 그래디언트 동기화)
-  - **TCP**: API 서버, 데이터베이스 복제
-  - **UDP**: Mooncake KV cache 전송 (RDMA 대신 UDP 소켓 사용, 간단한 구현)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | 서버를 네트워크에 연결하는 하드웨어 인터페이스 |
+| **RDMA 지원 NIC** | **InfiniBand HCA**: Mellanox ConnectX-7 (NDR 400Gbps), ConnectX-6 Dx (HDR 200Gbps)<br/>**RoCE NIC**: Broadcom P2100G (100Gbps), Marvell FastLinQ (25/100Gbps)<br/>**iWARP NIC**: Intel E810 (100Gbps, TCP/IP 기반 RDMA) |
+| **일반 이더넷 NIC** | Intel X710 (10Gbps), Mellanox ConnectX-4 Lx (25Gbps)<br/>표준 TCP/UDP 소켓 사용 (커널 스택 경유) |
+| **통신 프로토콜** | **RDMA**: 레이턴시 1-5μs, CPU 사용률 낮음, 커널 우회<br/>**TCP**: 레이턴시 50-100μs, 신뢰성 보장, 재전송<br/>**UDP**: 레이턴시 10-50μs, 비연결형, 패킷 손실 가능 |
+| **사용 사례** | **RDMA**: NCCL AllReduce, 분산 학습<br/>**TCP**: API 서버, DB 복제<br/>**UDP**: Mooncake KV cache 전송 |
 
 ---
 
 ## 3. NCCL & GPU 통신 라이브러리
 
 ### NCCL (NVIDIA Collective Communications Library)
-- **정의**: NVIDIA GPU 간 집합 통신(All-Reduce, All-Gather 등)을 최적화한 라이브러리
-- **핵심 알고리즘**:
-  - **Ring AllReduce**: 대역폭 효율적, O(N) 통신 (N=GPU 수)
-  - **Tree AllReduce**: 레이턴시 효율적, O(log N)
-  - **Double Binary Tree**: NCCL 2.4+ 기본값
-- **지원 백엔드**:
-  - **NVLink/NVSwitch**: 서버 내 GPU-GPU
-  - **PCIe**: CPU를 거치는 fallback
-  - **InfiniBand/RoCE**: 서버 간 GPU-GPU (NCCL IB plugin 필요)
-  - **TCP/IP**: 범용 네트워크 (성능 낮음)
-- **버전**: NCCL 2.30.4 (2026년 4월, 최신)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | NVIDIA GPU 간 집합 통신(All-Reduce, All-Gather 등)을 최적화한 라이브러리 |
+| **핵심 알고리즘** | **Ring AllReduce**: 대역폭 효율적, O(N) 통신<br/>**Tree AllReduce**: 레이턴시 효율적, O(log N)<br/>**Double Binary Tree**: NCCL 2.4+ 기본값 |
+| **지원 백엔드** | **NVLink/NVSwitch**: 서버 내 GPU-GPU<br/>**PCIe**: CPU를 거치는 fallback<br/>**InfiniBand/RoCE**: 서버 간 GPU-GPU<br/>**TCP/IP**: 범용 네트워크 (성능 낮음) |
+| **버전** | NCCL 2.30.4 (2026년 4월) |
 
 ### NCCL IB Plugin (nccl-rdma-sharp-plugins)
-- **정의**: NCCL이 InfiniBand/RoCE를 사용하도록 확장하는 플러그인
-- **역할**:
-  - RDMA Verbs API를 통해 GPU 메모리 직접 전송 (GPUDirect RDMA)
-  - SHARP(Scalable Hierarchical Aggregation and Reduction Protocol) 지원
-  - 다중 레일(Multi-Rail) 활용 (여러 HCA 동시 사용)
-- **설치**:
-  ```bash
-  apt install libnccl-rdma-sharp-plugins
-  export NCCL_IB_HCA=mlx5_0,mlx5_1  # 사용할 HCA 지정
-  export NCCL_IB_GID_INDEX=3        # Routable GID 사용
-  ```
-- **성능**: TCP 대비 10배 빠름 (100GB 데이터 전송 시 10초 → 1초)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | NCCL이 InfiniBand/RoCE를 사용하도록 확장하는 플러그인 |
+| **역할** | RDMA Verbs API를 통해 GPU 메모리 직접 전송 (GPUDirect RDMA)<br/>SHARP 지원<br/>다중 레일(Multi-Rail) 활용 (여러 HCA 동시 사용) |
+| **설치** | `apt install libnccl-rdma-sharp-plugins`<br/>`export NCCL_IB_HCA=mlx5_0,mlx5_1`<br/>`export NCCL_IB_GID_INDEX=3` |
+| **성능** | TCP 대비 10배 빠름 (100GB 데이터 전송 시 10초 → 1초) |
 
 ### NIXL (NVIDIA Inference Xfer Library)
-- **정의**: 분산 LLM 추론 환경에서 KV 캐시 텐서를 GPU 간 효율적으로 전송하기 위한 오픈소스 포인트-투-포인트 전송 라이브러리 (GTC 2025 공개, `ai-dynamo/nixl`)
-- **탄생 배경**: Disaggregated Inference에서 Prefill 노드 → Decode 노드로 KV 캐시를 전송할 때 NCCL은 GPU SM을 소비하지만, NIXL은 GPUDirect RDMA로 GPU 컴퓨팅 자원 없이 전송
-- **주요 특징**:
-  - GPU SM 미사용: GPUDirect RDMA로 직접 GPU 메모리 전송
-  - 비동기 API: 전송과 컴퓨팅 오버랩 가능
-  - 플러그인 백엔드: UCX (InfiniBand/RoCE), GDS/NVMe, S3, NVLink
-  - 메모리 통합: CPU DRAM, GPU VRAM, NVMe, 오브젝트 스토리지 통합 API
-- **NCCL과 차이**:
 
-  | 항목 | NCCL | NIXL |
-  |------|------|------|
-  | 통신 패턴 | Collective (AllReduce 등) | Point-to-point |
-  | GPU SM 사용 | 있음 | 없음 (GPUDirect RDMA) |
-  | 주 용도 | 학습, 텐서 병렬 | KV 캐시 전송, 추론 |
-
-- **통합 프레임워크**: NVIDIA Dynamo, TensorRT-LLM, vLLM (`NixlConnector`), SGLang, AWS EFA
+| 항목 | 설명 |
+|------|------|
+| **정의** | 분산 LLM 추론에서 KV 캐시 텐서를 GPU 간 효율적으로 전송하기 위한 오픈소스 라이브러리 (GTC 2025 공개, `ai-dynamo/nixl`) |
+| **탄생 배경** | Disaggregated Inference에서 Prefill → Decode 노드 KV 캐시 전송 시 NCCL은 GPU SM 소비, NIXL은 GPUDirect RDMA로 GPU 컴퓨팅 자원 미사용 |
+| **주요 특징** | GPU SM 미사용 (GPUDirect RDMA)<br/>비동기 API (전송/컴퓨팅 오버랩)<br/>플러그인 백엔드 (UCX, GDS/NVMe, S3, NVLink)<br/>메모리 통합 (CPU DRAM, GPU VRAM, NVMe, 오브젝트 스토리지) |
+| **NCCL과 차이** | **통신 패턴**: Point-to-point (NCCL: Collective)<br/>**GPU SM 사용**: 없음 (NCCL: 있음)<br/>**주 용도**: KV 캐시 전송, 추론 (NCCL: 학습, 텐서 병렬) |
+| **통합 프레임워크** | NVIDIA Dynamo, TensorRT-LLM, vLLM (`NixlConnector`), SGLang, AWS EFA |
 
 ---
 
 ## 4. 분산 AI 추론
 
 ### Mooncake
-- **정의**: ByteDance가 개발한 KV Cache 오프로딩 시스템 (분산 추론 최적화)
-- **핵심 아이디어**: Prefill GPU와 Decode GPU 분리 + KV Cache 네트워크 전송
-- **아키텍처**:
-  ```
-  [Prefill GPU] → KV Cache (50GB) → [네트워크 전송] → [Decode GPU]
-  ```
-- **네트워크 전송 방식**:
-  1. **NCCL over InfiniBand**: RDMA 사용, 레이턴시 ~1ms (HDR 200Gbps)
-  2. **UDP 직접 전송**: RDMA 없이 커널 소켓 사용, 레이턴시 ~5-10ms
-  3. **압축 전송**: KV Cache 압축 후 전송 (FP16 → INT8)
-- **효과**: Prefill/Decode 분리로 GPU 활용률 2배 향상
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | ByteDance가 개발한 KV Cache 오프로딩 시스템 (분산 추론 최적화) |
+| **핵심 아이디어** | Prefill GPU와 Decode GPU 분리 + KV Cache 네트워크 전송 |
+| **아키텍처** | Prefill GPU → KV Cache (50GB) → 네트워크 전송 → Decode GPU |
+| **네트워크 전송 방식** | **NCCL over InfiniBand**: RDMA, 레이턴시 ~1ms<br/>**UDP 직접 전송**: 커널 소켓, 레이턴시 ~5-10ms<br/>**압축 전송**: FP16 → INT8 |
+| **효과** | Prefill/Decode 분리로 GPU 활용률 2배 향상 |
 
 ### Mooncake의 KV Cache 전송
-- **KV Cache란?**: Transformer의 Attention 계산 시 이전 토큰의 Key/Value 벡터 저장
-- **크기**: LLaMA-70B 모델, 시퀀스 길이 4096 → 약 50GB
-- **전송 방법**:
-  - **방법 1**: GPUDirect RDMA (GPU → HCA → 네트워크 → HCA → GPU)
-  - **방법 2**: GPU → CPU 메모리 → UDP 소켓 → CPU 메모리 → GPU
-- **최적화**:
-  - NCCL Group Call로 All-Gather 오버랩
-  - 파이프라이닝 (전송 중 다음 토큰 생성)
-  - 선택적 전송 (Attention Score 낮은 토큰 제외)
+
+| 항목 | 설명 |
+|------|------|
+| **KV Cache란?** | Transformer의 Attention 계산 시 이전 토큰의 Key/Value 벡터 저장 |
+| **크기** | LLaMA-70B 모델, 시퀀스 길이 4096 → 약 50GB |
+| **전송 방법** | **방법 1**: GPUDirect RDMA (GPU → HCA → 네트워크 → HCA → GPU)<br/>**방법 2**: GPU → CPU 메모리 → UDP 소켓 → CPU 메모리 → GPU |
+| **최적화** | NCCL Group Call로 All-Gather 오버랩<br/>파이프라이닝 (전송 중 다음 토큰 생성)<br/>선택적 전송 (Attention Score 낮은 토큰 제외) |
 
 ### Mooncake NCCL 통합
 - **정의**: Mooncake에서 NCCL을 사용해 KV Cache를 Prefill → Decode GPU로 전송
@@ -430,40 +358,32 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 - **성능**: InfiniBand HDR 200Gbps 사용 시 50GB KV Cache 전송 시간 ~2초
 
 ### vLLM (Virtual Large Language Model)
-- **정의**: UC Berkeley가 개발한 LLM 추론 엔진. 'v'는 OS의 가상 메모리(Virtual Memory) 개념에서 착안 — KV Cache를 페이지 단위로 관리하는 PagedAttention이 핵심 기술
-- **핵심 기능**:
-  - **PagedAttention**: KV Cache를 페이지 단위로 관리 (메모리 낭비 감소)
-  - **Continuous Batching**: 요청 단위가 아닌 토큰 단위 배칭
-  - **Prefix Caching**: 공통 프롬프트 재사용
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | UC Berkeley가 개발한 LLM 추론 엔진. 'v'는 가상 메모리(Virtual Memory)에서 착안 — PagedAttention이 핵심 |
+| **핵심 기능** | **PagedAttention**: KV Cache를 페이지 단위 관리<br/>**Continuous Batching**: 토큰 단위 배칭<br/>**Prefix Caching**: 공통 프롬프트 재사용 |
 
 ### vLLM의 Disaggregated Prefill
-- **정의**: Prefill과 Decode를 별도 GPU 클러스터로 분리하는 아키텍처
-- **배경**:
-  - Prefill: 긴 입력 처리, Compute-bound (높은 TFLOPS 필요)
-  - Decode: 짧은 생성, Memory-bound (낮은 FLOPS, 높은 메모리 대역폭)
-- **구조**:
-  ```
-  [Prefill Cluster]                [Decode Cluster]
-  A100 (높은 FP16 성능)  →         H100 (높은 메모리 대역폭)
-     ↓                                  ↓
-  KV Cache 생성         →  네트워크   →  KV Cache 사용 (토큰 생성)
-  ```
-- **네트워크 전송**: gRPC 또는 RDMA (KV Cache 수십 GB)
-- **효과**: Prefill/Decode GPU를 독립적으로 스케일링, 비용 최적화
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | Prefill과 Decode를 별도 GPU 클러스터로 분리하는 아키텍처 |
+| **배경** | **Prefill**: 긴 입력 처리, Compute-bound (높은 TFLOPS 필요)<br/>**Decode**: 짧은 생성, Memory-bound (높은 메모리 대역폭 필요) |
+| **구조** | Prefill Cluster (A100, 높은 FP16 성능) → KV Cache 생성 → 네트워크 전송 → Decode Cluster (H100, 높은 메모리 대역폭) |
+| **네트워크 전송** | gRPC 또는 RDMA (KV Cache 수십 GB) |
+| **효과** | Prefill/Decode GPU를 독립 스케일링, 비용 최적화 |
 
 ### SGLang (Structured Generation Language)
-- **정의**: LLM 추론 엔진으로 구조화된 생성 및 복잡한 프롬프트 워크플로우에 최적화
-- **개발**: LMSYS (UC Berkeley, UC San Diego, CMU, Stanford 협력)
-- **핵심 기술**:
-  - **RadixAttention**: Radix Tree 기반 KV Cache 관리 (자동 prefix 재사용)
-  - **Structured Generation**: JSON, Regex, CFG 기반 출력 제약
-  - **Frontend Language**: Python DSL로 복잡한 프롬프트 체인 정의
-- **성능** (H100, Llama 3.1 8B):
-  - **처리량**: 16,215 tok/s (vLLM 대비 29% 빠름)
-  - **TTFT** (10 concurrent): 112ms (vLLM 120ms)
-  - **Prefix-heavy 워크로드**: vLLM 대비 6.4배 빠름 (RAG, 멀티턴 채팅)
-- **프로덕션 규모**: 400,000+ GPU에서 실행 (xAI Grok 3, Microsoft Azure)
-- **버전**: SGLang 0.4+ (2026년)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | 구조화된 생성 및 복잡한 프롬프트 워크플로우에 최적화된 LLM 추론 엔진 |
+| **개발** | LMSYS (UC Berkeley, UC San Diego, CMU, Stanford) |
+| **핵심 기술** | **RadixAttention**: Radix Tree 기반 KV Cache 관리<br/>**Structured Generation**: JSON, Regex, CFG 기반 출력 제약<br/>**Frontend Language**: Python DSL로 프롬프트 체인 정의 |
+| **성능 (H100)** | **처리량**: 16,215 tok/s (vLLM 대비 29% 빠름)<br/>**TTFT**: 112ms (vLLM 120ms)<br/>**Prefix-heavy**: vLLM 대비 6.4배 빠름 |
+| **프로덕션** | 400,000+ GPU (xAI Grok 3, Microsoft Azure) |
+| **버전** | SGLang 0.4+ (2026년) |
 
 ### vLLM vs SGLang 비교
 
@@ -522,54 +442,30 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 ## 5. 커널 & 시스템 레벨
 
 ### NIC 커널 드라이버
-- **역할**: NIC 하드웨어와 OS 간 인터페이스
-- **RDMA 스택**:
-  ```
-  [Application]
-       ↓
-  [Verbs API: libibverbs]
-       ↓
-  [RDMA Core: rdma-core]
-       ↓
-  [Kernel Module: mlx5_core, ib_core]
-       ↓
-  [NIC Hardware: ConnectX-7]
-  ```
-- **주요 모듈**:
-  - `mlx5_core`: Mellanox ConnectX-5/6/7 드라이버
-  - `ib_uverbs`: User-space Verbs 인터페이스
-  - `rdma_cm`: Connection Manager (QP 설정)
-- **확인 방법**:
-  ```bash
-  lsmod | grep mlx5
-  ibv_devices  # RDMA 장치 목록
-  ```
+
+| 항목 | 설명 |
+|------|------|
+| **역할** | NIC 하드웨어와 OS 간 인터페이스 |
+| **RDMA 스택** | Application → Verbs API (libibverbs) → RDMA Core (rdma-core) → Kernel Module (mlx5_core, ib_core) → NIC Hardware (ConnectX-7) |
+| **주요 모듈** | `mlx5_core` (ConnectX-5/6/7 드라이버)<br/>`ib_uverbs` (User-space Verbs)<br/>`rdma_cm` (Connection Manager) |
+| **확인 방법** | `lsmod \| grep mlx5`<br/>`ibv_devices` (RDMA 장치 목록) |
 
 ### GPUDirect RDMA
-- **정의**: GPU 메모리와 RDMA NIC 간 직접 DMA (CPU 메모리 우회)
-- **동작 원리**:
-  ```
-  기존: GPU → CPU RAM → NIC (2회 복사)
-  GPUDirect: GPU → NIC (1회 복사, PCIe P2P)
-  ```
-- **요구사항**:
-  - NVIDIA GPU + Mellanox HCA
-  - `nv_peer_mem` 커널 모듈
-  - CUDA 11.0+, NCCL 2.7+
-- **성능 향상**: 레이턴시 50% 감소, CPU 사용률 90% 감소
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | GPU 메모리와 RDMA NIC 간 직접 DMA (CPU 메모리 우회) |
+| **동작 원리** | **기존**: GPU → CPU RAM → NIC (2회 복사)<br/>**GPUDirect**: GPU → NIC (1회 복사, PCIe P2P) |
+| **요구사항** | NVIDIA GPU + Mellanox HCA<br/>`nv_peer_mem` 커널 모듈<br/>CUDA 11.0+, NCCL 2.7+ |
+| **성능 향상** | 레이턴시 50% 감소, CPU 사용률 90% 감소 |
 
 ### GID Index
-- **정의**: 하나의 HCA 포트가 여러 GID를 가질 때 각 GID의 인덱스
-- **확인 방법**:
-  ```bash
-  show_gids
-  # 출력 예시:
-  # DEV    PORT  INDEX  GID                                      IPv4            VER  DEV
-  # ---    ----  -----  ---                                      ------------    ---  ---
-  # mlx5_0 1     0      fe80:0000:0000:0000:7a2b:cbff:fe9e:3d4f                  v1   enp1s0
-  # mlx5_0 1     3      0000:0000:0000:0000:0000:ffff:0a00:0001  10.0.0.1        v2   enp1s0
-  ```
-- **용도**: NCCL 설정 시 Routable GID 지정 (`NCCL_IB_GID_INDEX=3`)
+
+| 항목 | 설명 |
+|------|------|
+| **정의** | 하나의 HCA 포트가 여러 GID를 가질 때 각 GID의 인덱스 |
+| **확인 방법** | `show_gids` (출력: DEV, PORT, INDEX, GID, IPv4, VER) |
+| **용도** | NCCL 설정 시 Routable GID 지정 (`NCCL_IB_GID_INDEX=3`) |
 
 ---
 

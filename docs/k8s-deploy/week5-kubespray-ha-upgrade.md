@@ -149,11 +149,14 @@ curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
 
 ```
 **HAProxy 설정 포인트**:
-- **Frontend**: `*:6443` - 모든 인터페이스에서 수신
-- **Backend**: roundrobin 알고리즘으로 3개 Control Plane에 분산
-- **Health Check**: `check` 옵션으로 장애 노드 자동 제외
-- **통계 페이지**: `http://192.168.10.10:9000/haproxy_stats`
-- **Prometheus 메트릭**: `http://192.168.10.10:8405/metrics`
+
+| 항목 | 설명 |
+|-----|------|
+| **Frontend** | `*:6443` - 모든 인터페이스에서 수신 |
+| **Backend** | roundrobin 알고리즘으로 3개 Control Plane에 분산 |
+| **Health Check** | `check` 옵션으로 장애 노드 자동 제외 |
+| **통계 페이지** | `http://192.168.10.10:9000/haproxy_stats` |
+| **Prometheus 메트릭** | `http://192.168.10.10:8405/metrics` |
 
 ---
 
@@ -190,10 +193,13 @@ systemctl restart sshd
 
 ```
 **설정 이유**:
-- **Swap 비활성화**: Kubernetes는 메모리 예측 가능성을 위해 Swap 사용 금지
-- **overlay**: OverlayFS 파일시스템 (Container 이미지 레이어링)
-- **br_netfilter**: Bridge 트래픽이 iptables를 거치도록 설정
-- **ip_forward**: Pod 간 통신을 위한 IP 포워딩
+
+| 설정 | 이유 |
+|-----|------|
+| **Swap 비활성화** | Kubernetes는 메모리 예측 가능성을 위해 Swap 사용 금지 |
+| **overlay** | OverlayFS 파일시스템 (Container 이미지 레이어링) |
+| **br_netfilter** | Bridge 트래픽이 iptables를 거치도록 설정 |
+| **ip_forward** | Pod 간 통신을 위한 IP 포워딩 |
 
 ---
 
@@ -275,10 +281,13 @@ sed -i 's|metrics_server_enabled: false|metrics_server_enabled: true|g' \
 
 ```
 **설정 이유**:
-- **Flannel**: 가볍고 간단한 CNI (VXLAN)
-- **iptables**: ipvs보다 디버깅 용이
-- **flannel_interface**: Vagrant Private Network 인터페이스 지정
-- **NodeLocalDNS 비활성화**: 실습 환경 단순화
+
+| 설정 | 이유 |
+|-----|------|
+| **Flannel** | 가볍고 간단한 CNI (VXLAN) |
+| **iptables** | ipvs보다 디버깅 용이 |
+| **flannel_interface** | Vagrant Private Network 인터페이스 지정 |
+| **NodeLocalDNS 비활성화** | 실습 환경 단순화 |
 
 ---
 
@@ -412,10 +421,13 @@ graph TB
 
 ```
 **특징**:
-- **Control Plane 노드**: 로컬 API Server 직접 접근 (`127.0.0.1:6443`)
-- **Worker 노드**: Nginx Static Pod를 통한 Client-Side LB
-- **외부 LB 불필요**: 각 노드가 독립적으로 LB 운영
-- **장애 조치**: Nginx가 `least_conn` 알고리즘으로 자동 failover
+
+| 항목 | 설명 |
+|-----|------|
+| **Control Plane 노드** | 로컬 API Server 직접 접근 (`127.0.0.1:6443`) |
+| **Worker 노드** | Nginx Static Pod를 통한 Client-Side LB |
+| **외부 LB 불필요** | 각 노드가 독립적으로 LB 운영 |
+| **장애 조치** | Nginx가 `least_conn` 알고리즘으로 자동 failover |
 
 **Nginx 설정** (`/etc/kubernetes/nginx-proxy.conf`):
 
@@ -527,10 +539,13 @@ graph TB
 
 ```
 **특징**:
-- **External LB**: kubectl 등 외부 접근용
-- **Control Plane**: 로컬 API Server 직접 접근
-- **Worker**: Client-Side LB (Nginx Static Pod)
-- **이중 장애 보호**: HAProxy + Nginx 모두 장애 대응
+
+| 항목 | 설명 |
+|-----|------|
+| **External LB** | kubectl 등 외부 접근용 |
+| **Control Plane** | 로컬 API Server 직접 접근 |
+| **Worker** | Client-Side LB (Nginx Static Pod) |
+| **이중 장애 보호** | HAProxy + Nginx 모두 장애 대응 |
 
 **설정 방법**:
 
@@ -1095,10 +1110,13 @@ ssh k8s-node1 poweroff
 open "http://192.168.10.10:9000/haproxy_stats"
 
 ```
-- **Backend Status**: k8s-node1~3의 Health Check 상태
-- **Session Rate**: 초당 요청 수
-- **Total Sessions**: 총 세션 수
-- **Bytes In/Out**: 트래픽 통계
+
+| 항목 | 설명 |
+|-----|------|
+| **Backend Status** | k8s-node1~3의 Health Check 상태 |
+| **Session Rate** | 초당 요청 수 |
+| **Total Sessions** | 총 세션 수 |
+| **Bytes In/Out** | 트래픽 통계 |
 
 **Prometheus 메트릭**:
 
@@ -1228,10 +1246,13 @@ graph TB
 
 ```
 **실전 팁**:
-- **99% 조절**: `inventory/mycluster/group_vars/`에서 조절
-- **긴급 변경**: `-e` 옵션으로 CLI에서 즉시 override
-- **특정 노드만**: `host_vars/` 사용
-- **변수 검색**: `grep -Rn "변수명" inventory/ roles/ playbooks/`
+
+| 상황 | 방법 |
+|-----|------|
+| **99% 조절** | `inventory/mycluster/group_vars/`에서 조절 |
+| **긴급 변경** | `-e` 옵션으로 CLI에서 즉시 override |
+| **특정 노드만** | `host_vars/` 사용 |
+| **변수 검색** | `grep -Rn "변수명" inventory/ roles/ playbooks/` |
 
 **예시**:
 
@@ -1258,10 +1279,13 @@ etcd_deployment_type: host
 
 ```
 **특징**:
-- **독립 관리**: systemd unit으로 etcd 실행
-- **kubeadm 독립**: kubeadm에 종속되지 않음
-- **업그레이드 용이**: etcd만 별도 업그레이드 가능
-- **백업/복구**: systemctl로 간편하게 관리
+
+| 항목 | 설명 |
+|-----|------|
+| **독립 관리** | systemd unit으로 etcd 실행 |
+| **kubeadm 독립** | kubeadm에 종속되지 않음 |
+| **업그레이드 용이** | etcd만 별도 업그레이드 가능 |
+| **백업/복구** | systemctl로 간편하게 관리 |
 
 **etcd.service**:
 
@@ -1879,10 +1903,13 @@ open "http://192.168.10.10:9000/haproxy_stats"
 ### 5. Next Steps
 
 **Week 6 Preview** (예상):
-- **Kubernetes Upgrade**: Kubespray를 통한 클러스터 업그레이드
-- **etcd Backup & Restore**: 백업 및 복구 전략
-- **Certificate Management**: 인증서 갱신 및 관리
-- **프로덕션 전환**: Best Practice 및 보안 강화
+
+| 주제 | 내용 |
+|-----|------|
+| **Kubernetes Upgrade** | Kubespray를 통한 클러스터 업그레이드 |
+| **etcd Backup & Restore** | 백업 및 복구 전략 |
+| **Certificate Management** | 인증서 갱신 및 관리 |
+| **프로덕션 전환** | Best Practice 및 보안 강화 |
 
 ---
 

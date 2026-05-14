@@ -1169,10 +1169,12 @@ aws eks list-insights \
 
 **Enhanced Container Network Observability**는 **Pod 간 네트워크 흐름을 시각화**합니다.
 
-- **Pod-to-Pod 통신 흐름**: VPC Flow Monitor 통합
-- **DNS 쿼리 추적**: 실패한 DNS 쿼리 분석
-- **Network Performance**: 레이턴시, 패킷 드롭 모니터링
-- **Service Map**: Pod 간 의존성 시각화
+| 기능 | 설명 |
+|-----|------|
+| **Pod-to-Pod 통신 흐름** | VPC Flow Monitor 통합 |
+| **DNS 쿼리 추적** | 실패한 DNS 쿼리 분석 |
+| **Network Performance** | 레이턴시, 패킷 드롭 모니터링 |
+| **Service Map** | Pod 간 의존성 시각화 |
 
 ---
 
@@ -1205,17 +1207,23 @@ aws eks list-insights \
 ### 2. Control Plane vs Data Plane
 
 **Control Plane (AWS 관리)**:
-- **API Server**: Kubernetes API 노출
-- **etcd**: 클러스터 상태 저장
-- **Controller Manager**: 리소스 관리
-- **Scheduler**: Pod 스케줄링
-- **관리**: AWS가 완전 관리 (HA, 백업, 패치)
+
+| 컴포넌트 | 역할 |
+|---------|------|
+| **API Server** | Kubernetes API 노출 |
+| **etcd** | 클러스터 상태 저장 |
+| **Controller Manager** | 리소스 관리 |
+| **Scheduler** | Pod 스케줄링 |
+| **관리** | AWS가 완전 관리 (HA, 백업, 패치) |
 
 **Data Plane (사용자 선택)**:
-- **EC2 Worker Nodes**: 사용자 관리 또는 AWS Managed
-- **Fargate**: 서버리스
-- **kubelet, kube-proxy**: 노드에서 실행
-- **관리**: 사용자 책임 (업데이트, 스케일링)
+
+| 컴포넌트 | 설명 |
+|---------|------|
+| **EC2 Worker Nodes** | 사용자 관리 또는 AWS Managed |
+| **Fargate** | 서버리스 |
+| **kubelet, kube-proxy** | 노드에서 실행 |
+| **관리** | 사용자 책임 (업데이트, 스케일링) |
 
 ### 3. Endpoint Access 전략 비교
 

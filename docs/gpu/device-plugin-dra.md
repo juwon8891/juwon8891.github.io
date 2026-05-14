@@ -551,11 +551,11 @@ spec:
       path: /dev/infiniband
 ```
 
-## DRANET (DRA Network Driver)
+## DRANET (DRA Kubernetes Network Driver)
 
 ### 개요
 
-**DRANET**은 Kubernetes SIG (Special Interest Group)가 관리하는 DRA 기반 네트워크 드라이버다.
+**DRANET** (DRA Kubernetes Network Driver)는 DRA 기반 네트워크 드라이버로, Kubecon NA 2025에서 Kubernetes 조직에 기증되어 현재 Kubernetes SIG가 관리한다.
 
 **목적**: AI/ML 분산 학습 시 GPU ↔ NIC 간 데이터 전송 성능 최적화
 

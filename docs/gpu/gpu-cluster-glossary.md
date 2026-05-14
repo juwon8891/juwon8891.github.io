@@ -368,12 +368,23 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
   ```
 - **성능**: TCP 대비 10배 빠름 (100GB 데이터 전송 시 10초 → 1초)
 
-### NIXL (Network Interface eXtension Library) - 추정
-- **정의**: (공식 문서 부족) NCCL의 네트워크 확장 인터페이스로 추정
-- **가능한 역할**:
-  - 사용자 정의 네트워크 백엔드 구현 (예: AWS EFA, Google gVNIC)
-  - RDMA 외 프로토콜 지원 (UDP, InfiniBand Extended)
-- **관련 기술**: UCX (Unified Communication X), libfabric
+### NIXL (NVIDIA Inference Xfer Library)
+- **정의**: 분산 LLM 추론 환경에서 KV 캐시 텐서를 GPU 간 효율적으로 전송하기 위한 오픈소스 포인트-투-포인트 전송 라이브러리 (GTC 2025 공개, `ai-dynamo/nixl`)
+- **탄생 배경**: Disaggregated Inference에서 Prefill 노드 → Decode 노드로 KV 캐시를 전송할 때 NCCL은 GPU SM을 소비하지만, NIXL은 GPUDirect RDMA로 GPU 컴퓨팅 자원 없이 전송
+- **주요 특징**:
+  - GPU SM 미사용: GPUDirect RDMA로 직접 GPU 메모리 전송
+  - 비동기 API: 전송과 컴퓨팅 오버랩 가능
+  - 플러그인 백엔드: UCX (InfiniBand/RoCE), GDS/NVMe, S3, NVLink
+  - 메모리 통합: CPU DRAM, GPU VRAM, NVMe, 오브젝트 스토리지 통합 API
+- **NCCL과 차이**:
+
+  | 항목 | NCCL | NIXL |
+  |------|------|------|
+  | 통신 패턴 | Collective (AllReduce 등) | Point-to-point |
+  | GPU SM 사용 | 있음 | 없음 (GPUDirect RDMA) |
+  | 주 용도 | 학습, 텐서 병렬 | KV 캐시 전송, 추론 |
+
+- **통합 프레임워크**: NVIDIA Dynamo, TensorRT-LLM, vLLM (`NixlConnector`), SGLang, AWS EFA
 
 ---
 

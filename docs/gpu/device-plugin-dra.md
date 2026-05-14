@@ -232,7 +232,7 @@ graph TB
         POD[GPU Pod]
     end
     
-    subgard "Hardware"
+    subgraph "Hardware"
         GPU[NVIDIA GPU]
     end
     

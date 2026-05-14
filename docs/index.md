@@ -8,7 +8,7 @@ Kubernetes, EKS, CUDA, CI/CD 등 다양한 기술 스택에 대한 학습 내용
 - [GPU 클러스터 용어 사전](gpu/gpu-cluster-glossary/)
 - [NVIDIA CUDA 아키텍처](gpu/nvidia-cuda-architecture/)
 - [GPU 인터커넥트](gpu/infiniband-nvlink-nvswitch/)
-- [RDMA Device Plugin](gpu/rdma-device-plugin/)
+- [Device Plugin & DRA](gpu/device-plugin-dra/)
 
 ### [ Networking](networking/l2-l3-troubleshooting/)
 - [L2/L3 스위치 & ARP 트러블슈팅](networking/l2-l3-troubleshooting/)

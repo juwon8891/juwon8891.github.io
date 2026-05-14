@@ -555,7 +555,7 @@ spec:
 
 ### 개요
 
-**DRANET**은 Google이 개발한 DRA 기반 Kubernetes 네트워크 드라이버다.
+**DRANET**은 Kubernetes SIG (Special Interest Group)가 관리하는 DRA 기반 네트워크 드라이버다.
 
 **목적**: AI/ML 분산 학습 시 GPU ↔ NIC 간 데이터 전송 성능 최적화
 
@@ -685,7 +685,7 @@ spec:
 
 | 항목 | RDMA Shared Device Plugin | DRANET |
 |------|---------------------------|--------|
-| **개발** | Mellanox/NVIDIA | Google |
+| **개발** | Mellanox/NVIDIA | Kubernetes SIG |
 | **메커니즘** | Device Plugin (정적) | DRA (동적) |
 | **대상 리소스** | RDMA NIC만 | NIC + GPU 통합 |
 | **토폴로지 인식** | X | O (GPU-NIC affinity) |
@@ -885,4 +885,4 @@ spec:
 - [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
 - [AMD GPU Operator](https://github.com/amd/amd-gpu-operator)
 - [RDMA Device Plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin)
-- [DRANET (DRA Network Driver)](https://github.com/google/dranet)
+- [DRANET (DRA Network Driver)](https://github.com/kubernetes-sigs/dranet)

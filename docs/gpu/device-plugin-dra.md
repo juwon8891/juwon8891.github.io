@@ -462,13 +462,11 @@ spec:
         amd.com/gpu: 1
 ```
 
-## RDMA Device Plugin (DRANET)
+## RDMA Device Plugin
 
 ### 개요
 
 **RDMA Device Plugin**은 InfiniBand HCA, RoCE NIC를 Pod에 할당한다.
-
-**DRANET (DRA Network)**은 RDMA Device Plugin을 DRA 기반으로 마이그레이션한 버전이다.
 
 ### 리소스 계층
 
@@ -553,51 +551,120 @@ spec:
       path: /dev/infiniband
 ```
 
-### DRANET (DRA 방식)
+## DRANET (DRA Network Driver)
 
-**기존 (Device Plugin)**:
-- 정적 리소스 할당
-- Pod 재시작 시 리소스 재할당 필요
-- 단순 카운팅 (`rdma/hca: 1`)
+### 개요
 
-**DRANET (DRA)**:
-- 동적 리소스 할당
-- 영구적 ResourceClaim 가능
-- 세밀한 요구사항 (`bandwidth: 200Gbps`, `numa-node: 0`)
+**DRANET**은 Google이 개발한 DRA 기반 Kubernetes 네트워크 드라이버다.
 
-**DRANET ResourceClass**:
+**핵심 특징**:
+- GPU + NIC **토폴로지 인식 스케줄링**으로 AI/ML 워크로드 최적화
+- all_gather 대역폭 **59.6% 향상**, all_reduce **58.1% 향상**
+- 기존 CNI 플러그인과 함께 작동
+- NRI (Node Resource Interface)를 통한 Container Runtime 통합
+
+### 아키텍처
+
+```mermaid
+graph TB
+    subgraph "Control Plane"
+        API[API Server]
+        SCHED[Scheduler]
+        DRA_CTRL[DRA Controller]
+    end
+    
+    subgraph "Worker Node"
+        KUBELET[Kubelet]
+        DRANET[DRANET Driver]
+        CRI[Container Runtime<br/>NRI Plugin]
+        CNI[CNI Plugin]
+    end
+    
+    subgraph "Hardware"
+        GPU[GPU]
+        NIC[NIC]
+    end
+    
+    API --> DRA_CTRL
+    DRA_CTRL --> SCHED
+    SCHED --> KUBELET
+    KUBELET --> DRANET
+    KUBELET --> CRI
+    DRANET --> CRI
+    CRI --> CNI
+    DRANET --> NIC
+    CNI --> NIC
+    CRI --> GPU
+```
+
+### 토폴로지 인식 스케줄링
+
+**문제**: GPU와 NIC가 서로 다른 NUMA 노드에 있으면 PCIe 대역폭 저하
+
+**DRANET 해결**:
+- GPU와 NIC를 **같은 PCIe 루트 컴플렉스**에 배치
+- NUMA 노드 인식으로 cross-NUMA 트래픽 최소화
+- 토폴로지 정보를 DRA ResourceClaim에 포함
+
+**ResourceClass 예시**:
 ```yaml
 apiVersion: resource.k8s.io/v1alpha2
 kind: ResourceClass
 metadata:
-  name: rdma-hca-cx7
-driverName: rdma.network.nvidia.com
+  name: high-perf-network
+driverName: dranet.networking.k8s.io
 parameters:
-  device:
-    vendor: "0x15b3"  # Mellanox/NVIDIA
-    model: "ConnectX-7"
-    speed: "400Gbps"
-    protocol: ["InfiniBand", "RoCEv2"]
+  bandwidth: "200Gbps"
+  latency: "low"
+  topology:
+    gpu-affinity: required  # GPU와 같은 PCIe 루트에 배치
+    numa-node: same         # 같은 NUMA 노드
 ```
 
-**Pod에서 사용**:
+**Pod 요청**:
 ```yaml
 apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: mpi-job
+  - name: training
     resources:
       claims:
-      - name: rdma-claim
+      - name: gpu-claim
+      - name: network-claim
 ---
 apiVersion: resource.k8s.io/v1alpha2
 kind: ResourceClaim
 metadata:
-  name: rdma-claim
+  name: network-claim
 spec:
-  resourceClassName: rdma-hca-cx7
+  resourceClassName: high-perf-network
 ```
+
+### 성능 향상
+
+**벤치마크 결과** (NVIDIA Collective Communications Library):
+
+| 작업 | 기존 (CNI only) | DRANET | 향상률 |
+|------|----------------|--------|--------|
+| **all_gather** | 100 GB/s | 159.6 GB/s | +59.6% |
+| **all_reduce** | 80 GB/s | 126.5 GB/s | +58.1% |
+| **all_to_all** | 90 GB/s | 140 GB/s | +55.6% |
+
+**향상 원인**:
+- GPU ↔ NIC 간 PCIe 경로 최적화
+- cross-NUMA 트래픽 제거
+- 토폴로지 인식 리소스 할당
+
+### CNI vs DRANET
+
+| 항목 | CNI (기존) | DRANET |
+|------|-----------|--------|
+| **토폴로지 인식** | X | O |
+| **GPU 친화성** | X | O |
+| **동적 할당** | X | O (DRA) |
+| **성능** | 기준 | +59.6% (all_gather) |
+| **호환성** | 모든 CNI | CNI와 함께 작동 |
 
 ## 벤더별 비교
 
@@ -622,7 +689,7 @@ spec:
 | **할당 방식** | 정적 (Pod 생성 시) | 동적 (실행 중 가능) |
 | **리소스 표현** | 단순 카운팅 | 구조화된 파라미터 |
 | **토폴로지 인식** | 없음 | NVLink, NUMA, PCIe 고려 |
-| **공유** | 불가 (MIG 제외) | 가능 |
+| **공유** | 가능 (Time-slicing, MPS, MIG) | 가능 (더 세밀한 제어) |
 | **재시작 시** | 재할당 (다른 GPU 가능) | 동일 GPU 유지 가능 |
 | **사용 사례** | 단순 GPU 할당 | 멀티 GPU 학습, RDMA 네트워크 |
 
@@ -704,14 +771,15 @@ spec:
 - **NVIDIA**: GPU Operator + CUDA + DCGM + MIG
 - **AMD**: GPU Operator + ROCm + AMD SMI
 
-**RDMA 네트워크**:
-- **Device Plugin**: ConfigMap 기반, 단순 할당
-- **DRANET (DRA)**: ResourceClass 기반, 대역폭/프로토콜 지정 가능
+**네트워크 리소스**:
+- **RDMA Device Plugin**: RDMA NIC 할당 (InfiniBand, RoCE)
+- **DRANET (DRA)**: GPU + NIC 토폴로지 인식, AI/ML 워크로드 최적화 (+59.6% 대역폭)
 
 **실전 권장**:
 - 단순 GPU 사용: Device Plugin (안정적)
 - 멀티 GPU 학습 (NVLink 필요): DRA + NVIDIA GPU Operator
-- RDMA 고성능 네트워크: DRANET (DRA 방식)
+- **GPU + NIC 토폴로지 최적화 (AI/ML)**: DRANET + DRA
+- RDMA 네트워크 (기본): RDMA Device Plugin
 - AMD GPU: AMD GPU Operator + Device Plugin
 
 ## 참고 자료
@@ -721,3 +789,4 @@ spec:
 - [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
 - [AMD GPU Operator](https://github.com/amd/amd-gpu-operator)
 - [RDMA Device Plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin)
+- [DRANET (DRA Network Driver)](https://github.com/google/dranet)

@@ -369,6 +369,56 @@ ping <ip>
 | L2 | MAC, Switch | MAC Learning, 포트 전달 |
 | L3 | IP, ARP, Router/L3 Switch | IP 라우팅, MAC ↔ IP 매핑 |
 
+### 3가지 주요 테이블
+
+**네트워크 장비가 사용하는 3가지 테이블**:
+
+| 테이블 | 위치 | 매핑 | 확인 명령어 | TTL | 용도 |
+|--------|------|------|------------|-----|------|
+| **ARP Table** | 호스트, L3 스위치, 라우터 | IP ↔ MAC | `arp -a` (호스트)<br/>`show ip arp` (스위치) | 60~240초 | IP 주소를 MAC 주소로 변환 |
+| **Routing Table** | 라우터, L3 스위치 | 목적지 네트워크 → Next Hop | `ip route` (Linux)<br/>`show ip route` (Cisco) | 정적 (수동 설정)<br/>동적 (라우팅 프로토콜) | 패킷을 어느 경로로 전달할지 결정 |
+| **MAC Address Table** | L2/L3 스위치 | MAC → Port | `show mac address-table` (Cisco) | 300초 (기본값) | MAC 주소를 물리 포트로 매핑 |
+
+**3가지 테이블의 협력 과정**:
+
+```
+외부 (192.168.1.10) → L3 스위치 → 내부 호스트 (10.0.1.100)
+
+1단계: Routing Table 조회
+- 목적지 IP: 10.0.1.100
+- Routing Table: 10.0.1.0/24 → eth0 인터페이스로 전달
+
+2단계: ARP Table 조회
+- 10.0.1.100의 MAC 주소는?
+- ARP Table: 10.0.1.100 → aa:bb:cc:dd:ee:ff
+
+3단계: MAC Address Table 조회
+- aa:bb:cc:dd:ee:ff는 어느 포트?
+- MAC Table: aa:bb:cc:dd:ee:ff → Port 5
+
+4단계: 패킷 전달
+- Port 5로 프레임 전송
+```
+
+**트러블슈팅 시 점검 순서**:
+
+1. **Routing Table**: 목적지 네트워크로 가는 경로가 있는가?
+   ```bash
+   ip route | grep 10.0.1.0
+   ```
+
+2. **ARP Table**: 목적지 IP의 MAC 주소를 알고 있는가?
+   ```bash
+   arp -a | grep 10.0.1.100
+   # Incomplete → ARP 응답 없음
+   ```
+
+3. **MAC Address Table**: MAC 주소가 어느 포트로 매핑되어 있는가?
+   ```bash
+   show mac address-table | include aa:bb:cc:dd:ee:ff
+   # 없음 → MAC Learning 안 됨 (arping 필요)
+   ```
+
 **ARP 트러블슈팅 핵심**:
 
 1. ARP 테이블은 TTL이 있어 주기적으로 만료됨

@@ -656,15 +656,93 @@ spec:
 - cross-NUMA 트래픽 제거
 - 토폴로지 인식 리소스 할당
 
-### CNI vs DRANET
+### RDMA Shared Device Plugin vs DRANET
 
-| 항목 | CNI (기존) | DRANET |
-|------|-----------|--------|
-| **토폴로지 인식** | X | O |
-| **GPU 친화성** | X | O |
-| **동적 할당** | X | O (DRA) |
-| **성능** | 기준 | +59.6% (all_gather) |
-| **호환성** | 모든 CNI | CNI와 함께 작동 |
+**RDMA Shared Device Plugin** (Mellanox/NVIDIA):
+- DaemonSet: `rdma-shared-dp-ds`
+- Device Plugin 방식
+- RDMA NIC 할당 (InfiniBand, RoCE)
+
+**비교표**:
+
+| 항목 | RDMA Shared Device Plugin | DRANET |
+|------|---------------------------|--------|
+| **개발** | Mellanox/NVIDIA | Google |
+| **메커니즘** | Device Plugin (정적) | DRA (동적) |
+| **대상 리소스** | RDMA NIC만 | NIC + GPU 통합 |
+| **토폴로지 인식** | X | O (GPU-NIC affinity) |
+| **NUMA 인식** | X | O |
+| **할당 방식** | ConfigMap (rdma/hca) | ResourceClass (구조화) |
+| **GPU 친화성** | X | O (same PCIe root) |
+| **성능 최적화** | 없음 | +59.6% (all_gather) |
+| **사용 사례** | RDMA 네트워크 | AI/ML 분산 학습 |
+| **DaemonSet** | `rdma-shared-dp-ds` | `dranet-*` |
+| **리소스 이름** | `rdma/hca`, `rdma/roce` | DRA ResourceClaim |
+
+**RDMA Shared Device Plugin 설정 예시**:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rdma-devices
+  namespace: kube-system
+data:
+  config.json: |
+    {
+      "periodicUpdateInterval": 300,
+      "configList": [{
+        "resourceName": "rdma_shared_device_a",
+        "rdmaHcaMax": 63,
+        "selectors": {
+          "vendors": ["15b3"],
+          "deviceIDs": ["1017"]
+        }
+      }]
+    }
+```
+
+**Pod 요청 비교**:
+
+```yaml
+# RDMA Shared Device Plugin 방식
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: rdma-app
+    resources:
+      limits:
+        rdma/hca: 1
+    volumeMounts:
+    - name: rdma
+      mountPath: /dev/infiniband
+  volumes:
+  - name: rdma
+    hostPath:
+      path: /dev/infiniband
+
+---
+# DRANET 방식 (GPU + NIC 토폴로지 인식)
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: training
+    resources:
+      claims:
+      - name: gpu-claim
+      - name: network-claim  # GPU와 같은 PCIe root에 배치
+```
+
+**선택 기준**:
+
+| 요구사항 | 추천 |
+|---------|------|
+| RDMA 네트워크만 필요 | RDMA Shared Device Plugin |
+| GPU + NIC 토폴로지 최적화 필요 | DRANET |
+| AI/ML 분산 학습 (NCCL) | DRANET |
+| 기존 워크로드 (MPI, UCX) | RDMA Shared Device Plugin |
+| DRA 기능 필요 (동적 할당) | DRANET |
 
 ## 벤더별 비교
 

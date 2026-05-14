@@ -85,13 +85,15 @@ graph TB
 
 **EKS는 다양한 관리 방법을 제공합니다**:
 
-- **AWS Management Console**: 웹 UI를 통한 클러스터 관리
-- **Amazon EKS API/SDK**: 프로그래매틱 액세스
-- **AWS CDK**: Infrastructure as Code (TypeScript, Python 등)
-- **AWS CLI**: 명령줄 인터페이스
-- **eksctl CLI**: EKS 전용 CLI 도구
-- **AWS CloudFormation**: YAML/JSON 템플릿 기반 배포
-- **Terraform**: HashiCorp의 IaC 도구
+| 관리 방법 | 설명 |
+|----------|------|
+| **AWS Management Console** | 웹 UI를 통한 클러스터 관리 |
+| **Amazon EKS API/SDK** | 프로그래매틱 액세스 |
+| **AWS CDK** | Infrastructure as Code (TypeScript, Python 등) |
+| **AWS CLI** | 명령줄 인터페이스 |
+| **eksctl CLI** | EKS 전용 CLI 도구 |
+| **AWS CloudFormation** | YAML/JSON 템플릿 기반 배포 |
+| **Terraform** | HashiCorp의 IaC 도구 |
 
 #### 3.2 액세스 제어
 
@@ -105,20 +107,24 @@ graph TB
 
 **다양한 컴퓨팅 옵션 제공**:
 
-- **Amazon EC2 인스턴스**: Nitro, Graviton 등 다양한 인스턴스 타입
-- **AWS Fargate**: 서버리스 컨테이너 실행
-- **Spot Instances**: 저렴한 비용 (최대 90% 절감)
-- **Karpenter**: 자동 스케일링 (EKS Auto Mode)
-- **Bottlerocket OS**: 컨테이너 최적화 OS
+| 컴퓨팅 옵션 | 설명 |
+|-----------|------|
+| **Amazon EC2 인스턴스** | Nitro, Graviton 등 다양한 인스턴스 타입 |
+| **AWS Fargate** | 서버리스 컨테이너 실행 |
+| **Spot Instances** | 저렴한 비용 (최대 90% 절감) |
+| **Karpenter** | 자동 스케일링 (EKS Auto Mode) |
+| **Bottlerocket OS** | 컨테이너 최적화 OS |
 
 #### 3.4 스토리지
 
 **EKS Auto Mode는 다양한 스토리지 옵션을 자동 관리**:
 
-- **Amazon EBS**: 블록 스토리지 (CSI Driver 자동 설치)
-- **Amazon EFS**: 파일 시스템 (다중 AZ 공유)
-- **Amazon FSx**: 고성능 파일 시스템
-- **Amazon EBS CSI Driver**: Kubernetes PersistentVolume 지원
+| 스토리지 옵션 | 설명 |
+|-------------|------|
+| **Amazon EBS** | 블록 스토리지 (CSI Driver 자동 설치) |
+| **Amazon EFS** | 파일 시스템 (다중 AZ 공유) |
+| **Amazon FSx** | 고성능 파일 시스템 |
+| **Amazon EBS CSI Driver** | Kubernetes PersistentVolume 지원 |
 
 #### 3.5 모니터링 및 로깅
 
@@ -218,11 +224,13 @@ graph TB
 ```
 **Control Plane 특징**:
 
-- **Multi-AZ HA**: 3개 AZ에 분산 배치
-- **Auto Scaling**: API Server 자동 스케일링
-- **Automatic Backup**: etcd 자동 백업 (AWS S3)
-- **Security Patching**: AWS가 보안 패치 자동 적용
-- **Monitoring**: Control Plane 메트릭 CloudWatch 전송
+| 특징 | 설명 |
+|-----|------|
+| **Multi-AZ HA** | 3개 AZ에 분산 배치 |
+| **Auto Scaling** | API Server 자동 스케일링 |
+| **Automatic Backup** | etcd 자동 백업 (AWS S3) |
+| **Security Patching** | AWS가 보안 패치 자동 적용 |
+| **Monitoring** | Control Plane 메트릭 CloudWatch 전송 |
 
 ### 2. Data Plane 선택
 
@@ -303,10 +311,12 @@ graph TB
 ```
 **네트워크 주요 개념**:
 
-- **VPC**: Kubernetes 클러스터가 실행되는 격리된 네트워크
-- **서브넷**: Public (NAT, LB) / Private (Worker 노드, Pod)
-- **Security Group**: 노드 간 통신 제어
-- **CNI 플러그인**: AWS VPC CNI (기본), Calico, Cilium 등
+| 개념 | 설명 |
+|-----|------|
+| **VPC** | Kubernetes 클러스터가 실행되는 격리된 네트워크 |
+| **서브넷** | Public (NAT, LB) / Private (Worker 노드, Pod) |
+| **Security Group** | 노드 간 통신 제어 |
+| **CNI 플러그인** | AWS VPC CNI (기본), Calico, Cilium 등 |
 
 ### 4. 클러스터 구성 요소
 
@@ -331,12 +341,14 @@ graph TB
 
 #### 4.3 클러스터 Add-ons (선택적 설치)
 
-- **CoreDNS**: 클러스터 내부 DNS
-- **AWS VPC CNI**: Pod 네트워크 플러그인
-- **kube-proxy**: Service 네트워크 프록시
-- **AWS Load Balancer Controller**: ALB/NLB Ingress
-- **Amazon EBS CSI Driver**: EBS 볼륨 지원 (EKS Auto Mode는 자동)
-- **Cluster Autoscaler** / **Karpenter**: 노드 자동 스케일링
+| Add-on | 역할 |
+|--------|------|
+| **CoreDNS** | 클러스터 내부 DNS |
+| **AWS VPC CNI** | Pod 네트워크 플러그인 |
+| **kube-proxy** | Service 네트워크 프록시 |
+| **AWS Load Balancer Controller** | ALB/NLB Ingress |
+| **Amazon EBS CSI Driver** | EBS 볼륨 지원 (EKS Auto Mode는 자동) |
+| **Cluster Autoscaler** / **Karpenter** | 노드 자동 스케일링 |
 
 ---
 

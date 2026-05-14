@@ -993,12 +993,15 @@ kubectl describe clusterrolebindings system:kube-apiserver \
 ### 1. Container Runtime 설치
 
 **설치 컴포넌트** (node-0, node-1):
-- **runc**: OCI 런타임 (실제 컨테이너 프로세스 생성)
-- **CNI 플러그인**: bridge, loopback
-- **containerd**: CRI (Container Runtime Interface)
-- **crictl**: CRI 디버깅 도구
-- **kubelet**: Node Agent
-- **kube-proxy**: Service 네트워크 구현
+
+| 컴포넌트 | 역할 |
+|---------|------|
+| **runc** | OCI 런타임 (실제 컨테이너 프로세스 생성) |
+| **CNI 플러그인** | bridge, loopback |
+| **containerd** | CRI (Container Runtime Interface) |
+| **crictl** | CRI 디버깅 도구 |
+| **kubelet** | Node Agent |
+| **kube-proxy** | Service 네트워크 구현 |
 
 **디렉토리 구조**:
 

@@ -334,17 +334,11 @@ graph TB
 
 #### 4.2 Data Plane 컴포넌트 (Worker 노드)
 
-- **kubelet**:
-  - 노드에서 실행되는 에이전트
-  - API Server와 통신하여 Pod 관리
-
-- **kube-proxy**:
-  - 네트워크 프록시
-  - Service IP to Pod IP 라우팅
-
-- **Container Runtime**:
-  - Docker (Deprecated), containerd (권장)
-  - Kubernetes 1.24+는 dockershim 제거
+| 컴포넌트 | 역할 | 비고 |
+|---------|------|------|
+| **kubelet** | 노드에서 실행되는 에이전트 | API Server와 통신하여 Pod 관리 |
+| **kube-proxy** | 네트워크 프록시 | Service IP to Pod IP 라우팅 |
+| **Container Runtime** | 컨테이너 실행 환경 | containerd (권장), Docker (Deprecated)<br/>Kubernetes 1.24+는 dockershim 제거 |
 
 #### 4.3 클러스터 Add-ons (선택적 설치)
 

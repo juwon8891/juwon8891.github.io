@@ -44,10 +44,10 @@
 
 | 타입 | 비유 | 신뢰성 | 연결성 | RDMA Read/Atomic | 용도 |
 |------|------|--------|--------|------------------|------|
-| **RC** | TCP | ✅ 보장 | 1:1 연결 | ✅ 가능 | **대부분 사용** (NCCL, MPI, UCX) |
-| **UC** | - | ❌ 재전송 없음 | 1:1 연결 | ❌ 불가능 | 스트리밍 (패킷 손실 허용) |
-| **UD** | UDP | ❌ 보장 없음 | 1:N | ❌ 불가능 | 멀티캐스트, 서비스 발견 |
-| **DC** | - | ✅ 보장 | 동적 연결 | ✅ 가능 | 대규모 클러스터 (QP 수 절약) |
+| **RC** | TCP | O 보장 | 1:1 연결 | O 가능 | **대부분 사용** (NCCL, MPI, UCX) |
+| **UC** | - | X 재전송 없음 | 1:1 연결 | X 불가능 | 스트리밍 (패킷 손실 허용) |
+| **UD** | UDP | X 보장 없음 | 1:N | X 불가능 | 멀티캐스트, 서비스 발견 |
+| **DC** | - | O 보장 | 동적 연결 | O 가능 | 대규모 클러스터 (QP 수 절약) |
 
 **RC가 기본인 이유**:
 - RDMA Read와 Atomic 연산이 **RC에서만 동작**
@@ -107,10 +107,10 @@
 ### NVIDIA GPU 세대별 아키텍처
 | 세대 | 마이크로아키텍처 | 주요 GPU | Tensor Core | FP8 지원 | 메모리 | NVLink | 출시 |
 |------|------------------|----------|-------------|----------|--------|--------|------|
-| Ampere | GA100/102 | A100 (80GB), A30 | 3세대 | ❌ | HBM2e | NVLink 3.0 (600GB/s) | 2020 |
-| Hopper | GH100 | H100 (80GB), H200 (141GB) | 4세대 | ✅ | HBM3/3e | NVLink 4.0 (900GB/s) | 2022 |
-| Blackwell | GB100 | B100, B200 (192GB) | 5세대 | ✅ | HBM3e | NVLink 5.0 (1.8TB/s) | 2024 |
-| Rubin | GR100 | R100 | 6세대 | ✅ | HBM4 | NVLink 6.0 (3.6TB/s) | 2026 H2 (예정) |
+| Ampere | GA100/102 | A100 (80GB), A30 | 3세대 | X | HBM2e | NVLink 3.0 (600GB/s) | 2020 |
+| Hopper | GH100 | H100 (80GB), H200 (141GB) | 4세대 | O | HBM3/3e | NVLink 4.0 (900GB/s) | 2022 |
+| Blackwell | GB100 | B100, B200 (192GB) | 5세대 | O | HBM3e | NVLink 5.0 (1.8TB/s) | 2024 |
+| Rubin | GR100 | R100 | 6세대 | O | HBM4 | NVLink 6.0 (3.6TB/s) | 2026 H2 (예정) |
 
 **핵심 차이점**:
 - **H100 vs A100**: FP8 지원 (2배 추론 성능), Transformer Engine, NVLink 대역폭 1.5배
@@ -128,14 +128,14 @@
 #### 1세대 대결: A100 vs MI250X (2020-2021)
 | 항목 | NVIDIA A100 | AMD MI250X | 승자 |
 |------|-------------|------------|------|
-| **메모리** | 80GB HBM2e, 2.0 TB/s | 128GB HBM2e, 3.2 TB/s | 🔴 AMD (1.6배 많음, 1.6배 빠름) |
-| **FP64 (HPC)** | 9.7 TFLOPS | 47.9 TFLOPS | 🔴 AMD (5배 빠름) |
-| **FP16 (AI 학습)** | 312 TFLOPS | 383 TFLOPS | 🔴 AMD (1.2배 빠름) |
-| **FP8 (AI 추론)** | ❌ 미지원 | ❌ 미지원 | 무승부 |
+| **메모리** | 80GB HBM2e, 2.0 TB/s | 128GB HBM2e, 3.2 TB/s | ● AMD (1.6배 많음, 1.6배 빠름) |
+| **FP64 (HPC)** | 9.7 TFLOPS | 47.9 TFLOPS | ● AMD (5배 빠름) |
+| **FP16 (AI 학습)** | 312 TFLOPS | 383 TFLOPS | ● AMD (1.2배 빠름) |
+| **FP8 (AI 추론)** | X 미지원 | X 미지원 | 무승부 |
 | **GPU 간 인터커넥트** | NVLink 3.0 (600 GB/s) | Infinity Fabric 3.0 (400 GB/s) | 🟢 NVIDIA (1.5배 빠름) |
 | **TDP** | 400W | 560W | 🟢 NVIDIA (전력 효율) |
 | **소프트웨어** | CUDA (성숙) | ROCm (초기) | 🟢 NVIDIA (생태계 압도적) |
-| **가격** | $10-15K | $10-12K | 🔴 AMD (가성비) |
+| **가격** | $10-15K | $10-12K | ● AMD (가성비) |
 
 **결론**: NVIDIA는 CUDA 생태계로 AI 시장 장악, AMD는 HPC(슈퍼컴퓨터) 공략
 
@@ -144,14 +144,14 @@
 #### 2세대 대결: H100 vs MI300X (2022-2023)
 | 항목 | NVIDIA H100 | AMD MI300X | 승자 |
 |------|-------------|------------|------|
-| **메모리** | 80GB HBM3, 3.35 TB/s<br/>(H200: 141GB, 4.8TB/s) | 192GB HBM3, 5.3 TB/s | 🔴 AMD (2.4배 많음, 1.6배 빠름) |
-| **FP64 (HPC)** | 34 TFLOPS | 163 TFLOPS | 🔴 AMD (4.8배 빠름) |
+| **메모리** | 80GB HBM3, 3.35 TB/s<br/>(H200: 141GB, 4.8TB/s) | 192GB HBM3, 5.3 TB/s | ● AMD (2.4배 많음, 1.6배 빠름) |
+| **FP64 (HPC)** | 34 TFLOPS | 163 TFLOPS | ● AMD (4.8배 빠름) |
 | **FP8 (AI 추론)** | 3,958 TFLOPS | 2,614 TFLOPS | 🟢 NVIDIA (1.5배 빠름) |
 | **FP16 (AI 학습)** | 1,979 TFLOPS | 1,307 TFLOPS | 🟢 NVIDIA (1.5배 빠름) |
 | **GPU 간 인터커넥트** | NVLink 4.0 (900 GB/s) | Infinity Fabric 4.0 (896 GB/s) | 🟢 NVIDIA (근소한 차이) |
 | **TDP** | 700W | 750W | 🟢 NVIDIA (전력 효율) |
 | **특수 기능** | Transformer Engine | APU 통합 메모리 | 각자 차별화 |
-| **가격** | $30-40K (H200: $50K+) | $15-20K | 🔴 AMD (2배 저렴) |
+| **가격** | $30-40K (H200: $50K+) | $15-20K | ● AMD (2배 저렴) |
 
 **결론**: NVIDIA는 FP8 추론 성능으로 LLM 추론 시장 선도, AMD는 대용량 메모리로 롱컨텍스트 모델 공략
 
@@ -160,16 +160,16 @@
 #### 3세대 대결: B200 vs MI350X (2024-2025)
 | 항목 | NVIDIA B200 | AMD MI350X | 승자 |
 |------|-------------|------------|------|
-| **아키텍처** | Blackwell (GB100), TSMC 4NP | CDNA4, TSMC N3P (3nm) | 🔴 AMD (더 미세 공정) |
+| **아키텍처** | Blackwell (GB100), TSMC 4NP | CDNA4, TSMC N3P (3nm) | ● AMD (더 미세 공정) |
 | **트랜지스터** | 208B | 185B | 🟢 NVIDIA (1.1배 많음) |
-| **메모리** | 192GB HBM3e, 8 TB/s | 288GB HBM3e, 8 TB/s | 🔴 AMD (1.5배 많음, 대역폭 동일) |
+| **메모리** | 192GB HBM3e, 8 TB/s | 288GB HBM3e, 8 TB/s | ● AMD (1.5배 많음, 대역폭 동일) |
 | **FP8 (AI 추론)** | 9,000 TFLOPS | ~6,000 TFLOPS (추정) | 🟢 NVIDIA (1.5배 빠름) |
-| **FP4 지원** | ✅ (MXFP4, MXFP6) | ✅ (MXFP4, MXFP6) | 무승부 (둘 다 지원) |
+| **FP4 지원** | O (MXFP4, MXFP6) | O (MXFP4, MXFP6) | 무승부 (둘 다 지원) |
 | **GPU 간 인터커넥트** | NVLink 5.0 (1,800 GB/s) | Infinity Fabric Link (1,120 GB/s) | 🟢 NVIDIA (1.6배 빠름) |
 | **TDP** | 1,000W (air-cooled) | 1,000W (MI350X, air)<br/>1,400W (MI355X, liquid) | 무승부 |
 | **폼팩터** | SXM6 | OAM 2.0 | 각자 표준화 |
-| **특수 기능** | NVLink Switch 72-way | 256 CU, 520B+ 파라미터 단일 GPU | 🔴 AMD (단일 GPU 용량) |
-| **가격** | $60-70K | $30-40K (추정) | 🔴 AMD (2배 저렴) |
+| **특수 기능** | NVLink Switch 72-way | 256 CU, 520B+ 파라미터 단일 GPU | ● AMD (단일 GPU 용량) |
+| **가격** | $60-70K | $30-40K (추정) | ● AMD (2배 저렴) |
 | **소프트웨어** | CUDA 13.2+, cuDNN 9.0+ | ROCm 7.2+, MIOpen 3.2+ | 🟢 NVIDIA (생태계) |
 
 **결론**: NVIDIA는 NVLink 5.0 + FP8 성능 우위, AMD는 288GB 메모리 + 가성비로 롱컨텍스트 모델 공략
@@ -189,8 +189,8 @@
 ### AMD GPU 세대별 아키텍처
 | 세대 | 마이크로아키텍처 | 주요 GPU | Matrix Core | FP8 지원 | 메모리 | Infinity Fabric | 출시 |
 |------|------------------|----------|-------------|----------|--------|-----------------|------|
-| CDNA 2 | CDNA2 | MI250X (128GB) | 2세대 | ❌ | HBM2e | IF 3.0 (400GB/s) | 2021 |
-| CDNA 3 | CDNA3 | MI300X (192GB) | 3세대 | ✅ | HBM3 | IF 4.0 (896GB/s) | 2023 |
+| CDNA 2 | CDNA2 | MI250X (128GB) | 2세대 | X | HBM2e | IF 3.0 (400GB/s) | 2021 |
+| CDNA 3 | CDNA3 | MI300X (192GB) | 3세대 | O | HBM3 | IF 4.0 (896GB/s) | 2023 |
 
 **특징**:
 - **MI300X**: CPU-GPU 통합 패키지, HBM3 192GB (H100 대비 2.4배), ROCm 6.0+
@@ -273,15 +273,15 @@
 |------|------|------|------|
 | **지원 하드웨어** | NVIDIA GPU 전용 | AMD GPU, 일부 CPU | 🟢 ROCm (멀티벤더) |
 | **라이선스** | 독점 (Proprietary) | 오픈소스 (Apache 2.0) | 🟢 ROCm |
-| **생태계 성숙도** | 압도적 (18년 역사) | 성장 중 (9년 역사) | 🔴 CUDA |
-| **프레임워크 지원** | PyTorch ✅, TensorFlow ✅, JAX ✅ | PyTorch ✅, TensorFlow ⚠️, JAX ⚠️ | 🔴 CUDA |
-| **성능 (동급 GPU)** | Baseline | 90-95% (일부 워크로드) | 🔴 CUDA (근소) |
+| **생태계 성숙도** | 압도적 (18년 역사) | 성장 중 (9년 역사) | ● CUDA |
+| **프레임워크 지원** | PyTorch O, TensorFlow O, JAX O | PyTorch O, TensorFlow △, JAX △ | ● CUDA |
+| **성능 (동급 GPU)** | Baseline | 90-95% (일부 워크로드) | ● CUDA (근소) |
 | **CUDA 호환성** | N/A | HIP으로 90%+ 포팅 가능 | 🟢 ROCm (마이그레이션 용이) |
-| **딥러닝 라이브러리** | cuDNN (최적화 ✅✅) | MIOpen (최적화 ⚠️) | 🔴 CUDA |
-| **디버깅 툴** | Nsight, cuda-gdb, nvprof | rocgdb, rocprof | 🔴 CUDA |
-| **문서/커뮤니티** | 방대함 | 제한적 | 🔴 CUDA |
+| **딥러닝 라이브러리** | cuDNN (최적화 OO) | MIOpen (최적화 △) | ● CUDA |
+| **디버깅 툴** | Nsight, cuda-gdb, nvprof | rocgdb, rocprof | ● CUDA |
+| **문서/커뮤니티** | 방대함 | 제한적 | ● CUDA |
 | **가격** | GPU 가격 높음 | GPU 가격 낮음 (50% 저렴) | 🟢 ROCm |
-| **최신 기능 지원** | 즉시 (FP8, TMA) | 1-2년 지연 | 🔴 CUDA |
+| **최신 기능 지원** | 즉시 (FP8, TMA) | 1-2년 지연 | ● CUDA |
 
 **사용 권장 사항**:
 - **CUDA 선택**: 
@@ -474,9 +474,9 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 | **TTFT (10 req)** | 120ms | 112ms | 🟢 SGLang (7% 빠름) |
 | **Prefix 재사용** | Prefix Caching (수동) | RadixAttention (자동) | 🟢 SGLang |
 | **Prefix-heavy 워크로드** | Baseline | 6.4배 빠름 | 🟢 SGLang (RAG, 채팅) |
-| **하드웨어 지원** | NVIDIA, AMD, TPU, Trainium, Gaudi | NVIDIA, AMD | 🔴 vLLM (더 광범위) |
-| **모델 호환성** | 광범위 (encoder-decoder 포함) | Decoder-only LLM | 🔴 vLLM |
-| **생태계 성숙도** | 높음 (3배 큰 커뮤니티) | 성장 중 | 🔴 vLLM |
+| **하드웨어 지원** | NVIDIA, AMD, TPU, Trainium, Gaudi | NVIDIA, AMD | ● vLLM (더 광범위) |
+| **모델 호환성** | 광범위 (encoder-decoder 포함) | Decoder-only LLM | ● vLLM |
+| **생태계 성숙도** | 높음 (3배 큰 커뮤니티) | 성장 중 | ● vLLM |
 | **Structured Output** | JSON Schema (기본) | JSON, Regex, CFG (고급) | 🟢 SGLang |
 | **프로덕션 사례** | Databricks, Anyscale | xAI (Grok 3), Azure | 각자 대규모 |
 | **최적 사용처** | 배치 처리, 다양한 하드웨어 | 멀티턴 대화, RAG, Agent | 워크로드별 |
@@ -502,10 +502,10 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 |------|---------------------|---------------------|------------------------|
 | **레이턴시** | 50-100μs | 10-50μs | 1-5μs |
 | **대역폭** | ~25Gbps | ~25Gbps | 200-400Gbps |
-| **신뢰성** | ✅ 재전송 보장 | ❌ 패킷 손실 가능 | ✅ 보장 (RC) |
+| **신뢰성** | O 재전송 보장 | X 패킷 손실 가능 | O 보장 (RC) |
 | **CPU 사용률** | 높음 (커널 처리) | 높음 (커널 처리) | 낮음 (NIC 오프로드) |
 | **구현 난이도** | 낮음 (표준 소켓) | 낮음 (표준 소켓) | 높음 (Verbs API, QP) |
-| **커널 경유** | ✅ 커널 스택 | ✅ 커널 스택 | ❌ Kernel Bypass |
+| **커널 경유** | O 커널 스택 | O 커널 스택 | X Kernel Bypass |
 | **사용 사례** | API 서버, DB 복제 | Mooncake KV cache 전송 | NCCL, MPI, 분산 학습 |
 
 **Kernel Socket vs RDMA 핵심 차이**:

@@ -52,7 +52,7 @@ graph TB
     subgraph "GitOps 핵심 개념"
         GIT[Git Repository<br/>📚 Single Source of Truth]
         CODE[Everything as Code<br/>💻 선언적 정의]
-        WORKFLOW[Git Workflow<br/>🔄 모든 작업 수행]
+        WORKFLOW[Git Workflow<br/>모든 작업 수행]
         AUTO[Automation<br/>🤖 자동 동기화]
 
         GIT --> CODE
@@ -114,7 +114,7 @@ graph LR
         DISASTER[💥 클러스터 장애] --> NEW_CLUSTER[🆕 새 클러스터 생성]
         NEW_CLUSTER --> INSTALL_GITOPS[⚙️ GitOps 도구 설치]
         INSTALL_GITOPS --> POINT_TO_GIT[📌 Git 저장소 연결]
-        POINT_TO_GIT --> AUTO_SYNC[🔄 자동 동기화]
+        POINT_TO_GIT --> AUTO_SYNC[자동 동기화]
         AUTO_SYNC --> RESTORED[복구 완료]
 
     end
@@ -1338,7 +1338,7 @@ sequenceDiagram
 graph LR
     AGILE[Agile<br/>애자일<br/>🏃 빠른 반복]
     DEVOPS[DevOps<br/>데브옵스<br/>🤝 개발+운영 통합]
-    GITOPS[GitOps<br/>깃옵스<br/>🔄 선언적 배포]
+    GITOPS[GitOps<br/>깃옵스<br/>선언적 배포]
 
     AGILE -->|보완| DEVOPS
     DEVOPS -->|보완| GITOPS
@@ -1745,7 +1745,7 @@ kind create cluster --name gitops-study
 # 생성 과정 출력
 Creating cluster "gitops-study" ...
  ✓ Ensuring node image (kindest/node:v1.32.0) 🖼
- ✓ Preparing nodes 📦
+ ✓ Preparing nodes
  ✓ Writing configuration 📜
  ✓ Starting control-plane 🕹️
  ✓ Installing CNI 🔌
@@ -1906,7 +1906,7 @@ graph TB
 graph TB
     subgraph "컨테이너 이미지 계층 구조"
         WRITABLE[컨테이너 Layer<br/>🔓 쓰기 가능]
-        APP[Application Layer<br/>📦 app.py, requirements.txt]
+        APP[Application Layer<br/>app.py, requirements.txt]
         DEPS[Dependencies Layer<br/>📚 pip packages]
         RUNTIME[Runtime Layer<br/>⚙️ Python 3.9]
         LIBS[System Libraries Layer<br/>🔧 libc, libssl 등]
@@ -2029,7 +2029,7 @@ flowchart TB
 
     RUN --> CACHE2{캐시 존재?}
     CACHE2 -->|예| REUSE2[캐시 재사용 ⚡]
-    CACHE2 -->|아니오| INSTALL[패키지 설치 📦]
+    CACHE2 -->|아니오| INSTALL[패키지 설치]
 
     REUSE2 --> COPY2
     INSTALL --> COPY2
@@ -2512,7 +2512,7 @@ Buildah는 Podman과 함께 사용할 때 강력합니다.
 ```mermaid
 graph LR
     subgraph "Buildah + Podman 생태계"
-        BUILDAH[Buildah<br/>📦 이미지 빌드]
+        BUILDAH[Buildah<br/>이미지 빌드]
         PODMAN[Podman<br/>🚀 컨테이너 실행]
         SKOPEO[Skopeo<br/>📤 이미지 전송]
 

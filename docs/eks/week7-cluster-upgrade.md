@@ -34,9 +34,9 @@ graph LR
 
 ```mermaid
 graph TB
-    START[시작: 1.30] --> CP[1. Control Plane<br/>업그레이드<br/>⏱️ 10분]
-    CP --> ADDON[2. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>EBS CSI Driver<br/>⏱️ 2분]
-    ADDON --> NODES[3. Nodes 업그레이드<br/>⏱️ 30분]
+    START[시작: 1.30] --> CP[1. Control Plane<br/>업그레이드<br/>10분]
+    CP --> ADDON[2. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>EBS CSI Driver<br/>2분]
+    ADDON --> NODES[3. Nodes 업그레이드<br/>30분]
 
     NODES --> MNG[관리형 노드그룹]
     NODES --> KARP[카펜터 노드]
@@ -991,9 +991,9 @@ kubectl rollout restart deployment -n <namespace>
 graph TB
     START[시작] --> INSIGHTS[1. Upgrade Insights<br/>사전 점검]
     INSIGHTS --> BACKUP[2. 백업<br/>etcd 스냅샷]
-    BACKUP --> CP[3. Control Plane<br/>업그레이드<br/>⏱️ 10분]
-    CP --> ADDON[4. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>VPC CNI, EBS CSI<br/>⏱️ 2분]
-    ADDON --> NODES[5. Nodes 업그레이드<br/>⏱️ 30분]
+    BACKUP --> CP[3. Control Plane<br/>업그레이드<br/>10분]
+    CP --> ADDON[4. Add-on 업그레이드<br/>CoreDNS, kube-proxy<br/>VPC CNI, EBS CSI<br/>2분]
+    ADDON --> NODES[5. Nodes 업그레이드<br/>30분]
 
     NODES --> MNG[관리형 노드그룹<br/>In-Place or Blue-Green]
     NODES --> KARP[카펜터 노드<br/>자동 교체]

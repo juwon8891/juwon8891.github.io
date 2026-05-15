@@ -1,7 +1,13 @@
+---
+tags:
+  - CI/CD
+  - ArgoCD
+  - Security
+---
 
 # ArgoCD Security & Keycloak
 
-> ArgoCD 보안 설정과 Keycloak SSO 연동을 학습합니다.
+> ArgoCD 보안 설정과 Keycloak SSO 연동을 학습한다.
 
 ---
 
@@ -11,7 +17,7 @@
 
 #### kind 클러스터 생성
 
-**kind(Kubernetes IN Docker)**를 사용하여 로컬 개발 환경을 구성합니다.
+**kind(Kubernetes IN Docker)**를 사용하여 로컬 개발 환경을 구성한다.
 
 ```bash
 # kind 클러스터 생성
@@ -50,7 +56,7 @@ kubectl get nodes
 
 #### kube-ops-view 설치
 
-클러스터 리소스를 시각화하는 도구를 설치합니다.
+클러스터 리소스를 시각화하는 도구를 설치한다.
 
 ```bash
 # kube-ops-view 설치
@@ -69,7 +75,7 @@ open "http://127.0.0.1:30001/#scale=1.5"
 
 #### Ingress-Nginx 배포
 
-**Ingress Controller**는 HTTP/HTTPS 트래픽을 클러스터 내부 서비스로 라우팅합니다.
+**Ingress Controller**는 HTTP/HTTPS 트래픽을 클러스터 내부 서비스로 라우팅한다.
 
 ```bash
 # 노드 라벨 확인
@@ -90,7 +96,7 @@ kubectl describe -n ingress-nginx deployments/ingress-nginx-controller
 
 #### SSL Passthrough 활성화
 
-ArgoCD의 자체 TLS를 사용하기 위해 **SSL Passthrough**를 활성화합니다.
+ArgoCD의 자체 TLS를 사용하기 위해 **SSL Passthrough**를 활성화한다.
 
 ```bash
 # SSL Passthrough 옵션 확인
@@ -140,7 +146,7 @@ exit
 
 #### TLS 인증서 생성
 
-**OpenSSL**로 self-signed 인증서를 생성합니다.
+**OpenSSL**로 self-signed 인증서를 생성한다.
 
 ```bash
 # TLS 키·인증서 생성
@@ -263,7 +269,7 @@ argocd app list
 
 #### 관리자 계정과 로컬 사용자
 
-ArgoCD는 기본적으로 **admin 계정**을 제공하지만, 일상적인 작업을 위해 **최소 권한의 로컬 사용자**를 생성해야 합니다.
+ArgoCD는 기본적으로 **admin 계정**을 제공하지만, 일상적인 작업을 위해 **최소 권한의 로컬 사용자**를 생성해야 한다.
 
 **로컬 사용자 alice 생성**:
 
@@ -299,7 +305,7 @@ argocd login argocd.example.com --username alice --insecure
 
 #### RBAC 정책 구성
 
-ArgoCD의 RBAC는 **argocd-rbac-cm** ConfigMap에서 관리합니다.
+ArgoCD의 RBAC는 **argocd-rbac-cm** ConfigMap에서 관리한다.
 
 **정책 형식**:
 
@@ -352,7 +358,7 @@ kubectl rollout restart deployment argocd-server -n argocd
 
 #### 서비스 어카운트란?
 
-**서비스 어카운트**는 CI/CD 파이프라인과 같은 자동화 시스템에 인증하는 데 사용하는 계정입니다.
+**서비스 어카운트**는 CI/CD 파이프라인과 같은 자동화 시스템에 인증하는 데 사용하는 계정이다.
 
 **특징**:
 - 사용자와 연결되어서는 안 됨 (파이프라인 실패 방지)
@@ -409,7 +415,7 @@ kubectl rollout restart deployment argocd-server -n argocd
 
 ### 1. Keycloak이
 
-**Keycloak**은 애플리케이션에 초점을 맞춘 오픈 소스 **ID 및 접근(권한) 관리 도구**입니다.
+**Keycloak**은 애플리케이션에 초점을 맞춘 오픈 소스 **ID 및 접근(권한) 관리 도구**이다.
 
 ```mermaid
 graph TB
@@ -488,7 +494,7 @@ graph TB
 
 ### 3. 표준 프로토콜 지원
 
-Keycloak은 업계 표준 프로토콜을 지원합니다:
+Keycloak은 업계 표준 프로토콜을 지원한다:
 
 | 프로토콜 | 설명 | 사용 사례 |
 |---------|------|-----------|
@@ -546,7 +552,7 @@ docker logs dev-keycloak -f
 
 #### Realm이란?
 
-**Realm**은 애플리케이션과 사용자를 위한 **영역(테넌트)**입니다.
+**Realm**은 애플리케이션과 사용자를 위한 **영역(테넌트)**이다.
 
 - Realm은 다른 Realm과 완전히 **독립적**
 - 각 Realm은 자체 **설정, 애플리케이션, 사용자** 보유
@@ -554,9 +560,7 @@ docker logs dev-keycloak -f
 
 #### Realm 생성
 
-1. **좌측 상단 모서리** (로고 왼쪽) 메뉴 아이콘 클릭하여 메뉴 확장
-2. **Create Realm** 클릭
-3. **Realm name**: `myrealm` (URL에 사용되므로 특수 문자 피하기)
+- `myrealm` (URL에 사용되므로 특수 문자 피하기)
 4. **Create** 클릭
 5. 왼쪽 메뉴 **Realm settings** 클릭 → **General** 탭
 6. **Display name** 설정:
@@ -578,21 +582,10 @@ docker logs dev-keycloak -f
    - **Email**: `keycloak@keycloak.org`
    - **First name**: `Ola`
    - **Last name**: `Nordmann`
-4. **Create** 클릭
-5. 생성된 User 클릭 → **Credentials** 탭
-6. **Set password** 클릭
-   - **Password**: (각자 설정)
+- (각자 설정)
    - **Temporary**: `Off` (ON일 경우 첫 로그인 시 비밀번호 변경 필요)
-7. **Save** 클릭
-
-#### Group 생성
-
-1. 왼쪽 메뉴 **Groups** 클릭
-2. **Create group** 클릭
-3. **Name**: `mygroup`
-4. **Create** 클릭
-
-**Group의 역할**:
+- `mygroup`
+-
 - 그룹에 **속성** 추가 가능 → 사용자가 상속
 - 그룹에 **역할** 부여 가능 → 사용자가 상속
 
@@ -600,12 +593,7 @@ docker logs dev-keycloak -f
 
 1. 왼쪽 메뉴 **Users** 클릭
 2. 해당 User 클릭 → **Groups** 탭
-3. **Join Group** 클릭
-4. `mygroup` 선택 → **Join** 클릭
-
-#### Global Role 생성
-
-**Keycloak Role 구분**:
+-
 - **Realm Role**: Realm 전체에서 사용 가능한 역할
 - **Client Role**: 특정 Client에서만 사용하는 역할
 - **Composite Role**: 여러 역할을 조합한 역할
@@ -613,28 +601,12 @@ docker logs dev-keycloak -f
 **Realm Role 생성**:
 
 1. 왼쪽 메뉴 **Realm roles** 클릭
-2. **Create role** 클릭
-3. **Role name**: `myrole`
-4. **Save** 클릭
-
-**User에게 Role 할당**:
+- `myrole`
+-
 
 1. 왼쪽 메뉴 **Users** 클릭
 2. 해당 User 클릭 → **Role mapping** 탭
-3. **Assign role** 클릭
-4. `myrole` 선택 → **Assign** 클릭
-
-#### Keycloak Account Console
-
-**Account Console**은 사용자가 자신의 계정을 관리할 수 있는 인터페이스입니다.
-
-- 사용자 프로필 업데이트
-- 패스워드 업데이트
-- 2단계 인증 활성화
-- 인증된 애플리케이션 보기
-- 현재 세션 보기 및 원격 로그아웃
-
-**접속**:
+-
 
 ```bash
 # Account Console 접속
@@ -654,15 +626,12 @@ open http://localhost:8080/realms/myrealm/account
 #### ArgoCD Client 생성
 
 1. Admin Console → 왼쪽 메뉴 **Clients** 클릭
-2. **Create client** 클릭
-3. **General Settings**:
+-
    - **Client type**: `OpenID Connect`
    - **Client ID**: `argocd`
-4. **Next** 클릭
-5. **Capability config**:
+-
    - **Client authentication**: `On` (confidential client)
-6. **Next** 클릭
-7. **Login settings**:
+-
    - **Root URL**: `https://argocd.example.com/`
    - **Home URL**: `/applications`
    - **Valid redirect URIs**: `https://argocd.example.com/auth/callback`
@@ -676,7 +645,7 @@ open http://localhost:8080/realms/myrealm/account
 2. **Credentials** 탭 클릭
 3. **Client secret** 복사 (예: `mV3IZO3nmHoZr3BBC37UpdrMSMkF9Umt`)
 
-**메모해두기**: 이 시크릿은 ArgoCD 설정에 사용됩니다.
+**메모해두기**: 이 시크릿은 ArgoCD 설정에 사용된다.
 
 ### 2. ArgoCD OIDC 설정
 
@@ -724,7 +693,7 @@ kubectl get secret -n argocd argocd-secret -o jsonpath='{.data}' | jq
 ```
 #### OIDC Config 추가
 
-**중요**: `192.168.254.110`은 **자신의 로컬 IP**로 변경해야 합니다.
+**중요**: `192.168.254.110`은 **자신의 로컬 IP**로 변경해야 한다.
 - Keycloak 컨테이너와 kind 클러스터(argocd-server 파드) 모두가 통신 가능해야 함
 
 ```bash
@@ -795,7 +764,7 @@ open "https://argocd.example.com"
 
 ### 1. OAuth 2.0 Authorization Code Flow
 
-**OAuth 2.0**은 **권한 부여 프레임워크**입니다.
+**OAuth 2.0**은 **권한 부여 프레임워크**이다.
 
 ```mermaid
 sequenceDiagram
@@ -824,7 +793,7 @@ sequenceDiagram
 
 ### 2. OIDC와 OAuth 2.0의 관계
 
-**OpenID Connect (OIDC)**는 OAuth 2.0 위에 구축된 **인증 레이어**입니다.
+**OpenID Connect (OIDC)**는 OAuth 2.0 위에 구축된 **인증 레이어**이다.
 
 | 구분 | OAuth 2.0 | OpenID Connect |
 |------|-----------|----------------|
@@ -890,18 +859,11 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-**🎉 5주차 학습 완료!**
+**핵심 내용**:
 
-5주차에서는 ArgoCD의 **보안 및 인증**을 학습했습니다:
+- kind + Ingress-Nginx + ArgoCD with TLS 환경 구성
+- 로컬 사용자, RBAC, 서비스 어카운트를 통한 접근 제어
+- Keycloak SSO: Realm, User, Group, Role 관리
+- ArgoCD와 Keycloak SSO 통합 (OIDC 연동)
+- OAuth 2.0 & OIDC 인증 및 권한 부여 프로토콜
 
-| 주제 | 내용 |
-|------|------|
-| 실습 환경 구성 | kind + Ingress-Nginx + ArgoCD with TLS |
-| 접근 제어 | 로컬 사용자, RBAC, 서비스 어카운트 |
-| Keycloak SSO | Realm, User, Group, Role 관리 |
-| OIDC 연동 | ArgoCD와 Keycloak SSO 통합 |
-| OAuth 2.0 & OIDC | 인증 및 권한 부여 프로토콜 이해 |
-
-이제 **엔터프라이즈급 인증 및 권한 관리**를 구현할 수 있는 역량을 갖추게 되었습니다! 🚀
-
-다음 단계에서는 멀티 클러스터 GitOps, 고급 보안 기능, 관찰성 등을 추가하여 프로덕션 수준의 플랫폼을 완성하는 것을 목표로 합니다.

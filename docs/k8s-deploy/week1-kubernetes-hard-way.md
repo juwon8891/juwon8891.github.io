@@ -1,8 +1,12 @@
+---
+tags:
+  - Kubernetes
+  - Deploy
+---
 
 # Bootstrap Kubernetes The Hard Way
 
-
-> **새로운 스터디 시작**: Kubernetes 클러스터를 처음부터 수동으로 구축하며 내부 동작 원리를 깊이 이해하는 K8s-Deploy 스터디의 첫 번째 주차입니다.
+> **새로운 스터디 시작**: Kubernetes 클러스터를 처음부터 수동으로 구축하며 내부 동작 원리를 깊이 이해하는 K8s-Deploy 스터디의 첫 번째 주차이다.
 
 ---
 
@@ -10,11 +14,11 @@
 
 ### 1. 스터디 목표
 
-**K8s-Deploy 스터디**는 Kubernetes 클러스터 배포와 운영에 대한 깊은 이해를 목표로 합니다.
+**K8s-Deploy 스터디**는 Kubernetes 클러스터 배포와 운영에 대한 깊은 이해를 목표로 한다.
 
 ### 2. Week 1 학습 목표
 
-**Kubernetes The Hard Way**는 Kubernetes 클러스터를 kubeadm과 같은 자동화 도구 없이 처음부터 수동으로 구축하는 실습입니다.
+**Kubernetes The Hard Way**는 Kubernetes 클러스터를 kubeadm과 같은 자동화 도구 없이 처음부터 수동으로 구축하는 실습이다.
 
 **이번 주 핵심 학습 포인트**:
 - Kubernetes 각 컴포넌트의 역할과 상호작용 이해
@@ -305,7 +309,7 @@ openssl x509 -in kube-scheduler.crt -text -noout
 ```
 ### 5. API Server 인증서 특징
 
-**kube-apiserver 인증서는 특별합니다**:
+**kube-apiserver 인증서는 특별한다**:
 
 ```
 Subject: CN=kubernetes, C=US, ST=Washington, L=Seattle
@@ -363,7 +367,7 @@ scp ca.key ca.crt \
 
 ### 1. Kubeconfig 구조 이해
 
-Kubeconfig는 Kubernetes API Server와 통신하기 위한 **클라이언트 인증 설정 파일**입니다.
+Kubeconfig는 Kubernetes API Server와 통신하기 위한 **클라이언트 인증 설정 파일**이다.
 
 **구성 요소**:
 
@@ -467,7 +471,7 @@ current-context: default
 | admin.kubeconfig | kubectl | admin | https://127.0.0.1:6443 | ~/.kube/config |
 
 **주의사항**:
-- **admin.kubeconfig**는 server 주소가 `127.0.0.1`입니다 (로컬 접근)
+- **admin.kubeconfig**는 server 주소가 `127.0.0.1`이다 (로컬 접근)
 - 나머지는 `server.kubernetes.local`로 원격 접근
 
 **일괄 생성 예시 (kube-proxy)**:
@@ -518,7 +522,7 @@ scp admin.kubeconfig \
 
 ### 1. ETCD 암호화 설정
 
-**문제점**: 기본적으로 Kubernetes Secret은 etcd에 **평문으로 저장**됩니다.
+**문제점**: 기본적으로 Kubernetes Secret은 etcd에 **평문으로 저장**된다.
 
 **스터디 멤버 투표 결과**:
 - API-Server → ETCD Secret 암호화 적용 중: **1명**
@@ -698,6 +702,7 @@ RestartSec=5
 WantedBy=multi-user.target
 
 ```
+
 | 플래그 | 설명 |
 |--------|------|
 | `--name` | etcd 멤버 이름 (클러스터 내 고유) |
@@ -706,7 +711,7 @@ WantedBy=multi-user.target
 | `--initial-cluster` | 초기 클러스터 구성원 목록 |
 | `--data-dir` | 데이터 저장 경로 |
 
-****주의** 주의**: 이 실습에서는 **HTTP 통신** 사용 (프로덕션에서는 HTTPS 필수!)
+> **주의**: 이 실습에서는 **HTTP 통신** 사용 (프로덕션에서는 HTTPS 필수!)
 
 **서비스 시작 및 확인**:
 
@@ -1347,10 +1352,10 @@ ssh node-1 curl -s 10.200.0.2 | grep title
 # <title>Welcome to nginx!</title>
 
 ```
-****주의** 주의사항**:
-- 영구 설정이 아니므로 재부팅 시 라우팅 규칙 사라짐
-- 프로덕션에서는 CNI 플러그인 필수 (Calico, Cilium, Flannel 등)
-- BGP 기반 라우팅 또는 Overlay 네트워크 사용 권장
+> **주의사항**:
+> - 영구 설정이 아니므로 재부팅 시 라우팅 규칙 사라짐
+> - 프로덕션에서는 CNI 플러그인 필수 (Calico, Cilium, Flannel 등)
+> - BGP 기반 라우팅 또는 Overlay 네트워크 사용 권장
 
 ---
 
@@ -1394,7 +1399,7 @@ ssh root@server \
 - `k8s:enc:aescbc:v1:key1:` 헤더 확인
 - 데이터가 암호화되어 있음 확인
 
-**결론**: Secret이 etcd에 암호화되어 저장됨! 🔒
+**결론**: Secret이 etcd에 암호화되어 저장됨! 
 
 ### 2. Deployment 테스트
 
@@ -1591,8 +1596,7 @@ ssh node-0 iptables -t nat -L KUBE-SERVICES | grep nginx
 # KUBE-SVC-XXX tcp -- anywhere 10.32.0.149 tcp dpt:80
 
 ```
-**검증 완료**! 🎉
-
+**검증 완료**
 ---
 
 ## 핵심 개념 정리
@@ -1750,7 +1754,6 @@ graph LR
     USER1 -->|Group 매칭| CRB1
     CRB1 -->|RoleRef| CR1
 
-
     subgraph "Kubelet 인증서"
         CERT2["인증서<br/>CN=system:node:node-0<br/>O=system:nodes"]
     end
@@ -1767,7 +1770,6 @@ graph LR
     CERT2 -->|X.509 Subject 추출| USER2
     USER2 -->|User/Group 패턴| NA
     USER2 -.->|필요시| CR2
-
 
     subgraph "Scheduler 인증서"
         CERT3["인증서<br/>CN=system:kube-scheduler"]
@@ -1878,6 +1880,6 @@ kubectl rbac-tool lookup system:masters
 
 ---
 
-**Week 1 학습을 마치며**: Kubernetes를 "처음부터 끝까지 손으로 만들어보는" 이 실습을 통해 Kubernetes의 내부 동작 원리, 보안 메커니즘, 컴포넌트 간 상호작용을 깊이 이해할 수 있었습니다. 자동화 도구(kubeadm, kops, EKS 등)에 가려져 있던 세부 사항들을 직접 다루면서 **진짜 Kubernetes**를 배웠습니다! 🚀
+**Week 1 학습을 마치며**: Kubernetes를 "처음부터 끝까지 손으로 만들어보는" 이 실습을 통해 Kubernetes의 내부 동작 원리, 보안 메커니즘, 컴포넌트 간 상호작용을 깊이 이해할 수 있었다. 자동화 도구(kubeadm, kops, EKS 등)에 가려져 있던 세부 사항들을 직접 다루면서 **진짜 Kubernetes**를 배웠다! 
 
-다음 주에는 프로덕션 환경에 더 가까운 고급 네트워킹을 다루며 계속 발전해나가겠습니다. K8s-Deploy 스터디, 화이팅! 💪
+다음 주에는 프로덕션 환경에 더 가까운 고급 네트워킹을 다루며 계속 발전해나가겠다. K8s-Deploy 스터디, 

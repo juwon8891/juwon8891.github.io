@@ -1,7 +1,17 @@
+---
+tags:
+  - Kubernetes
+  - Deploy
+  - Upgrade
+---
+
+# Kubeadm & K8s 업그레이드
+
+> kubeadm으로 Kubernetes 클러스터를 구축하고 버전 업그레이드하는 방법을 정리한다.
 
 ## 들어가며
 
-Week 3에서는 **kubeadm**을 사용하여 Kubernetes 클러스터를 구축하고, 클러스터의 버전을 업그레이드하는 방법을 학습합니다.
+Week 3에서는 **kubeadm**을 사용하여 Kubernetes 클러스터를 구축하고, 클러스터의 버전을 업그레이드하는 방법을 학습한다.
 
 Week 1에서 "The Hard Way"로 모든 컴포넌트를 수동 설치하며 K8s의 내부 동작을 이해했다면, 이번 주차에서는 프로덕션 환경에서 실제로 사용되는 kubeadm 도구를 통해 효율적인 클러스터 운영 방법을 익힙니다.
 
@@ -45,7 +55,7 @@ Week 1에서 "The Hard Way"로 모든 컴포넌트를 수동 설치하며 K8s의
 
 ### Kubeadm이란?
 
-**kubeadm**은 Kubernetes Cluster Lifecycle 프로젝트의 핵심 도구로, 클러스터의 생성부터 업그레이드, 관리까지 전체 라이프사이클을 담당합니다.
+**kubeadm**은 Kubernetes Cluster Lifecycle 프로젝트의 핵심 도구로, 클러스터의 생성부터 업그레이드, 관리까지 전체 라이프사이클을 담당한다.
 
 #### 주요 기능
 
@@ -137,7 +147,7 @@ flowchart TD
 
 #### 5. Kubelet 시작 및 API Server 헬스 체크 대기
 
-kubelet이 Static Pod를 실행하고, API Server가 정상 동작할 때까지 대기합니다.
+kubelet이 Static Pod를 실행하고, API Server가 정상 동작할 때까지 대기한다.
 
 #### 6. ClusterConfiguration 저장
 
@@ -193,7 +203,7 @@ kubeadm join 192.168.10.100:6443 \
   --discovery-token-ca-cert-hash sha256:1234...
 
 ```
-CA 인증서 해시를 검증하여 중간자 공격(MITM)을 방지합니다.
+CA 인증서 해시를 검증하여 중간자 공격(MITM)을 방지한다.
 
 #### 2. TLS Bootstrap
 
@@ -215,7 +225,7 @@ kubelet이 자신의 인증서를 자동으로 발급받는 과정:
 ```bash
 # KST 타임존 설정
 
-> kubeadm을 활용한 Kubernetes 클러스터 구축 및 업그레이드를 학습합니다.
+> kubeadm을 활용한 Kubernetes 클러스터 구축 및 업그레이드를 학습한다.
 timedatectl set-timezone Asia/Seoul
 
 # Chrony NTP 설정
@@ -427,7 +437,7 @@ kubectl get nodes
 
 ### OverlayFS란?
 
-**OverlayFS**는 여러 파일시스템 레이어를 하나로 겹쳐 보이게 하는 Union Filesystem 기술입니다.
+**OverlayFS**는 여러 파일시스템 레이어를 하나로 겹쳐 보이게 하는 Union Filesystem 기술이다.
 
 ```mermaid
 graph TB
@@ -458,7 +468,7 @@ graph TB
 
 ### Snapshotter란?
 
-**Snapshotter**는 컨테이너 이미지 레이어를 스냅샷 단위로 관리하는 컴포넌트입니다.
+**Snapshotter**는 컨테이너 이미지 레이어를 스냅샷 단위로 관리하는 컴포넌트이다.
 
 ```mermaid
 flowchart LR
@@ -491,7 +501,7 @@ flowchart LR
 
 ### 생성되는 인증서 목록
 
-kubeadm init 시 `/etc/kubernetes/pki/` 디렉터리에 다음 인증서들이 생성됩니다:
+kubeadm init 시 `/etc/kubernetes/pki/` 디렉터리에 다음 인증서들이 생성된다:
 
 | 인증서 | CN | O | 유효기간 | 용도 |
 |--------|----|----|----------|------|
@@ -614,7 +624,7 @@ graph TD
 
 ### Metrics Server 설치
 
-**Metrics Server**는 kubelet으로부터 메트릭을 수집하여 `kubectl top` 명령어를 사용할 수 있게 합니다.
+**Metrics Server**는 kubelet으로부터 메트릭을 수집하여 `kubectl top` 명령어를 사용할 수 있게 한다.
 
 ```bash
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
@@ -640,7 +650,7 @@ kubectl top pods -A
 
 ### Kube-Prometheus-Stack 설치
 
-**Kube-Prometheus-Stack**은 Prometheus, Grafana, Alertmanager를 포함한 완전한 모니터링 솔루션입니다.
+**Kube-Prometheus-Stack**은 Prometheus, Grafana, Alertmanager를 포함한 완전한 모니터링 솔루션이다.
 
 ```bash
 helm repo add prometheus-community \
@@ -674,7 +684,7 @@ helm install kube-prometheus-stack \
 
 ### Control Plane 메트릭 수집 설정
 
-기본적으로 kube-controller-manager와 kube-scheduler는 localhost에서만 메트릭을 제공합니다. Prometheus가 수집할 수 있도록 bind-address를 변경합니다.
+기본적으로 kube-controller-manager와 kube-scheduler는 localhost에서만 메트릭을 제공한다. Prometheus가 수집할 수 있도록 bind-address를 변경한다.
 
 #### kube-controller-manager 설정
 
@@ -736,7 +746,7 @@ curl http://192.168.10.100:2381/metrics
 
 ### x509 Certificate Exporter 설치
 
-인증서 만료를 모니터링하는 Prometheus Exporter입니다.
+인증서 만료를 모니터링하는 Prometheus Exporter이다.
 
 ```bash
 helm repo add enix https://charts.enix.io
@@ -769,7 +779,7 @@ helm install x509-certificate-exporter enix/x509-certificate-exporter \
 
 ### 버전 정책
 
-Kubernetes는 **1년에 3개의 마이너 버전**을 출시하며, **최근 3개 버전**을 지원합니다.
+Kubernetes는 **1년에 3개의 마이너 버전**을 출시하며, **최근 3개 버전**을 지원한다.
 
 - 현재 지원 버전 (예시): 1.35, 1.34, 1.33
 - 버전 형식: **메이저.마이너.패치** (예: 1.32.11)
@@ -832,7 +842,7 @@ graph TB
 
 #### 1. In-Place Upgrade
 
-기존 클러스터를 순차적으로 업그레이드하는 방식입니다.
+기존 클러스터를 순차적으로 업그레이드하는 방식이다.
 
 **장점**:
 - 리소스 절약 (추가 클러스터 불필요)
@@ -848,7 +858,7 @@ graph TB
 
 #### 2. Blue-Green Upgrade
 
-신규 클러스터를 생성한 후 트래픽을 전환하는 방식입니다.
+신규 클러스터를 생성한 후 트래픽을 전환하는 방식이다.
 
 **장점**:
 - 빠른 롤백 가능
@@ -975,7 +985,7 @@ kubectl get nodes
 
 ### Worker 노드 업그레이드 (k8s-w1, k8s-w2)
 
-각 Worker 노드를 순차적으로 업그레이드합니다.
+각 Worker 노드를 순차적으로 업그레이드한다.
 
 #### 1단계: 1.32 → 1.33
 
@@ -1020,7 +1030,7 @@ kubectl get nodes
 ```
 #### 2단계: 1.33 → 1.34
 
-위 단계를 반복하여 1.34로 업그레이드합니다.
+위 단계를 반복하여 1.34로 업그레이드한다.
 
 ```bash
 # Drain
@@ -1037,7 +1047,7 @@ systemctl restart kubelet
 kubectl uncordon k8s-w1
 
 ```
-**k8s-w2 노드도 동일하게 진행**합니다.
+**k8s-w2 노드도 동일하게 진행**한다.
 
 ---
 
@@ -1103,7 +1113,7 @@ flowchart TD
 
 ### Kubelet Sysctl 파라미터 변경
 
-kubeadm은 kubelet 시작 시 특정 커널 파라미터를 변경합니다.
+kubeadm은 kubelet 시작 시 특정 커널 파라미터를 변경한다.
 
 #### Kubelet 적용 파라미터
 
@@ -1151,7 +1161,7 @@ net.netfilter.nf_conntrack_tcp_timeout_established = 432000 → 86400
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 
@@ -1183,7 +1193,7 @@ net.netfilter.nf_conntrack_tcp_timeout_established = 432000 → 86400
 
 ## 마치며
 
-Week 3에서는 kubeadm을 사용하여 Kubernetes 클러스터를 구축하고, 버전 업그레이드를 수행하는 방법을 학습했습니다.
+Week 3에서는 kubeadm을 사용하여 Kubernetes 클러스터를 구축하고, 버전 업그레이드를 수행하는 방법을 학습했다.
 
 **핵심 포인트**:
 
@@ -1193,4 +1203,4 @@ Week 3에서는 kubeadm을 사용하여 Kubernetes 클러스터를 구축하고,
 4. **Version Skew Policy**: 컴포넌트별 버전 호환성
 5. **업그레이드 전략**: In-Place vs Blue-Green
 
-Week 1에서 "The Hard Way"로 K8s의 내부를 깊이 이해했고, Week 3에서 kubeadm을 통해 실무에서 사용하는 효율적인 클러스터 운영 방법을 익혔습니다! 🚀
+Week 1에서 "The Hard Way"로 K8s의 내부를 깊이 이해했고, Week 3에서 kubeadm을 통해 실무에서 사용하는 효율적인 클러스터 운영 방법을 익혔다! 

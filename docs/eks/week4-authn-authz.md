@@ -1,9 +1,17 @@
+---
+tags:
+  - EKS
+  - Security
+  - IRSA
+---
 
 # AuthN & AuthZ
 
+> EKS의 IAM 기반 인증과 RBAC·IRSA를 활용한 세분화된 인가 설정 방법을 정리한다.
+
 ## 들어가며
 
-Week 4에서는 **Amazon EKS 환경에서의 Identity and Access Management**를 학습합니다.
+Week 4에서는 **Amazon EKS 환경에서의 Identity and Access Management**를 학습한다.
 
 Week 1에서 EKS 클러스터 배포, Week 2에서 네트워킹, Week 3에서 Auto Scaling을 익혔다면, 이번 주차에서는 **"누가(Authentication) 무엇을(Authorization) 할 수 있는가"**를 제어하는 보안의 핵심을 배웁니다.
 
@@ -168,7 +176,7 @@ data:
 ```bash
 # EKS 클러스터 생성 시 자동 생성
 
-> EKS 인증/인가 (IRSA, OIDC, RBAC, ServiceAccount)를 학습합니다.
+> EKS 인증/인가 (IRSA, OIDC, RBAC, ServiceAccount)를 학습한다.
 eksctl utils associate-iam-oidc-provider --cluster myeks --approve
 
 # 확인
@@ -247,7 +255,7 @@ spec:
 
 ---
 
-### 3. IRSA (IAM Roles for Service Accounts)
+### 3. IRSA
 
 **정의**: **Pod(ServiceAccount)**에 **AWS IAM Role** 권한을 부여하는 메커니즘
 
@@ -539,7 +547,7 @@ sequenceDiagram
     RS->>App: 9. 리소스 제공
 
 ```
-#### OIDC (OpenID Connect)
+#### OIDC
 
 **정의**: **OAuth 2.0 위에 구축된 인증 레이어**, **ID Token (JWT)** 추가
 
@@ -573,7 +581,7 @@ sequenceDiagram
 
 ---
 
-### 7. JWT (JSON Web Token)
+### 7. JWT
 
 **정의**: **Base64 URL-safe** 인코딩된 JSON, **서명(Signature)**을 통해 무결성 보장
 
@@ -628,7 +636,7 @@ graph LR
     Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
 
 ```
-### 2. IRSA (IAM Roles for Service Accounts) 전체 흐름
+### 2. IRSA 전체 흐름
 
 ```mermaid
 sequenceDiagram
@@ -903,7 +911,7 @@ kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 
 **목표**: `aws-auth` ConfigMap과 EKS API의 차이 이해
 
-| 항목 | ConfigMap (aws-auth) | EKS API (Cluster Access Entry) |
+| 항목 | ConfigMap (aws-auth) | EKS API |
 |------|----------------------|-------------------------------|
 | **관리 방법** | kubectl edit | AWS Console/CLI |
 | **사용자 타입** | IAM User/Role | IAM Principal |
@@ -984,9 +992,9 @@ kubectl config set-credentials oidc-user \
 | 방법 | 주체 | Token 형식 | 유효 기간 | EKS 사용 | 용도 |
 |------|------|------------|-----------|----------|------|
 | X.509 Client Cert | User, Node | PEM/DER | 1년 | | kubelet 인증 (Node Authorizer) |
-| ServiceAccount JWT | Pod | JWT (Projected Volume) | 1시간 (기본) | | Pod 내 애플리케이션 → K8S API |
-| AWS IAM Authenticator | User | JWT (Presigned STS URL) | 15분 | | kubectl → K8S API (EKS 기본) |
-| OIDC Token | User | JWT (ID Token) | IdP 설정 | | 외부 IdP (Google, Keycloak) 연동 |
+| ServiceAccount JWT | Pod | JWT | 1시간 (기본) | | Pod 내 애플리케이션 → K8S API |
+| AWS IAM Authenticator | User | JWT | 15분 | | kubectl → K8S API |
+| OIDC Token | User | JWT | IdP 설정 | | 외부 IdP (Google, Keycloak) 연동 |
 | Bootstrap Token | Node | secret.token | 24시간 | | kubeadm 전용 (TLS Bootstrap) |
 | Static Token File | User | Plain Text | 무제한 | | 비권장 (보안 취약) |
 
@@ -1168,7 +1176,7 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 
@@ -1198,7 +1206,7 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
 
 ---
 
-## 마무리
+## 마무리 {: .no-toc }
 
 Week 4에서는 EKS 환경에서의 **Identity and Access Management**를 학습했습니다.
 
@@ -1206,15 +1214,15 @@ Week 4에서는 EKS 환경에서의 **Identity and Access Management**를 학습
 
 1. **Authentication (인증)**:
    - AWS IAM Authenticator (EKS 기본)
-   - ServiceAccount JWT (Pod 내부)
-   - OIDC (외부 IdP 연동)
+   - ServiceAccount JWT
+   - OIDC
 
 2. **Authorization (인가)**:
    - RBAC (Role + RoleBinding)
    - K8S API 구조 이해
 
 3. **Pod Identity**:
-   - IRSA (IAM Roles for Service Accounts)
+   - IRSA
    - EKS Pod Identity (차세대)
 
 4. **Admission Control**:

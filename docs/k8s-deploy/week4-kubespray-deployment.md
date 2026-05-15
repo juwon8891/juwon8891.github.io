@@ -1,6 +1,10 @@
+---
+tags:
+  - Kubespray
+  - Deploy
+---
 
 # Kubespray 배포 분석
-
 
 > **Ansible 기반 K8s 배포 자동화**: Kubespray를 활용한 프로덕션급 Kubernetes 클러스터 배포 및 내부 동작 분석
 
@@ -10,7 +14,7 @@
 
 ### 1. Kubespray
 
-**Kubespray**는 Ansible 기반의 Kubernetes 클러스터 배포 자동화 도구입니다.
+**Kubespray**는 Ansible 기반의 Kubernetes 클러스터 배포 자동화 도구이다.
 
 **공식 저장소**: [kubernetes-sigs/kubespray](https://github.com/kubernetes-sigs/kubespray)
 
@@ -73,7 +77,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
 
 ### 3. Release Cycle
 
-Kubespray는 Kubernetes 최신 3개 버전(N, N-1, N-2)을 지원합니다.
+Kubespray는 Kubernetes 최신 3개 버전(N, N-1, N-2)을 지원한다.
 
 | Kubespray 버전 | 지원 K8s 버전 |
 |---------------|--------------|
@@ -117,7 +121,7 @@ Kubespray는 Kubernetes 최신 3개 버전(N, N-1, N-2)을 지원합니다.
 
 ### 1. 전체 실행 흐름
 
-Kubespray는 `cluster.yml` Playbook을 실행하면 총 **15개의 PLAY**와 **559개의 TASK**가 순차적으로 실행됩니다.
+Kubespray는 `cluster.yml` Playbook을 실행하면 총 **15개의 PLAY**와 **559개의 TASK**가 순차적으로 실행된다.
 
 ```mermaid
 graph TD
@@ -292,7 +296,7 @@ graph TD
 
 ### 1. Containerd 설치 과정
 
-Kubespray는 `container-engine` Role을 통해 Containerd를 설치합니다.
+Kubespray는 `container-engine` Role을 통해 Containerd를 설치한다.
 
 ```mermaid
 flowchart TD
@@ -360,7 +364,7 @@ flowchart TD
    ```
 ### 2. Registry 미러 설정
 
-Kubespray는 Containerd의 Registry 미러 기능을 활용하여 Private Registry 사용을 지원합니다.
+Kubespray는 Containerd의 Registry 미러 기능을 활용하여 Private Registry 사용을 지원한다.
 
 ```mermaid
 graph TD
@@ -458,7 +462,7 @@ kubectl get cm kubelet-config -n kube-system -o yaml | grep cgroupDriver
 
 ### 1. etcd Deployment Type
 
-Kubespray는 두 가지 etcd 배포 방식을 지원합니다.
+Kubespray는 두 가지 etcd 배포 방식을 지원한다.
 
 | Deployment Type | 설명 | 장점 | 단점 |
 |----------------|------|------|------|
@@ -600,7 +604,7 @@ ETCDCTL_API=3 etcdctl \
 
 ### 1. Node 컴포넌트 설치
 
-**kubernetes/node Role**은 모든 노드(Control Plane + Worker)에 공통 컴포넌트를 설치합니다.
+**kubernetes/node Role**은 모든 노드(Control Plane + Worker)에 공통 컴포넌트를 설치한다.
 
 **설치 항목**:
 - kubelet (v1.33.3)
@@ -653,7 +657,7 @@ WantedBy=multi-user.target
 
 **kubeadm init 실행**:
 
-Kubespray는 `kubeadm init`을 통해 Control Plane을 구성합니다.
+Kubespray는 `kubeadm init`을 통해 Control Plane을 구성한다.
 
 **kubeadm-config.yaml**:
 
@@ -725,7 +729,7 @@ kubeadm init --config=/etc/kubernetes/kubeadm-config.yaml --upload-certs
 
 **Flannel CNI 설치**:
 
-Kubespray는 선택한 CNI 플러그인(Flannel)의 매니페스트를 적용합니다.
+Kubespray는 선택한 CNI 플러그인(Flannel)의 매니페스트를 적용한다.
 
 **Flannel 설정**:
 
@@ -752,8 +756,7 @@ kubectl apply -f /etc/kubernetes/flannel.yaml
 
 ### 4. 애드온 설치
 
-**kubernetes-apps Role**은 다양한 애드온을 설치합니다.
-
+**kubernetes-apps Role**은 다양한 애드온을 설치한다.
 
 ```yaml
 # inventory/mycluster/group_vars/k8s_cluster/addons.yml
@@ -924,7 +927,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
 
 ### 1. Kubeadm Auto Renew
 
-Kubespray는 **kubeadm cert auto renew** 기능을 활성화하여 인증서를 자동으로 갱신합니다.
+Kubespray는 **kubeadm cert auto renew** 기능을 활성화하여 인증서를 자동으로 갱신한다.
 
 **설정**:
 
@@ -944,7 +947,7 @@ auto_renew_certificates: true
 
 ### 2. Systemd Timer 설정
 
-Kubespray는 systemd timer를 사용하여 매달 인증서를 갱신합니다.
+Kubespray는 systemd timer를 사용하여 매달 인증서를 갱신한다.
 
 **k8s-certs-renew.timer**:
 
@@ -1042,7 +1045,7 @@ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates
 
 ### 1. Control Plane HA
 
-Kubespray는 여러 Control Plane 노드를 구성하여 HA를 지원합니다.
+Kubespray는 여러 Control Plane 노드를 구성하여 HA를 지원한다.
 
 **HA 구성 예시**:
 
@@ -1103,7 +1106,7 @@ ETCD_INITIAL_CLUSTER_STATE=new
 ```
 ### 3. Client-Side LoadBalancing
 
-Kubespray는 Worker 노드에 **Nginx 기반 LoadBalancer**를 구성하여 API Server에 분산 접속합니다.
+Kubespray는 Worker 노드에 **Nginx 기반 LoadBalancer**를 구성하여 API Server에 분산 접속한다.
 
 **구성**:
 
@@ -1300,7 +1303,7 @@ find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
 
 ### 2. Ansible Role 기반 구조
 
-Kubespray는 **Ansible Role**을 활용하여 모듈화된 구조를 제공합니다.
+Kubespray는 **Ansible Role**을 활용하여 모듈화된 구조를 제공한다.
 
 **Role 기반 구조의 장점**:
 
@@ -1375,7 +1378,7 @@ ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 - [Kubespray 공식 문서](https://kubespray.io/)
 - [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)

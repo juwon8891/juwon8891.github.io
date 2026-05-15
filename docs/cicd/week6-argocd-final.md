@@ -1,7 +1,12 @@
+---
+tags:
+  - CI/CD
+  - ArgoCD
+---
 
 # ArgoCD Final
 
-> ArgoCD 고가용성 구성, 멀티 클러스터 관리, LDAP 통합을 학습합니다.
+> ArgoCD 고가용성 구성, 멀티 클러스터 관리, LDAP 통합을 학습한다.
 
 ---
 
@@ -11,7 +16,7 @@
 
 #### ArgoCD 컴포넌트별 확장 전략
 
-**프로덕션 ArgoCD는 다음과 같은 고가용성 요구사항을 만족해야 합니다**:
+**프로덕션 ArgoCD는 다음과 같은 고가용성 요구사항을 만족해야 한다**:
 
 ```mermaid
 graph TB
@@ -136,7 +141,7 @@ helm upgrade --install argocd argo/argo-cd \
 
 #### Redis Sentinel 아키텍처
 
-**Redis HA**는 **Sentinel**을 사용하여 자동 failover를 제공합니다.
+**Redis HA**는 **Sentinel**을 사용하여 자동 failover를 제공한다.
 
 ```mermaid
 graph TB
@@ -167,10 +172,10 @@ graph TB
 
 ```
 **Sentinel 동작 방식**:
-1. **정족수(Quorum)**: 최소 2개의 Sentinel이 Master 장애 합의
-2. **투표(Vote)**: 과반수 Sentinel이 새 Master 선출
-3. **승격(Promote)**: 선출된 Replica가 Master로 승격
-4. **재구성(Reconfigure)**: 나머지 Replica들이 새 Master를 따르도록 재구성
+- 최소 2개의 Sentinel이 Master 장애 합의
+- 과반수 Sentinel이 새 Master 선출
+- 선출된 Replica가 Master로 승격
+- 나머지 Replica들이 새 Master를 따르도록 재구성
 
 #### Redis HA 확인
 
@@ -201,7 +206,7 @@ kubectl exec -n argocd argocd-redis-ha-server-0 -c sentinel -- \
 
 #### Leader Election 메커니즘
 
-**ApplicationSet Controller**는 **Leader Election**을 사용하여 Active-Standby 고가용성을 제공합니다.
+**ApplicationSet Controller**는 **Leader Election**을 사용하여 Active-Standby 고가용성을 제공한다.
 
 ```mermaid
 sequenceDiagram
@@ -250,7 +255,7 @@ kubectl describe lease -n argocd argocd-applicationset-controller
 
 #### Sync Window란?
 
-**Sync Window**는 특정 시간대에만 동기화를 허용하거나 차단하는 기능입니다.
+**Sync Window**는 특정 시간대에만 동기화를 허용하거나 차단하는 기능이다.
 
 **사용 사례**:
 - 업무 시간 외(야간)에만 프로덕션 배포
@@ -315,15 +320,15 @@ argocd app get myapp | grep "Sync Windows"
 
 #### Argo Rollouts 통합
 
-**Argo Rollouts**는 Blue-Green, Canary 배포 전략을 제공합니다.
+**Argo Rollouts**는 Blue-Green, Canary 배포 전략을 제공한다.
 
 ```mermaid
 graph LR
     subgraph "Canary Deployment"
-        V1[Version 1<br/>100% Traffic]
-        V2A[Version 2<br/>10% Traffic]
-        V2B[Version 2<br/>50% Traffic]
-        V2C[Version 2<br/>100% Traffic]
+        V1["Version 1<br/>100% Traffic"]
+        V2A["Version 2<br/>10% Traffic"]
+        V2B["Version 2<br/>50% Traffic"]
+        V2C["Version 2<br/>100% Traffic"]
     end
 
     V1 -->|1. Deploy| V2A
@@ -422,7 +427,7 @@ spec:
 
 #### Self-Healing 설정
 
-**Self-Healing**은 Git 상태와 클러스터 상태가 불일치할 때 자동으로 복구합니다.
+**Self-Healing**은 Git 상태와 클러스터 상태가 불일치할 때 자동으로 복구한다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -475,7 +480,7 @@ spec:
 
 #### ArgoCD Resource Tracking 방식
 
-ArgoCD는 **3가지 방식**으로 리소스를 추적합니다:
+ArgoCD는 **3가지 방식**으로 리소스를 추적한다:
 
 | 방식 | 설명 | 장점 | 단점 |
 |-----|------|------|-----|
@@ -502,7 +507,7 @@ kubectl rollout restart deployment argocd-application-controller -n argocd
 
 #### Annotation 방식 동작
 
-**Annotation 기반 Tracking**은 `argocd.argoproj.io/tracking-id` 값을 사용합니다.
+**Annotation 기반 Tracking**은 `argocd.argoproj.io/tracking-id` 값을 사용한다.
 
 ```yaml
 # Annotation 기반 Tracking 예시
@@ -576,7 +581,7 @@ data:
 
 #### Matrix Generator란?
 
-**Matrix Generator**는 **2개의 Generator를 조합**하여 애플리케이션을 생성합니다.
+**Matrix Generator**는 **2개의 Generator를 조합**하여 애플리케이션을 생성한다.
 
 ```mermaid
 graph TB
@@ -653,7 +658,7 @@ spec:
 
 #### Git File Generator란?
 
-**Git File Generator**는 **Git 리포지토리의 JSON/YAML 파일**을 읽어 애플리케이션을 생성합니다.
+**Git File Generator**는 **Git 리포지토리의 JSON/YAML 파일**을 읽어 애플리케이션을 생성한다.
 
 **사용 사례**:
 - 각 팀이 자신의 애플리케이션 목록 관리
@@ -724,7 +729,7 @@ spec:
 
 #### Pull Request Generator란?
 
-**Pull Request Generator**는 **Git Pull Request**를 기반으로 preview 환경을 자동 생성합니다.
+**Pull Request Generator**는 **Git Pull Request**를 기반으로 preview 환경을 자동 생성한다.
 
 ```mermaid
 sequenceDiagram
@@ -865,7 +870,7 @@ argocd cluster list
 
 #### ServiceAccount 기반 인증
 
-**ArgoCD는 클러스터 접근을 위해 ServiceAccount Token을 사용합니다**:
+**ArgoCD는 클러스터 접근을 위해 ServiceAccount Token을 사용한다**:
 
 ```bash
 # 대상 클러스터에서 ServiceAccount 생성
@@ -916,7 +921,7 @@ kubectl get secret -n argocd argocd-manager-token -o jsonpath='{.data.token}' | 
 
 #### App of Apps란?
 
-**App of Apps**는 **하나의 Application이 다른 Application들을 관리**하는 패턴입니다.
+**App of Apps**는 **하나의 Application이 다른 Application들을 관리**하는 패턴이다.
 
 ```mermaid
 graph TB
@@ -1044,7 +1049,7 @@ spec:
 
 #### LDAP란?
 
-**LDAP (Lightweight Directory Access Protocol)**는 사용자, 그룹, 권한 정보를 계층적으로 관리하는 디렉터리 서비스입니다.
+**LDAP (Lightweight Directory Access Protocol)**는 사용자, 그룹, 권한 정보를 계층적으로 관리하는 디렉터리 서비스이다.
 
 **쉬운 비유**:
 - **LDAP 서버** = 회사의 인사/보안부 (모든 직원 정보 중앙 관리)
@@ -1279,7 +1284,7 @@ ldapsearch -x -H ldap://localhost:389 \
 
 #### LDAP 연동 아키텍처
 
-**Keycloak을 사용하여 OpenLDAP를 ArgoCD SSO에 통합**할 수 있습니다.
+**Keycloak을 사용하여 OpenLDAP를 ArgoCD SSO에 통합**할 수 있다.
 
 ```mermaid
 graph TB
@@ -1453,7 +1458,7 @@ env:
 
 #### Sealed Secrets란?
 
-**Sealed Secrets**는 암호화된 Secret을 **안전하게 Git에 저장**할 수 있게 합니다.
+**Sealed Secrets**는 암호화된 Secret을 **안전하게 Git에 저장**할 수 있게 한다.
 
 ```mermaid
 sequenceDiagram
@@ -1513,7 +1518,7 @@ kubectl get secret mysecret -o jsonpath='{.data.password}' | base64 -d
 
 #### External Secrets Operator란?
 
-**External Secrets Operator (ESO)**는 **외부 Secret 저장소**와 Kubernetes를 동기화합니다.
+**External Secrets Operator (ESO)**는 **외부 Secret 저장소**와 Kubernetes를 동기화한다.
 
 **지원 백엔드**:
 - AWS Secrets Manager
@@ -1658,7 +1663,7 @@ spec:
 
 #### ArgoCD Metrics 수집
 
-**ArgoCD는 Prometheus 형식의 메트릭을 노출**합니다.
+**ArgoCD는 Prometheus 형식의 메트릭을 노출**한다.
 
 ```bash
 # argocd-metrics Service 확인
@@ -1897,21 +1902,12 @@ kubectl logs -n argocd deployment/argocd-server --tail=100 -f
 
 ---
 
-**🎉 6주차 학습 완료!**
+## 6주차 학습 정리
 
-6주간의 ArgoCD 학습을 통해 다음과 같은 역량을 갖추게 되었습니다:
+- ArgoCD Notification (Slack, Email, Webhook)
+- RBAC 및 프로젝트 기반 멀티테넌시
+- Prometheus 메트릭 및 Grafana 대시보드
+- Audit Logging (JSON 형식)
+- Sealed Secrets (Git에 암호화된 Secret 저장)
+- External Secrets Operator (AWS Secrets Manager, Vault 연동)
 
-1. **GitOps 철학 이해**: 선언적 배포, Git을 Single Source of Truth로
-2. **ArgoCD 전문가**: 설치부터 고급 기능까지 완벽 이해
-3. **프로덕션 준비**: HA, 보안, 모니터링, 멀티 클러스터
-4. **실무 적용 능력**: 실제 엔터프라이즈 환경에 적용 가능한 수준
-
-이제 **프로덕션급 GitOps 플랫폼을 구축하고 운영**할 수 있는 역량을 갖추게 되었습니다! 🚀
-
-다음 단계로는:
-- **플랫폼 엔지니어링**: Backstage.io, Internal Developer Portal
-- **Service Mesh**: Istio, Linkerd와 GitOps 통합
-- **Policy as Code**: OPA, Kyverno
-- **FinOps**: 비용 최적화, Kubecost
-
-계속해서 학습하고 발전해 나가시기 바랍니다! 💪

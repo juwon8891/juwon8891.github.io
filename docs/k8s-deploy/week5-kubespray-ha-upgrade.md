@@ -1,6 +1,10 @@
+---
+tags:
+  - Kubespray
+  - HA
+---
 
 # Kubespray HA & Upgrade
-
 
 > **고가용성 Kubernetes 클러스터 운영**: Kubespray를 활용한 HA 구성, API 엔드포인트 전략, 노드 관리 및 클러스터 업그레이드
 
@@ -59,7 +63,6 @@ end
 ### 2. 초기화 스크립트 분석
 
 #### (1) admin-lb.sh - Kubespray 실행 노드
-
 
 ```bash
 #!/bin/bash
@@ -161,7 +164,6 @@ curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
 ---
 
 #### (2) init-cfg.sh - K8s 노드 초기화
-
 
 ```bash
 #!/bin/bash
@@ -375,7 +377,7 @@ kube-scheduler-k8s-node3            1/1   Running   k8s-node3
 
 ## K8S API 엔드포인트 전략
 
-Kubernetes 클러스터에서 **API Server에 접근하는 방법**은 다음 3가지 Case로 구분됩니다.
+Kubernetes 클러스터에서 **API Server에 접근하는 방법**은 다음 3가지 Case로 구분된다.
 
 ---
 
@@ -1902,8 +1904,6 @@ open "http://192.168.10.10:9000/haproxy_stats"
 
 ### 5. Next Steps
 
-**Week 6 Preview** (예상):
-
 | 주제 | 내용 |
 |-----|------|
 | **Kubernetes Upgrade** | Kubespray를 통한 클러스터 업그레이드 |
@@ -1913,7 +1913,7 @@ open "http://192.168.10.10:9000/haproxy_stats"
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)

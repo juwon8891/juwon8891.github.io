@@ -1,8 +1,12 @@
+---
+tags:
+  - RKE2
+  - Cluster API
+---
 
 # RKE2 & Cluster API
 
-
-> **Week 7 학습 주제**: Rancher Government의 보안 강화 Kubernetes 배포판 RKE2와 선언적 클러스터 관리를 위한 Cluster API를 학습합니다.
+> **Week 7 학습 주제**: Rancher Government의 보안 강화 Kubernetes 배포판 RKE2와 선언적 클러스터 관리를 위한 Cluster API를 학습한다.
 
 ---
 

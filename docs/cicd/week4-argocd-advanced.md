@@ -1,7 +1,13 @@
+---
+tags:
+  - CI/CD
+  - ArgoCD
+  - GitOps
+---
 
 # ArgoCD Advanced
 
-> ArgoCD ApplicationSet, Sync Waves, RBAC, Notifications를 학습합니다.
+> ArgoCD ApplicationSet, Sync Waves, RBAC, Notifications를 학습한다.
 
 ---
 
@@ -11,7 +17,7 @@
 
 #### ApplicationSet이란?
 
-**ApplicationSet**은 ArgoCD의 **Application 생성을 자동화**하는 CRD(Custom Resource Definition)입니다. 하나의 템플릿으로 **여러 환경, 클러스터, 테넌트**에 동일한 애플리케이션을 배포할 수 있습니다.
+**ApplicationSet**은 ArgoCD의 **Application 생성을 자동화**하는 CRD(Custom Resource Definition)이다. 하나의 템플릿으로 **여러 환경, 클러스터, 테넌트**에 동일한 애플리케이션을 배포할 수 있다.
 
 ```mermaid
 graph TB
@@ -184,7 +190,7 @@ kubectl get all -n prod-nginx
 
 #### Git Generator 개념
 
-Git 저장소의 **디렉토리 구조**를 기반으로 자동으로 Application을 생성합니다.
+Git 저장소의 **디렉토리 구조**를 기반으로 자동으로 Application을 생성한다.
 
 ```mermaid
 graph LR
@@ -363,7 +369,7 @@ kubectl get all -n database
 
 #### Matrix Generator 개념
 
-**여러 Generator를 조합**하여 복잡한 배포 패턴을 구성합니다.
+**여러 Generator를 조합**하여 복잡한 배포 패턴을 구성한다.
 
 ```
 Matrix Generator = List(environments) × Git(apps)
@@ -441,7 +447,7 @@ kubectl get ns | grep -E "(dev|staging|prod)-(frontend|backend|database)"
 
 #### Sync Waves란?
 
-**Sync Waves**는 ArgoCD가 리소스를 **순서대로 배포**하도록 제어하는 기능입니다. 숫자가 낮은 Wave부터 순차적으로 배포됩니다.
+**Sync Waves**는 ArgoCD가 리소스를 **순서대로 배포**하도록 제어하는 기능이다. 숫자가 낮은 Wave부터 순차적으로 배포된다.
 
 ```mermaid
 sequenceDiagram
@@ -680,7 +686,7 @@ argocd app get sync-waves-demo --show-operation
 
 #### Resource Hooks 종류
 
-ArgoCD는 **5가지 Hook**을 제공하여 배포 전후에 작업을 실행할 수 있습니다.
+ArgoCD는 **5가지 Hook**을 제공하여 배포 전후에 작업을 실행할 수 있다.
 
 | Hook | 실행 시점 | 사용 사례 |
 |------|----------|-----------|
@@ -799,7 +805,7 @@ git push
 ```
 ### 3. 실전 예제: 데이터베이스 마이그레이션
 
-실제 프로덕션 환경에서 DB 스키마 변경 시 사용하는 패턴입니다.
+실제 프로덕션 환경에서 DB 스키마 변경 시 사용하는 패턴이다.
 
 ```bash
 mkdir -p sync-waves-demo/migration
@@ -897,10 +903,10 @@ git push
 
 ```
 **배포 플로우**:
-1. **PreSync Hook (Wave -1)**: DB 백업
-2. **Sync (Wave 0)**: 마이그레이션 스크립트 실행
-3. **PostSync Hook (Wave 1)**: 스키마 검증
-4. **Sync (Wave 2)**: 애플리케이션 업데이트
+- DB 백업
+- 마이그레이션 스크립트 실행
+- 스키마 검증
+- 애플리케이션 업데이트
 
 ---
 
@@ -910,7 +916,7 @@ git push
 
 #### ArgoCD 프로젝트란?
 
-**프로젝트(AppProject)**는 여러 팀이 하나의 ArgoCD를 공유할 때 **격리와 권한 관리**를 제공합니다.
+**프로젝트(AppProject)**는 여러 팀이 하나의 ArgoCD를 공유할 때 **격리와 권한 관리**를 제공한다.
 
 ```mermaid
 graph TB
@@ -1095,7 +1101,7 @@ EOF
 
 #### ArgoCD RBAC 개념
 
-ArgoCD는 **역할 기반 접근 제어(RBAC)**를 통해 사용자/그룹별 권한을 관리합니다.
+ArgoCD는 **역할 기반 접근 제어(RBAC)**를 통해 사용자/그룹별 권한을 관리한다.
 
 **기본 역할**:
 - `role:readonly`: 읽기 전용
@@ -1264,7 +1270,7 @@ argocd app sync backend-app
 
 #### ArgoCD Notifications란?
 
-**ArgoCD Notifications**는 배포 이벤트를 **Slack, Email, Webhook** 등으로 전송하는 기능입니다.
+**ArgoCD Notifications**는 배포 이벤트를 **Slack, Email, Webhook** 등으로 전송하는 기능이다.
 
 ```mermaid
 graph LR
@@ -1428,7 +1434,7 @@ trigger.on-prod-deployed: |
 ```yaml
 template.app-deployed-detailed: |
   message: |
-    🚀 **Deployment Successful**
+    **Deployment Successful**
 
     **Application:** {{.app.metadata.name}}
     **Project:** {{.app.spec.project}}
@@ -1473,7 +1479,7 @@ trigger.on-deployment-updated: |
 
 #### Blue-Green with Argo Rollouts
 
-3주차에서 Jenkins로 구현한 Blue-Green을 Argo Rollouts로 자동화합니다.
+3주차에서 Jenkins로 구현한 Blue-Green을 Argo Rollouts로 자동화한다.
 
 ```bash
 cd ~/cicd-labs/ops-deploy
@@ -1650,7 +1656,7 @@ curl http://127.0.0.1:30005
 
 #### AnalysisTemplate이란?
 
-**AnalysisTemplate**은 **배포 중 메트릭을 수집하고 분석**하여 자동으로 프로모션/롤백을 결정합니다.
+**AnalysisTemplate**은 **배포 중 메트릭을 수집하고 분석**하여 자동으로 프로모션/롤백을 결정한다.
 
 ```mermaid
 sequenceDiagram
@@ -2124,7 +2130,7 @@ EOF
 
 #### Sealed Secrets 활용
 
-**Sealed Secrets**는 암호화된 Secret을 Git에 안전하게 저장하는 도구입니다.
+**Sealed Secrets**는 암호화된 Secret을 Git에 안전하게 저장하는 도구이다.
 
 ```bash
 # Sealed Secrets Controller 설치
@@ -2203,10 +2209,15 @@ spec:
 
 ---
 
-**🎉 4주차 학습 완료!**
+## 4주차 학습 정리
 
-4주차에서는 ArgoCD의 고급 기능인 ApplicationSet, Sync Waves, RBAC, Notifications을 학습하고, Argo Rollouts의 Blue-Green 및 Prometheus 기반 자동 롤백을 실습했습니다. 이제 **엔터프라이즈급 GitOps 파이프라인**을 구축할 수 있는 역량을 갖추게 되었습니다.
+- App-of-Apps 패턴 (Root App이 하위 Apps 관리)
+- Sync Waves 및 Sync Hooks (순차 배포 제어)
+- ApplicationSet (멀티 클러스터 자동 배포)
+- 멀티 클러스터 관리 (Cluster Bootstrap)
+- LDAP/Keycloak 통합 및 RBAC 권한 분리
 
-GitOps의 핵심은 **Git을 Single Source of Truth로 사용**하여 인프라와 애플리케이션의 모든 변경사항을 추적하고, 자동화된 배포를 통해 일관성과 안정성을 확보하는 것입니다.
+---
 
-다음 단계에서는 Service Mesh, Observability, Security를 추가하여 프로덕션 수준의 플랫폼을 완성하는 것을 목표로 합니다! 🚀
+GitOps의 핵심은 **Git을 Single Source of Truth로 사용**하여 인프라와 애플리케이션의 모든 변경사항을 추적하고, 자동화된 배포를 통해 일관성과 안정성을 확보하는 것이다.
+

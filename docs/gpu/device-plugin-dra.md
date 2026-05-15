@@ -1,3 +1,9 @@
+---
+tags:
+  - GPU
+  - Kubernetes
+---
+
 # Device Plugin & DRA
 
 > Kubernetes에서 GPU, RDMA 등 특수 하드웨어 리소스를 관리하는 메커니즘
@@ -18,9 +24,9 @@ Dynamic Resource Allocation (DRA, K8s 1.26+ Alpha)
 | 플러그인 | 대상 리소스 | 벤더 |
 |---------|------------|------|
 | NVIDIA GPU Operator | GPU (A100, H100 등) | NVIDIA |
-| AMD GPU Operator | GPU (MI250X, MI300X 등) | AMD |
+| AMD GPU Operator | GPU | AMD |
 | RDMA Device Plugin | InfiniBand HCA, RoCE NIC | Mellanox/NVIDIA |
-| Intel GPU Device Plugin | GPU (Flex, Max 등) | Intel |
+| Intel GPU Device Plugin | GPU | Intel |
 
 ## Device Plugin 메커니즘
 
@@ -277,7 +283,7 @@ status:
     nvidia.com/cuda.driver.minor: "2"
 ```
 
-### MIG (Multi-Instance GPU) 지원
+### MIG 지원
 
 **MIG**는 A100, H100 GPU를 여러 독립 인스턴스로 분할하는 기능이다.
 
@@ -387,7 +393,7 @@ data:
 
 ### 개요
 
-**AMD GPU Operator**는 AMD Instinct GPU (MI250X, MI300X 등)를 Kubernetes에서 관리한다.
+**AMD GPU Operator**는 AMD Instinct GPU를 Kubernetes에서 관리한다.
 
 **구성 요소**:
 - ROCm (AMD GPU 소프트웨어 스택) 드라이버
@@ -750,42 +756,27 @@ spec:
       - name: network-claim  # GPU와 같은 PCIe root에 배치
 ```
 
-**선택 기준**:
+**선택 기준**
 
-| 요구사항 | 추천 |
-|---------|------|
-| RDMA 네트워크만 필요 | RDMA Shared Device Plugin |
-| GPU + NIC 토폴로지 최적화 필요 | DRANET |
-| AI/ML 분산 학습 (NCCL) | DRANET |
-| 기존 워크로드 (MPI, UCX) | RDMA Shared Device Plugin |
-| DRA 기능 필요 (동적 할당) | DRANET |
+RDMA 네트워크 접속만 필요하거나 MPI, UCX 등 기존 워크로드를 그대로 사용하는 경우 **RDMA Shared Device Plugin**이 적합하다. 설정이 단순하고 검증된 방식이다.
+
+GPU와 NIC 간 토폴로지 최적화가 필요하거나 NCCL 기반 AI/ML 분산 학습을 수행하는 경우, 또는 DRA의 동적 할당 기능이 필요한 경우에는 **DRANET**을 선택한다.
 
 ## 벤더별 비교
 
 ### GPU Operator 비교
 
-| 항목 | NVIDIA GPU Operator | AMD GPU Operator |
-|------|---------------------|------------------|
-| **대상 GPU** | A100, H100, L40S, RTX 등 | MI250X, MI300X, MI350X 등 |
-| **소프트웨어 스택** | CUDA Toolkit 12.x | ROCm 6.x |
-| **드라이버** | NVIDIA Driver 535+ | ROCm Kernel Driver |
-| **리소스 이름** | `nvidia.com/gpu` | `amd.com/gpu` |
-| **MIG/파티셔닝** | MIG (Multi-Instance GPU) | 미지원 |
-| **모니터링** | DCGM (GPU 전용) | ROCm SMI |
-| **AI 프레임워크** | PyTorch, TensorFlow (CUDA) | PyTorch, TensorFlow (ROCm) |
-| **Kubernetes 지원** | 1.20+ | 1.23+ |
+**NVIDIA GPU Operator**는 NVIDIA GPU를 대상으로 CUDA 기반으로 동작한다. 리소스는 `nvidia.com/gpu`로 표현하며, MIG를 통한 GPU 파티셔닝과 DCGM 기반 상세 모니터링을 지원한다.
+
+**AMD GPU Operator**는 AMD GPU를 대상으로 ROCm 스택 위에서 동작한다. 리소스는 `amd.com/gpu`로 표현하며, 파티셔닝은 현재 미지원이고 모니터링은 ROCm SMI를 사용한다.
+
+두 Operator 모두 PyTorch, TensorFlow를 지원하지만 NVIDIA는 CUDA, AMD는 ROCm 백엔드를 사용한다.
 
 ### Device Plugin vs DRA
 
-| 항목 | Device Plugin | DRA |
-|------|---------------|-----|
-| **Kubernetes 버전** | 1.8+ (GA) | 1.26+ (Alpha), 1.30+ (Beta) |
-| **할당 방식** | 정적 (Pod 생성 시) | 동적 (실행 중 가능) |
-| **리소스 표현** | 단순 카운팅 | 구조화된 파라미터 |
-| **토폴로지 인식** | 없음 | NVLink, NUMA, PCIe 고려 |
-| **공유** | 가능 (Time-slicing, MPS, MIG) | 가능 (더 세밀한 제어) |
-| **재시작 시** | 재할당 (다른 GPU 가능) | 동일 GPU 유지 가능 |
-| **사용 사례** | 단순 GPU 할당 | 멀티 GPU 학습, RDMA 네트워크 |
+**Device Plugin**은 Kubernetes 1.8부터 GA로 사용 가능한 전통적인 방식이다. Pod 생성 시점에 정적으로 GPU를 할당하며, 리소스를 단순 카운팅으로 표현한다. 토폴로지 인식 기능이 없어 NVLink, NUMA, PCIe 구성을 고려하지 않지만, Time-slicing, MPS, MIG를 통한 GPU 공유가 가능하다. Pod 재시작 시 다른 GPU에 재할당될 수 있다.
+
+**DRA**는 Kubernetes 1.26(Alpha)에서 도입되어 1.30(Beta)부터 안정화 중인 방식이다. 구조화된 파라미터로 리소스를 표현하며, NVLink, NUMA, PCIe 토폴로지를 고려한 할당이 가능하다. Pod 재시작 시에도 동일 GPU를 유지할 수 있어 멀티 GPU 학습이나 RDMA 네트워크처럼 복잡한 리소스 요구사항에 적합하다.
 
 ## 실전 예시
 
@@ -888,11 +879,11 @@ spec:
 | RDMA 네트워크 (기본) | RDMA Device Plugin |
 | AMD GPU | AMD GPU Operator + Device Plugin |
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 - [Kubernetes Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)
 - [Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)
 - [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/)
 - [AMD GPU Operator](https://github.com/amd/amd-gpu-operator)
 - [RDMA Device Plugin](https://github.com/Mellanox/k8s-rdma-shared-dev-plugin)
-- [DRANET (DRA Network Driver)](https://github.com/kubernetes-sigs/dranet)
+- [DRANET](https://github.com/kubernetes-sigs/dranet)

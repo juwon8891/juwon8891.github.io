@@ -1,7 +1,16 @@
+---
+tags:
+  - Kubespray
+  - Air-Gap
+---
+
+# Kubespray 폐쇄망 오프라인 설치
+
+> 폐쇄망(Air-Gap) 환경에서 kubespray-offline 도구를 활용한 Kubernetes 클러스터 배포 방법을 정리한다.
 
 ## 개요
 
-**Week 6**에서는 **폐쇄망(Air-Gap) 환경**에서 Kubespray를 활용한 Kubernetes 클러스터 배포를 학습합니다.
+**Week 6**에서는 **폐쇄망(Air-Gap) 환경**에서 Kubespray를 활용한 Kubernetes 클러스터 배포를 학습한다.
 
 ### 학습 목표
 - 폐쇄망 환경 아키텍처 이해
@@ -17,8 +26,8 @@
 
 ```mermaid
 graph TB
-    Internet["🌐 Internet"]
-    Internet --> FW1["🛡️ 외부 방화벽"]
+    Internet[" Internet"]
+    Internet --> FW1[" 외부 방화벽"]
 
     subgraph DMZ
         Bastion["Bastion Server"]
@@ -26,7 +35,7 @@ graph TB
     end
 
     FW1 --> DMZ
-    DMZ --> FW2["🛡️ 내부 방화벽"]
+    DMZ --> FW2[" 내부 방화벽"]
 
     subgraph Internal["내부망 (Air-Gap)"]
         Admin["Admin Server"]
@@ -105,7 +114,7 @@ graph TB
 ```bash
 # IP Forwarding 활성화
 
-> Kubespray 폐쇄망(Air-Gap) 환경 offline 설치를 학습합니다.
+> Kubespray 폐쇄망(Air-Gap) 환경 offline 설치를 학습한다.
 sysctl -w net.ipv4.ip_forward=1
 cat <<EOF | tee /etc/sysctl.d/99-ipforward.conf
 net.ipv4.ip_forward = 1
@@ -138,7 +147,7 @@ ip route
 ```mermaid
 graph LR
     K8sNode["k8s-node<br/>192.168.10.11"] -->|"SNAT<br/>192.168.10.11 → 10.0.2.15"| Admin["admin<br/>enp0s9: 192.168.10.10<br/>enp0s8: 10.0.2.15"]
-    Admin -->|"외부 인터넷"| Internet["🌐 Internet"]
+    Admin -->|"외부 인터넷"| Internet[" Internet"]
 
     Internet -->|"DNAT<br/>10.0.2.15 → 192.168.10.11"| Admin
     Admin --> K8sNode
@@ -240,7 +249,7 @@ chronyc sources -v
 
 ```mermaid
 graph TB
-    Internet["🌐 Internet<br/>pool.ntp.org<br/>kr.pool.ntp.org"]
+    Internet[" Internet<br/>pool.ntp.org<br/>kr.pool.ntp.org"]
 
     Internet -->|"iburst<br/>4~8 packets"| AdminNTP["admin<br/>chronyd<br/>Stratum 3"]
 
@@ -1095,7 +1104,7 @@ podman pull 192.168.10.10:5000/alpine:1.0
 | **구현** | Shell Script | Ansible Playbook |
 | **다운로드** | download-all.sh | manage-offline-files.sh |
 | **이미지 관리** | load-push-all-images.sh | manage-offline-container-images.sh |
-| **사용 편의성** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **사용 편의성** |  |  |
 | **커스터마이징** | Shell 수정 | Ansible 수정 |
 
 ### 2. Offline 배포 핵심 구성요소
@@ -1161,7 +1170,7 @@ server = "https://192.168.10.10:35000"
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### Week 6: Kubespray Offline 설치
 

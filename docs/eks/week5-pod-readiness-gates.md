@@ -1,9 +1,16 @@
+---
+tags:
+  - EKS
+  - Kubernetes
+---
 
 # Pod Readiness Gates
 
+> 롤링 업데이트 중 502 에러를 방지하기 위한 Pod Readiness Gates의 동작 원리와 적용 방법을 정리한다.
+
 ## 개요
 
-Kubernetes 롤링 업데이트 중 발생하는 간헐적 502/503 에러는 대부분의 클라우드 환경에서 공통적으로 관찰되는 문제입니다. 이 글에서는 EKS와 GKE 환경에서 **Kubernetes Pod 라이프사이클과 클라우드 LoadBalancer 라이프사이클 간 불일치**를 분석하고, Pod Readiness Gates를 통한 해결 방법을 비교합니다.
+Kubernetes 롤링 업데이트 중 발생하는 간헐적 502/503 에러는 대부분의 클라우드 환경에서 공통적으로 관찰되는 문제이다. 이 글에서는 EKS와 GKE 환경에서 **Kubernetes Pod 라이프사이클과 클라우드 LoadBalancer 라이프사이클 간 불일치**를 분석하고, Pod Readiness Gates를 통한 해결 방법을 비교한다.
 
 ### 핵심 질문
 
@@ -31,7 +38,7 @@ $ kubectl set image deployment/my-app app=my-app:v2
 
 # Kubernetes Event Log
 
-> Pod Readiness Gates를 통한 롤링 업데이트 502 에러 해결 방법을 학습합니다.
+> Pod Readiness Gates를 통한 롤링 업데이트 502 에러 해결 방법을 학습한다.
 my-app-v2-abc   0/1   ContainerCreating   0   0s
 my-app-v2-abc   0/1   Running             0   5s
 my-app-v2-abc   1/1   Running             0   10s   ← Pod Ready
@@ -72,7 +79,7 @@ my-app-v1-xyz   1/1   Terminating         0   5m    ← 기존 Pod 종료 시작
 
 ### 2.1 개념
 
-Pod Readiness Gates는 **Kubernetes의 Pod Ready 판정 조건에 외부 시스템의 상태를 추가**하는 메커니즘입니다.
+Pod Readiness Gates는 **Kubernetes의 Pod Ready 판정 조건에 외부 시스템의 상태를 추가**하는 메커니즘이다.
 
 **기본 Ready 조건**:
 
@@ -131,11 +138,11 @@ kubectl label namespace production \
   elbv2.k8s.aws/pod-readiness-gate-inject=enabled
 
 ```
-AWS Load Balancer Controller의 **Mutating Webhook**이 자동으로 readinessGates를 주입합니다.
+AWS Load Balancer Controller의 **Mutating Webhook**이 자동으로 readinessGates를 주입한다.
 
 #### 3.1.2 주입된 구조 및 동작 흐름
 
-Namespace label을 추가하면 AWS Load Balancer Controller가 **Mutating Webhook**을 통해 Pod 생성 시점에 `spec.readinessGates`를 자동으로 주입합니다.
+Namespace label을 추가하면 AWS Load Balancer Controller가 **Mutating Webhook**을 통해 Pod 생성 시점에 `spec.readinessGates`를 자동으로 주입한다.
 
 ```yaml
 spec:
@@ -159,15 +166,15 @@ spec:
    - `target-health: True` (ALB에서 healthy 확인)
    - `Ready: True` ← 이제 안전하게 기존 Pod 제거
 
-이 메커니즘을 통해 **Kubernetes는 ALB가 준비될 때까지 기다리게** 되므로, 트래픽을 받을 수 없는 Pod로 기존 Pod를 교체하는 상황을 방지합니다.
+이 메커니즘을 통해 **Kubernetes는 ALB가 준비될 때까지 기다리게** 되므로, 트래픽을 받을 수 없는 Pod로 기존 Pod를 교체하는 상황을 방지한다.
 
 #### 3.1.3 컨트롤러 동작 원리
 
-AWS Load Balancer Controller는 **두 가지 핵심 컴포넌트**로 동작합니다:
+AWS Load Balancer Controller는 **두 가지 핵심 컴포넌트**로 동작한다:
 
 **1. Pod Mutator (주입 단계)**
 
-Pod 생성 시 Mutating Webhook이 호출되어 readinessGates를 자동 주입합니다.
+Pod 생성 시 Mutating Webhook이 호출되어 readinessGates를 자동 주입한다.
 
 ```go
 // pkg/inject/pod_readiness_gate.go (핵심 로직)
@@ -186,7 +193,7 @@ func (m *podMutator) Mutate(ctx context.Context, pod *corev1.Pod) error {
 
 **2. Target Health Reconciler (동기화 단계)**
 
-주기적으로 (기본 15초) ALB Target Health 상태를 조회하여 Pod Condition을 업데이트합니다.
+주기적으로 (기본 15초) ALB Target Health 상태를 조회하여 Pod Condition을 업데이트한다.
 
 ```go
 // pkg/backend/target_health_reconciler.go (핵심 로직)
@@ -208,7 +215,7 @@ func (r *targetHealthReconciler) Reconcile(...) error {
 3. ALB 상태가 `healthy`면 `True`, 아니면 `False`로 업데이트
 4. Kubernetes는 모든 readinessGates가 `True`일 때만 Pod를 `Ready`로 판정
 
-이 두 컴포넌트의 협업으로 **Kubernetes와 AWS ALB의 상태가 실시간 동기화**됩니다.
+이 두 컴포넌트의 협업으로 **Kubernetes와 AWS ALB의 상태가 실시간 동기화**된다.
 
 #### 3.1.4 기존 해결책 vs Pod Readiness Gates
 
@@ -250,7 +257,7 @@ kubectl label namespace production \
 | 유지보수 | ALB 설정 변경 시 수동 업데이트 | 자동 동기화 |
 | 배포 시간 | 항상 30초 추가 | 실제 필요한 만큼만 (평균 25~40초) |
 
-**결론**: Pod Readiness Gates는 minReadySeconds의 "추측"을 "확인"으로 바꾸어, 더 정확하고 효율적인 해결책을 제공합니다.
+**결론**: Pod Readiness Gates는 minReadySeconds의 "추측"을 "확인"으로 바꾸어, 더 정확하고 효율적인 해결책을 제공한다.
 
 #### 3.1.5 필수 설정
 
@@ -274,7 +281,7 @@ metadata:
 
 #### 3.2.1 활성화 방법
 
-GKE에서는 **Container-native load balancing (NEG)을 사용하면 Pod Readiness Gates가 자동으로 활성화**됩니다.
+GKE에서는 **Container-native load balancing (NEG)을 사용하면 Pod Readiness Gates가 자동으로 활성화**된다.
 
 **방법 1: Ingress를 통한 자동 활성화** (권장)
 
@@ -309,13 +316,13 @@ spec:
               number: 80
 
 ```
-**GKE 1.17+ 버전**에서는 Ingress 생성 시 자동으로 NEG가 사용되며, Pod Readiness Gates (`cloud.google.com/load-balancer-neg-ready`)가 자동으로 주입됩니다.
+**GKE 1.17+ 버전**에서는 Ingress 생성 시 자동으로 NEG가 사용되며, Pod Readiness Gates (`cloud.google.com/load-balancer-neg-ready`)가 자동으로 주입된다.
 
 **별도의 Namespace annotation이나 readiness gate annotation은 필요하지 않습니다.**
 
 #### 3.2.2 주입된 구조 및 동작 흐름
 
-Ingress를 생성하면 GKE Ingress Controller가 자동으로 `spec.readinessGates`를 주입합니다.
+Ingress를 생성하면 GKE Ingress Controller가 자동으로 `spec.readinessGates`를 주입한다.
 
 ```yaml
 spec:
@@ -340,14 +347,14 @@ spec:
    - `Ready: True` ← 이제 안전하게 기존 Pod 제거
 
 **NEG Controller의 역할**:
-- NEG (Network Endpoint Group)에 Pod IP를 endpoint로 등록
+- NEG에 Pod IP를 endpoint로 등록
 - GCLB Health Check 상태를 모니터링
 - Health Check 통과 시 Pod Condition을 `True`로 업데이트
 - 이를 통해 **GCLB가 트래픽을 보낼 준비가 된 후에만** Pod가 Ready 상태로 전환
 
 #### 3.2.3 GKE의 추가 고려사항: Drain Latency
 
-GKE NEG는 Pod Readiness Gates를 지원하지만, **Pod 종료 시 Drain Latency 문제**가 존재합니다:
+GKE NEG는 Pod Readiness Gates를 지원하지만, **Pod 종료 시 Drain Latency 문제**가 존재한다:
 
 **Drain Latency**: NEG API에서 endpoint를 분리하는 데 걸리는 시간 (평균 5~15초)
 
@@ -488,7 +495,7 @@ terminationGracePeriodSeconds >= preStop + App Shutdown Time
 | T+45s | **이제 v1 안전하게 제거** | v1 Terminating | - |
 | T+45s 이후 | 완벽한 전환 | v2 healthy | 200 OK |
 
-**결과**: 에러 0초, Zero Downtime 달성 🎉
+**결과**: 에러 0초, Zero Downtime 달성 
 
 ### 4.2 Deployment 구성 요소 설명
 
@@ -504,7 +511,7 @@ spec:
       maxSurge: 1
 
 ```
-- `maxUnavailable: 0`은 **필수**입니다. 이 설정이 없으면 기존 Pod를 먼저 제거하고 신규 Pod를 생성하여, Pod Readiness Gates의 효과가 사라집니다.
+- `maxUnavailable: 0`은 **필수**이다. 이 설정이 없으면 기존 Pod를 먼저 제거하고 신규 Pod를 생성하여, Pod Readiness Gates의 효과가 사라집니다.
 - `maxSurge: 1`로 신규 Pod를 먼저 생성한 후 Ready 확인 후 기존 Pod 제거
 
 **2. Readiness Probe (필수)**
@@ -659,7 +666,7 @@ annotations:
 # GKE: NEG 사용 시 자동 IP 모드
 
 ```
-## 6. 참고 자료
+## 6. 참고 자료 {: .no-toc }
 
 ### EKS
 - [AWS Load Balancer Controller - Pod Readiness Gates](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.9/deploy/pod_readiness_gate/)

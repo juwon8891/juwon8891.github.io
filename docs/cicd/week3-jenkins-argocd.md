@@ -1,7 +1,13 @@
+---
+tags:
+  - CI/CD
+  - Jenkins
+  - ArgoCD
+---
 
 # Jenkins & ArgoCD
 
-> Jenkins CI/CD와 ArgoCD GitOps 기반 쿠버네티스 배포를 학습합니다.
+> Jenkins CI/CD와 ArgoCD GitOps 기반 쿠버네티스 배포를 학습한다.
 
 ---
 
@@ -91,7 +97,7 @@ docker compose ps
 ```
 #### Docker-out-of-Docker 설정
 
-Jenkins 컨테이너 내부에서 호스트의 Docker 데몬을 사용하도록 설정합니다.
+Jenkins 컨테이너 내부에서 호스트의 Docker 데몬을 사용하도록 설정한다.
 
 ```bash
 # Jenkins 컨테이너 접속 (root)
@@ -124,13 +130,13 @@ docker compose exec jenkins docker ps
 docker compose exec jenkins docker info
 
 ```
-**Windows 사용자 참고**: WSL2 환경에서는 모든 docker compose 명령 앞에 `sudo`를 붙여야 합니다.
+**Windows 사용자 참고**: WSL2 환경에서는 모든 docker compose 명령 앞에 `sudo`를 붙여야 한다.
 
 ### 2. Kind 로컬 쿠버네티스 클러스터
 
 #### Kind란?
 
-**Kind**(Kubernetes IN Docker)는 Docker 컨테이너를 "노드"로 사용하여 로컬 쿠버네티스 클러스터를 실행하는 도구입니다.
+**Kind**(Kubernetes IN Docker)는 Docker 컨테이너를 "노드"로 사용하여 로컬 쿠버네티스 클러스터를 실행하는 도구이다.
 
 ```mermaid
 graph TB
@@ -240,7 +246,7 @@ docker ps | grep myk8s
 ```
 #### kube-ops-view 설치
 
-클러스터 상태를 시각적으로 확인할 수 있는 도구를 설치합니다.
+클러스터 상태를 시각적으로 확인할 수 있는 도구를 설치한다.
 
 ```bash
 # Helm 저장소 추가
@@ -497,7 +503,7 @@ pipeline {
 
 #### Kubernetes 선언적 배포
 
-쿠버네티스는 **선언적 구성(Declarative Configuration)**을 사용합니다. 원하는 상태를 YAML로 선언하면, 쿠버네티스가 해당 상태를 유지합니다.
+쿠버네티스는 **선언적 구성(Declarative Configuration)**을 사용한다. 원하는 상태를 YAML로 선언하면, 쿠버네티스가 해당 상태를 유지한다.
 
 ```mermaid
 sequenceDiagram
@@ -553,7 +559,7 @@ watch -d kubectl get deploy,pod -o wide
 ```
 #### 이미지 Pull 에러 해결
 
-Private 이미지 저장소를 사용하는 경우 인증이 필요합니다.
+Private 이미지 저장소를 사용하는 경우 인증이 필요한다.
 
 ```bash
 # 에러 확인
@@ -606,7 +612,7 @@ kubectl get deploy,rs,pod -o wide
 
 #### Service의 필요성
 
-Pod는 생성/삭제 시마다 IP가 변경됩니다. Service는 Pod에 대한 **안정적인 네트워크 엔드포인트**를 제공합니다.
+Pod는 생성/삭제 시마다 IP가 변경된다. Service는 Pod에 대한 **안정적인 네트워크 엔드포인트**를 제공한다.
 
 ```mermaid
 graph TB
@@ -718,7 +724,7 @@ curl http://127.0.0.1:30000
 
 #### Gogs Webhook 설정
 
-Gogs에서 코드 변경 시 Jenkins 빌드를 자동으로 트리거하도록 설정합니다.
+Gogs에서 코드 변경 시 Jenkins 빌드를 자동으로 트리거하도록 설정한다.
 
 **Gogs app.ini 파일 수정**:
 
@@ -743,11 +749,11 @@ docker compose restart gogs
 ```
 **Webhook 추가** (Gogs 웹):
 1. dev-app 저장소 → Settings → Webhooks → Add Webhook → Gogs
-2. **Payload URL**: `http://192.168.254.124:8080/gogs-webhook/?job=SCM-Pipeline`
-3. **Content Type**: `application/json`
-4. **Secret**: `qwe123`
-5. **When should this webhook be triggered?**: Just the push event
-6. **Active**: ✓
+- `http://192.168.254.124:8080/gogs-webhook/?job=SCM-Pipeline`
+- `application/json`
+- `qwe123`
+- Just the push event
+- ✓
 
 #### Jenkins Pipeline with SCM
 
@@ -844,7 +850,7 @@ git push
 
 #### Blue-Green 배포란?
 
-Blue-Green 배포는 두 개의 동일한 프로덕션 환경(Blue, Green)을 유지하여 **무중단 배포**와 **빠른 롤백**을 가능하게 하는 전략입니다.
+Blue-Green 배포는 두 개의 동일한 프로덕션 환경(Blue, Green)을 유지하여 **무중단 배포**와 **빠른 롤백**을 가능하게 하는 전략이다.
 
 ```mermaid
 graph TB
@@ -1064,8 +1070,7 @@ watch -d 'kubectl get deploy -o wide; echo; kubectl get svc,ep echo-server-servi
 
 #### ArgoCD란?
 
-**ArgoCD**는 쿠버네티스를 위한 **선언적 GitOps 지속적 배포(CD) 도구**입니다.
-
+**ArgoCD**는 쿠버네티스를 위한 **선언적 GitOps 지속적 배포(CD) 도구**이다.
 
 > Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
 
@@ -1135,12 +1140,12 @@ flowchart TB
 ```
 **GitOps 루프 상세 설명**:
 
-1. **Deploy**: Git 저장소에 정의된 Manifest를 쿠버네티스 클러스터에 배포
-2. **Monitor**:
+- Git 저장소에 정의된 Manifest를 쿠버네티스 클러스터에 배포
+-
    - Git 저장소 변경사항 주기적 확인 (기본 3분)
    - 클러스터 리소스 상태 실시간 모니터링
-3. **Detect Drift**: Git의 원하는 상태와 클러스터의 실제 상태 비교
-4. **Take Action**: 차이(Drift)가 발견되면 자동으로 Git 상태로 복구
+- Git의 원하는 상태와 클러스터의 실제 상태 비교
+- 차이(Drift)가 발견되면 자동으로 Git 상태로 복구
 
 #### ArgoCD 핵심 개념
 
@@ -1448,7 +1453,7 @@ curl http://127.0.0.1:30000
 ```
 **ArgoCD 동기화 주기 설정**:
 
-ArgoCD는 기본적으로 **3분마다** Git 저장소를 확인합니다.
+ArgoCD는 기본적으로 **3분마다** Git 저장소를 확인한다.
 
 ```bash
 # 동기화 주기 확인
@@ -1703,7 +1708,7 @@ curl http://127.0.0.1:30000
 
 ### 1. Argo Rollouts 소개
 
-**Argo Rollouts**는 쿠버네티스를 위한 **Progressive Delivery Controller**입니다.
+**Argo Rollouts**는 쿠버네티스를 위한 **Progressive Delivery Controller**이다.
 
 **기본 RollingUpdate의 한계**:
 - 롤아웃 속도 제어 부족
@@ -1760,26 +1765,26 @@ graph TB
 
 #### Canary 배포란?
 
-**Canary 배포**는 새 버전을 소수의 사용자에게 먼저 배포하여 테스트한 후, 점진적으로 트래픽을 늘려가는 배포 전략입니다.
+**Canary 배포**는 새 버전을 소수의 사용자에게 먼저 배포하여 테스트한 후, 점진적으로 트래픽을 늘려가는 배포 전략이다.
 
 ```mermaid
 graph TB
     subgraph "1단계: 10% Canary"
-        USER1[사용자 100%] --> SVC1[Service]
+        USER1["사용자 100%"] --> SVC1[Service]
         SVC1 -->|90%| STABLE1[Stable<br/>v1.0]
         SVC1 -->|10%| CANARY1[Canary<br/>v2.0]
 
     end
 
     subgraph "2단계: 50% Canary"
-        USER2[사용자 100%] --> SVC2[Service]
+        USER2["사용자 100%"] --> SVC2[Service]
         SVC2 -->|50%| STABLE2[Stable<br/>v1.0]
         SVC2 -->|50%| CANARY2[Canary<br/>v2.0]
 
     end
 
     subgraph "3단계: 100% New Version"
-        USER3[사용자 100%] --> SVC3[Service]
+        USER3["사용자 100%"] --> SVC3[Service]
         SVC3 -->|100%| NEW[New Stable<br/>v2.0]
 
     end
@@ -1883,7 +1888,7 @@ kubectl argo rollouts undo rollouts-demo
 kubectl argo rollouts abort rollouts-demo
 
 ```
-**Argo Rollouts 대시보드**에서 시각적으로 Canary 배포 진행 상황을 확인할 수 있습니다:
+**Argo Rollouts 대시보드**에서 시각적으로 Canary 배포 진행 상황을 확인할 수 있다:
 - 각 ReplicaSet의 Pod 수
 - 트래픽 가중치
 - 분석 결과
@@ -1892,148 +1897,11 @@ kubectl argo rollouts abort rollouts-demo
 
 ## 3주차 학습 정리
 
-### 1. 핵심 성취 목표
-
-**Jenkins CI/CD 마스터**
-- Jenkins와 Kubernetes 통합
-- Docker-out-of-Docker 설정
-- Pipeline as Code (Jenkinsfile)
-- Gogs Webhook 연동
-- Blue-Green 배포 구현
-
-**ArgoCD GitOps 배포**
-- GitOps 철학 이해 및 실습
-- ArgoCD 아키텍처 이해
-- Helm Chart 기반 배포
-- 선언적 Application 관리
-- 자동 동기화 및 Drift 감지
-
-**Argo Rollouts**
-- Progressive Delivery 개념 이해
-- Canary 배포 전략 실습
-- 수동 승인 및 자동 프로모션
-
-**Full CI/CD 파이프라인**
-- 개발 저장소(dev-app)와 운영 저장소(ops-deploy) 분리
-- Jenkins CI → ArgoCD CD 통합
-- 완전 자동화된 배포 플로우 구축
-
-### 2. 실무 적용 포인트
-
-#### GitOps 저장소 전략
-
-```mermaid
-graph LR
-    subgraph "개발팀"
-        DEV_REPO[dev-app<br/>코드, Dockerfile]
-    end
-
-    subgraph "데브옵스팀"
-        OPS_REPO[ops-deploy<br/>K8s Manifest]
-    end
-
-    subgraph "자동화"
-        JENKINS[Jenkins CI]
-        ARGOCD[ArgoCD]
-    end
-
-    DEV_REPO -->|Webhook| JENKINS
-    JENKINS -->|이미지 빌드| REGISTRY[Docker Hub]
-    JENKINS -->|Manifest 업데이트| OPS_REPO
-    OPS_REPO -->|GitOps| ARGOCD
-    ARGOCD -->|배포| K8S[Kubernetes]
-
-```
-**저장소 분리의 이점**:
-- **책임 분리**: 개발팀은 코드, 데브옵스팀은 인프라
-- **보안**: 개발팀은 프로덕션 클러스터 접근 불필요
-- **감사 추적**: 각 저장소별 변경 이력 명확
-- **유연성**: 동일 이미지를 다양한 환경에 배포 가능
-
-#### 배포 전략 선택 가이드
-
-| 전략 | 다운타임 | 리소스 | 롤백 속도 | 적합한 경우 |
-|-----|---------|--------|-----------|------------|
-| **Rolling Update** | 없음 | 1배 | 느림 (재배포) | 대부분의 일반적인 배포 |
-| **Blue-Green** | 없음 | 2배 | 매우 빠름 | 빠른 롤백이 중요한 경우 |
-| **Canary** | 없음 | 1.1~1.5배 | 빠름 (트래픽 전환) | 점진적 검증이 필요한 경우 |
-| **Recreate** | 있음 | 1배 | 빠름 | 개발 환경, 다운타임 허용 |
-
-#### ArgoCD 활용 팁
-
-**1. App of Apps 패턴**
-
-여러 애플리케이션을 하나의 App으로 관리:
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: app-of-apps
-spec:
-  source:
-    path: apps/  # 여러 Application YAML 포함
-  syncPolicy:
-    automated:
-      prune: true
-
-```
-**2. ApplicationSet으로 멀티 클러스터 관리**
-
-동일한 애플리케이션을 여러 클러스터에 배포:
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: timeserver-all-clusters
-spec:
-  generators:
-  - list:
-      elements:
-      - cluster: dev
-        url: https://dev-cluster
-      - cluster: prod
-        url: https://prod-cluster
-  template:
-    # Application 템플릿
-
-```
-**3. Webhook으로 즉시 동기화**
-
-ArgoCD Webhook 설정으로 Git push 시 즉시 동기화:
-
-```bash
-# Gogs에서 Webhook 추가
-# Payload URL: https://<argocd-server>/api/webhook
-# Secret: <argocd-webhook-secret>
-
-```
-### 3. 다음 단계 학습 방향
-
-**Jenkins 심화**
-- Shared Libraries로 코드 재사용
-- JenkinsX로 클라우드 네이티브 CI/CD
-- Multi-branch Pipeline
-- Blue Ocean UI
-
-**ArgoCD 심화**
-- RBAC 및 멀티테넌시
-- Sync Waves와 Hooks
-- ApplicationSet Controller
-- Notifications 설정
-
-**Argo Rollouts 심화**
-- AnalysisTemplate으로 메트릭 기반 자동 롤백
-- Ingress 컨트롤러 통합 (NGINX, Istio)
-- Flagger와 비교
-
-**전체 GitOps 플랫폼**
-- Tekton + ArgoCD 조합
-- Flux vs ArgoCD 비교
-- GitHub Actions + ArgoCD
-- Kubernetes Operators 개발
-
+- Jenkins Pipeline (Jenkinsfile) 및 Git Webhook 연동
+- Blue-Green 배포 (무중단 배포, 빠른 롤백)
+- ArgoCD GitOps 배포 (Git → Kubernetes 자동 동기화)
+- Jenkins CI + ArgoCD CD 통합 (dev-app → ops-deploy)
+- Argo Rollouts Canary 배포 (점진적 트래픽 전환)
 ### 4. 주요 명령어 치트시트
 
 #### Kind 명령어
@@ -2088,8 +1956,5 @@ kubectl argo rollouts dashboard
 
 ---
 
-**🎉 3주차 학습 완료!**
-
 이번 주차에서는 Jenkins CI/CD와 ArgoCD를 활용한 완전한 GitOps 파이프라인을 구축했습니다. 개발 저장소와 운영 저장소를 분리하여 책임을 명확히 하고, ArgoCD의 자동 동기화로 운영 부담을 크게 줄일 수 있었습니다. Argo Rollouts를 통해 안전한 배포 전략도 실습했습니다.
 
-다음 단계에서는 이러한 개념들을 실제 프로덕션 환경에 적용하고, 모니터링과 로깅을 추가하여 완전한 관측 가능성(Observability)을 확보하는 것이 목표입니다!

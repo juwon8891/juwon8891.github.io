@@ -1,8 +1,12 @@
+---
+tags:
+  - EKS
+  - Networking
+---
 
 # EKS Networking
 
-
-> **Week 2 학습 주제**: Amazon EKS의 네트워킹 구조를 깊이 이해하고, VPC CNI, Service, LoadBalancer, Ingress, ExternalDNS 등 네트워크 관련 핵심 기능을 학습합니다.
+> **Week 2 학습 주제**: Amazon EKS의 네트워킹 구조를 깊이 이해하고, VPC CNI, Service, LoadBalancer, Ingress, ExternalDNS 등 네트워크 관련 핵심 기능을 학습한다.
 
 ---
 
@@ -10,7 +14,7 @@
 
 ### 1. VPC CNI
 
-**AWS VPC CNI**는 EKS에서 기본으로 사용하는 Container Network Interface 플러그인입니다.
+**AWS VPC CNI**는 EKS에서 기본으로 사용하는 Container Network Interface 플러그인이다.
 
 - Pod에 VPC IP 주소를 직접 할당
 - AWS Security Group for Pods 지원
@@ -92,7 +96,7 @@ sequenceDiagram
 
 ### 3. IP 주소 할당 모드
 
-Amazon VPC CNI는 두 가지 IP 할당 모드를 지원합니다.
+Amazon VPC CNI는 두 가지 IP 할당 모드를 지원한다.
 
 #### (1) Secondary IP mode (기본값)
 
@@ -442,7 +446,7 @@ iptables -t nat -A AWS-SNAT-CHAIN-0 ! -d 192.168.0.0/16 -j SNAT --to-source 192.
 
 ## AWS VPC CNI 설정 변경
 
-AWS VPC CNI는 여러 환경 변수로 동작을 제어할 수 있습니다.
+AWS VPC CNI는 여러 환경 변수로 동작을 제어할 수 있다.
 
 ### 1. WARM_ENI_TARGET
 
@@ -589,7 +593,7 @@ sudo systemctl restart kubelet
 
 ### 1. Service 개념
 
-**Service**는 Pod 간 통신 시 고정된 IP 와 도메인 이름<Domain Name>을 제공합니다.
+**Service**는 Pod 간 통신 시 고정된 IP 와 도메인 이름<Domain Name>을 제공한다.
 
 **문제점**:
 - Pod IP는 재시작 시 변경됨
@@ -613,7 +617,7 @@ graph TB
 ```
 ### 2. Service 종류
 
-Kubernetes에는 총 4가지 Service 종류가 있습니다.
+Kubernetes에는 총 4가지 Service 종류가 있다.
 
 | Service 종류 | 접근 범위 | 용도 |
 |-------------|----------|------|
@@ -624,7 +628,7 @@ Kubernetes에는 총 4가지 Service 종류가 있습니다.
 
 ### 3. ClusterIP Service
 
-**기본 Service 타입**으로 클러스터 내부에서만 접근 가능합니다.
+**기본 Service 타입**으로 클러스터 내부에서만 접근 가능한다.
 
 ```yaml
 apiVersion: v1
@@ -664,7 +668,7 @@ sequenceDiagram
 
 ### 4. NodePort Service
 
-**NodePort**는 모든 노드의 IP:`NodePort`로 외부에서 접근 가능합니다.
+**NodePort**는 모든 노드의 IP:`NodePort`로 외부에서 접근 가능한다.
 
 ```yaml
 apiVersion: v1
@@ -702,7 +706,7 @@ graph LR
 
 ### 5. LoadBalancer Service
 
-**LoadBalancer**는 클라우드 제공업체의 외부 로드밸런서를 생성합니다.
+**LoadBalancer**는 클라우드 제공업체의 외부 로드밸런서를 생성한다.
 
 ```yaml
 apiVersion: v1
@@ -747,7 +751,7 @@ graph TB
 
 ### 6. ExternalName Service
 
-**ExternalName**은 외부 서비스의 도메인 이름을 매핑합니다.
+**ExternalName**은 외부 서비스의 도메인 이름을 매핑한다.
 
 ```yaml
 apiVersion: v1
@@ -768,11 +772,11 @@ spec:
 
 ## kube-proxy 모드
 
-**kube-proxy**는 Service를 구현하는 핵심 컴포넌트로, 여러 모드를 지원합니다.
+**kube-proxy**는 Service를 구현하는 핵심 컴포넌트로, 여러 모드를 지원한다.
 
 ### 1. User Space 모드
 
-**가장 초기 모드**로 kube-proxy가 직접 프록시 역할을 합니다.
+**가장 초기 모드**로 kube-proxy가 직접 프록시 역할을 한다.
 
 ```mermaid
 graph TB
@@ -789,7 +793,7 @@ graph TB
 
 ### 2. iptables 모드
 
-**기본 모드**로 iptables 규칙으로 트래픽을 전달합니다.
+**기본 모드**로 iptables 규칙으로 트래픽을 전달한다.
 
 ```mermaid
 graph TB
@@ -815,7 +819,7 @@ graph TB
 
 ### 3. IPVS 모드
 
-**IPVS**(IP Virtual Server)는 Linux Kernel의 Layer 4 로드밸런서입니다.
+**IPVS**(IP Virtual Server)는 Linux Kernel의 Layer 4 로드밸런서이다.
 
 ```mermaid
 graph TB
@@ -855,7 +859,7 @@ kubectl delete pod -n kube-system -l k8s-app=kube-proxy
 
 ### 4. nftables 모드
 
-**nftables**는 iptables의 후속 기술입니다.
+**nftables**는 iptables의 후속 기술이다.
 
 **특징**:
 - Linux Kernel 5.13 이상 필요
@@ -864,7 +868,7 @@ kubectl delete pod -n kube-system -l k8s-app=kube-proxy
 
 ### 5. eBPF/XDP 모드
 
-**eBPF**(Extended Berkeley Packet Filter)는 Kernel Networking Layer를 우회합니다.
+**eBPF**(Extended Berkeley Packet Filter)는 Kernel Networking Layer를 우회한다.
 
 ```mermaid
 graph TB
@@ -896,7 +900,7 @@ graph TB
 
 ## AWS LoadBalancer Controller
 
-**AWS Load Balancer Controller**는 Kubernetes Service를 AWS NLB/ALB와 연동합니다.
+**AWS Load Balancer Controller**는 Kubernetes Service를 AWS NLB/ALB와 연동한다.
 
 ### 1. Instance mode vs IP mode
 
@@ -957,7 +961,7 @@ graph TB
 
 ### 2. IRSA 설정
 
-**AWS Load Balancer Controller**는 IRSA (IAM Roles for Service Accounts)를 사용합니다.
+**AWS Load Balancer Controller**는 IRSA (IAM Roles for Service Accounts)를 사용한다.
 
 ```bash
 # (1) IAM OIDC Provider 생성
@@ -1044,7 +1048,7 @@ curl http://$NLB_DNS
 
 ### 1. Ingress Controller
 
-**Ingress Controller**는 L7 HTTP/HTTPS 로드밸런싱을 제공합니다.
+**Ingress Controller**는 L7 HTTP/HTTPS 로드밸런싱을 제공한다.
 
 ```mermaid
 graph TB
@@ -1067,7 +1071,7 @@ graph TB
 
 ### 2. ALB Ingress Controller
 
-**AWS Load Balancer Controller**를 사용하여 ALB를 생성합니다.
+**AWS Load Balancer Controller**를 사용하여 ALB를 생성한다.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -1134,7 +1138,7 @@ sequenceDiagram
 
 ### 1. ExternalDNS
 
-**ExternalDNS**는 Kubernetes Service/Ingress를 Route53에 자동 등록합니다.
+**ExternalDNS**는 Kubernetes Service/Ingress를 Route53에 자동 등록한다.
 
 ```mermaid
 graph LR
@@ -1225,11 +1229,11 @@ aws route53 list-resource-record-sets --hosted-zone-id <ZONE_ID> --query "Resour
 
 | 모드 | 성능 | 확장성 | 복잡도 | Kernel 요구사항 |
 |------|------|--------|--------|----------------|
-| **userspace** | ⭐ | ⭐ | ⭐⭐ | - |
-| **iptables** | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | iptables |
-| **IPVS** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | IPVS 모듈 |
-| **nftables** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | nftables (5.13+) |
-| **eBPF/XDP** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | eBPF (4.8+) |
+| **userspace** |  |  |  | - |
+| **iptables** |  |  |  | iptables |
+| **IPVS** |  |  |  | IPVS 모듈 |
+| **nftables** |  |  |  | nftables (5.13+) |
+| **eBPF/XDP** |  |  |  | eBPF (4.8+) |
 
 **권장사항**:
 - **소규모 클러스터** (< 100 Service): iptables

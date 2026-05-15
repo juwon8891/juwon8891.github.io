@@ -1,3 +1,9 @@
+---
+tags:
+  - GPU
+  - InfiniBand
+---
+
 # GPU 인터커넥트
 
 > GPU 클러스터의 고성능 통신 기술 - PCIe, NVLink, Infinity Fabric, InfiniBand, RDMA
@@ -47,11 +53,7 @@ graph TB
     SW <--> HCA_B
     HCA_B --> GPU_B1
 
-    style NS_A fill:#1e4d2b,stroke:#4caf50,color:#e8e8e8
-    style SW fill:#2d4a6b,stroke:#5b8dd9,color:#e8e8e8
-
 ```
-
 
 ---
 
@@ -264,7 +266,6 @@ InfiniBand는 세대마다 약 2배씩 대역폭이 증가한다.
 | **HCA (Host Channel Adapter)** | 서버에 장착되는 InfiniBand NIC<br/>주요 제품: Mellanox ConnectX-7 (NDR, 400Gbps)<br/>RDMA 엔진 내장, GPUDirect 지원 |
 | **Switch** | 여러 HCA를 연결하는 InfiniBand 스위치<br/>Mellanox QM9700 (NDR 64포트)<br/>Fat-Tree 토폴로지로 구성 |
 
-
 ## 핵심 개념 정리
 
 ### 전체 기술 스택 한눈에 보기
@@ -291,10 +292,6 @@ graph TB
     NCCL --> HCA
     GPU_LINK --> GPU_SW
     HCA --> IB_SW
-
-    style HCA fill:#2d4a6b,stroke:#5b8dd9,color:#e8e8e8
-    style IB_SW fill:#1e4d2b,stroke:#4caf50,color:#e8e8e8
-    style GPU_SW fill:#1e4d2b,stroke:#4caf50,color:#e8e8e8
 
 ```
 ### 핵심 용어
@@ -325,21 +322,20 @@ Q3: 서버 간 GPU 통신이 느린가? (분산 학습 스케일이 안 됨)
 
 ```
 
-
 ---
 
-## 마무리
+## 마무리 {: .no-toc }
 
 GPU 클러스터의 성능은 계산 능력(FLOPS)만큼이나 **통신 대역폭**이 중요하다.
 
 - **CPU ↔ GPU**: PCIe, NVMe SSD, GPUDirect Storage (NVIDIA/AMD 공통)
 - **서버 내 GPU ↔ GPU**: NVLink/NVSwitch (NVIDIA), Infinity Fabric (AMD)
-- **서버 간 GPU ↔ GPU**: InfiniBand NDR (400Gbps), RDMA (NVIDIA/AMD 공통)
+- **서버 간 GPU ↔ GPU**: InfiniBand NDR (400Gbps), RDMA
 
 워크로드 프로파일링으로 병목 구간을 먼저 파악한 뒤 해당 구간에 맞는 기술을 도입하는 것이 핵심이다.
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 - [토스증권 - 고성능 GPU 클러스터 도입기 #2](https://toss.tech/article/securities_llm_2)

@@ -1,8 +1,12 @@
+---
+tags:
+  - EKS
+  - Kubernetes
+---
 
 # EKS 소개 및 배포
 
-
-> **Week 1 학습 주제**: Amazon EKS의 기본 개념을 이해하고, eksctl, Terraform, CloudFormation을 활용한 다양한 배포 방법과 EKS Cluster Endpoint Access 전략을 학습합니다.
+> **Week 1 학습 주제**: Amazon EKS의 기본 개념을 이해하고, eksctl, Terraform, CloudFormation을 활용한 다양한 배포 방법과 EKS Cluster Endpoint Access 전략을 학습한다.
 
 ---
 
@@ -17,7 +21,7 @@
 - **자동 업그레이드, 패치, 백업** 지원
 - AWS 서비스와 **네이티브 통합**
 
-**EKS 클러스터는 두 가지로 구성됩니다**:
+**EKS 클러스터는 두 가지로 구성된다**:
 
 1. **Managed Control Plane** (AWS 관리):
    - API Server instances (Multi-AZ HA)
@@ -83,7 +87,7 @@ graph TB
 
 #### 3.1 관리 인터페이스
 
-**EKS는 다양한 관리 방법을 제공합니다**:
+**EKS는 다양한 관리 방법을 제공한다**:
 
 | 관리 방법 | 설명 |
 |----------|------|
@@ -234,7 +238,7 @@ graph TB
 
 ### 2. Data Plane 선택
 
-**EKS는 3가지 Data Plane 옵션을 제공합니다**:
+**EKS는 3가지 Data Plane 옵션을 제공한다**:
 
 #### 2.1 Self-Managed Node Groups
 
@@ -356,7 +360,7 @@ graph TB
 
 ### 1. eksctl을 이용한 배포
 
-**eksctl**은 EKS 클러스터를 **가장 쉽게** 배포할 수 있는 CLI 도구입니다.
+**eksctl**은 EKS 클러스터를 **가장 쉽게** 배포할 수 있는 CLI 도구이다.
 
 #### 1.1 기본 클러스터 생성
 
@@ -456,7 +460,7 @@ eksctl delete cluster --name myeks --region ap-northeast-2
 ```
 ### 2. Terraform을 이용한 배포
 
-**Terraform**은 Infrastructure as Code 도구로 **재현 가능한** 클러스터 배포가 가능합니다.
+**Terraform**은 Infrastructure as Code 도구로 **재현 가능한** 클러스터 배포가 가능한다.
 
 #### 2.1 Terraform 코드 작성
 
@@ -591,7 +595,7 @@ terraform destroy -auto-approve
 ```
 ### 3. CloudFormation을 이용한 배포
 
-**AWS CloudFormation**은 AWS 네이티브 IaC 도구입니다.
+**AWS CloudFormation**은 AWS 네이티브 IaC 도구이다.
 
 #### 3.1 CloudFormation 템플릿
 
@@ -710,7 +714,7 @@ aws cloudformation delete-stack \
 ```
 ### 4. AWS Management Console 배포
 
-**AWS 콘솔**을 통한 GUI 배포도 가능합니다.
+**AWS 콘솔**을 통한 GUI 배포도 가능한다.
 
 #### 단계별 배포 과정:
 
@@ -737,11 +741,11 @@ aws cloudformation delete-stack \
 
 ## EKS Cluster Endpoint Access
 
-**EKS Cluster Endpoint Access**는 API Server에 접근하는 방식을 제어합니다.
+**EKS Cluster Endpoint Access**는 API Server에 접근하는 방식을 제어한다.
 
 ### 1. Endpoint Access 모드
 
-**EKS는 3가지 Endpoint Access 모드를 제공합니다**:
+**EKS는 3가지 Endpoint Access 모드를 제공한다**:
 
 ```mermaid
 graph TB
@@ -1013,13 +1017,9 @@ graph LR
 
 **EKS 보안 그룹 구성**:
 
-1. **Cluster Security Group** (AWS 자동 생성):
-   - Control Plane ↔ Worker 노드 통신
-   - 노드 간 통신 (Pod to Pod)
+**Cluster Security Group** (AWS 자동 생성): Control Plane과 Worker 노드 간 통신, 그리고 노드 간 Pod to Pod 통신을 허용한다.
 
-2. **Node Security Group** (사용자 관리):
-   - SSH 접근 (22/tcp)
-   - 추가 애플리케이션 포트
+**Node Security Group** (사용자 관리): SSH 접근(22/tcp)과 추가 애플리케이션 포트를 직접 관리한다.
 
 **권장 규칙**:
 
@@ -1049,7 +1049,7 @@ Outbound:
 
 ### 1. Auto Mode 개요
 
-**EKS Auto Mode**는 **2025년 출시**된 새로운 클러스터 관리 모드입니다.
+**EKS Auto Mode**는 **2025년 출시**된 새로운 클러스터 관리 모드이다.
 
 - **완전 관리형**: Control Plane + **Data Plane + Add-ons**까지 자동 관리
 - **Karpenter** 자동 설치: 노드 자동 스케일링
@@ -1079,20 +1079,11 @@ graph TB
 
 **Auto Mode가 자동으로 관리하는 항목**:
 
-1. **Compute (Karpenter)**:
-   - 노드 자동 프로비저닝
-   - Spot/On-Demand 혼합 사용
-   - 최적 인스턴스 타입 선택
+**Compute (Karpenter)**: 노드를 자동으로 프로비저닝한다. Spot/On-Demand를 혼합 사용하며 Pod 요구사항에 맞는 최적 인스턴스 타입을 자동으로 선택한다.
 
-2. **Storage**:
-   - **EBS CSI Driver** 자동 설치
-   - PersistentVolume 자동 생성
-   - 스냅샷, 리사이즈 자동 지원
+**Storage**: EBS CSI Driver를 자동 설치하고 PersistentVolume을 자동 생성한다. 스냅샷과 리사이즈도 자동으로 지원한다.
 
-3. **Load Balancing**:
-   - **AWS Load Balancer Controller** 자동 설치
-   - Ingress → ALB 자동 생성
-   - Service (LoadBalancer) → NLB 자동 생성
+**Load Balancing**: AWS Load Balancer Controller를 자동 설치한다. Ingress는 ALB로, Service(LoadBalancer)는 NLB로 자동 생성된다.
 
 ### 3. Standard Mode vs Auto Mode
 
@@ -1132,7 +1123,7 @@ aws eks create-cluster \
 
 ### 1. Cluster Insights
 
-**Cluster Insights**는 **업그레이드 가능 여부**를 분석하고 권장사항을 제공합니다.
+**Cluster Insights**는 **업그레이드 가능 여부**를 분석하고 권장사항을 제공한다.
 
 - **Deprecated API 감지**: Kubernetes 버전 업그레이드 시 제거되는 API 사용 여부 확인
 - **호환성 검사**: 현재 클러스터에서 사용 중인 리소스가 다음 버전에서 호환되는지 확인
@@ -1150,7 +1141,7 @@ aws eks list-insights \
 ```
 ### 2. Upgrade Insights
 
-**Upgrade Insights**는 **클러스터 업그레이드 시 발생할 수 있는 문제를 사전에 감지**합니다.
+**Upgrade Insights**는 **클러스터 업그레이드 시 발생할 수 있는 문제를 사전에 감지**한다.
 
 **감지 항목**:
 - **Deprecated APIs**: v1.29에서 제거된 API 사용 여부
@@ -1159,7 +1150,7 @@ aws eks list-insights \
 
 ### 3. Global Dashboard
 
-**EKS Global Dashboard**는 **모든 리전의 클러스터를 한눈에 확인**할 수 있습니다.
+**EKS Global Dashboard**는 **모든 리전의 클러스터를 한눈에 확인**할 수 있다.
 
 - **Cross-Region 클러스터 목록**: 모든 리전의 클러스터 상태 확인
 - **버전 분포**: Kubernetes 버전별 클러스터 수
@@ -1167,7 +1158,7 @@ aws eks list-insights \
 
 ### 4. Container Network Observability
 
-**Enhanced Container Network Observability**는 **Pod 간 네트워크 흐름을 시각화**합니다.
+**Enhanced Container Network Observability**는 **Pod 간 네트워크 흐름을 시각화**한다.
 
 | 기능 | 설명 |
 |-----|------|
@@ -1182,27 +1173,13 @@ aws eks list-insights \
 
 ### 1. EKS의 장점
 
-**Amazon EKS를 사용하는 이유**:
+**관리형 Control Plane**: AWS가 etcd와 API Server를 직접 관리한다. HA 구성과 자동 백업이 기본 제공되며, 업그레이드도 원클릭으로 처리된다.
 
-1. **관리형 Control Plane**:
-   - etcd, API Server 자동 관리 (HA, 백업)
-   - 업그레이드 간소화 (원클릭)
+**AWS 통합**: IAM 기반 인증/인가(IRSA), VPC 네이티브 네트워킹, EBS/EFS 스토리지, ECR·CloudWatch·X-Ray까지 AWS 생태계와 긴밀하게 연동된다.
 
-2. **AWS 통합**:
-   - IAM 인증/인가 (IRSA)
-   - VPC 네이티브 네트워킹
-   - EBS/EFS 스토리지
-   - ECR, CloudWatch, X-Ray 통합
+**보안 준수**: FIPS 140-2, PCI-DSS, SOC, HIPAA 등 주요 컴플라이언스를 충족한다. KMS를 통한 Secrets 암호화와 VPC Private Endpoint도 지원한다.
 
-3. **보안 준수**:
-   - FIPS 140-2, PCI-DSS, SOC, HIPAA
-   - Secrets 암호화 (KMS)
-   - VPC Private Endpoint
-
-4. **자동화**:
-   - Managed Node Groups
-   - Auto Scaling (Karpenter)
-   - Add-ons 자동 업데이트
+**자동화**: Managed Node Groups로 노드 생애 주기를 위임하고, Karpenter 기반 Auto Scaling과 Add-on 자동 업데이트로 운영 부담을 줄인다.
 
 ### 2. Control Plane vs Data Plane
 
@@ -1235,9 +1212,9 @@ aws eks list-insights \
 
 | 전략 | 보안 수준 | 관리 편의성 | 비용 | 추천 환경 |
 |------|-----------|-------------|------|-----------|
-| **Public** | ⭐⭐ | ⭐⭐⭐⭐⭐ | 낮음 | 개발/테스트 |
-| **Public + Private** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | 중간 | 프로덕션 (권장) |
-| **Fully Private** | ⭐⭐⭐⭐⭐ | ⭐⭐ | 높음 (VPN/DX) | 금융, 의료, 정부 |
+| **Public** |  |  | 낮음 | 개발/테스트 |
+| **Public + Private** |  |  | 중간 | 프로덕션 (권장) |
+| **Fully Private** |  |  | 높음 (VPN/DX) | 금융, 의료, 정부 |
 
 ---
 

@@ -1,9 +1,16 @@
+---
+tags:
+  - EKS
+  - Scaling
+---
 
 # Scaling
 
+> EKS의 HPA, KEDA, Karpenter, VPA를 활용한 파드·노드 오토스케일링 전략을 정리한다.
+
 ## 들어가며
 
-Week 3에서는 **Amazon EKS 환경에서의 다양한 Auto Scaling 메커니즘**을 학습합니다.
+Week 3에서는 **Amazon EKS 환경에서의 다양한 Auto Scaling 메커니즘**을 학습한다.
 
 Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서 네트워킹을 이해했다면, 이번 주차에서는 **워크로드 변화에 따른 자동 확장/축소**를 통해 비용 최적화와 성능을 동시에 달성하는 방법을 배웁니다.
 
@@ -83,12 +90,7 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 - **ScaleDown**: 5분 안정화 후 실행
 - 최소/최대 Replica 수 지정 가능
 
-**동작 원리**:
-1. Metrics Server가 kubelet으로부터 Pod CPU/메모리 메트릭 수집
-2. HPA Controller가 주기적으로 메트릭 확인 (기본 15초)
-3. 현재 메트릭 값과 Target 비교
-4. Desired Replicas = ceil[현재 Replicas × (현재 메트릭 / Target 메트릭)]
-5. Deployment/ReplicaSet의 replicas 필드 업데이트
+**동작 원리**: Metrics Server가 kubelet으로부터 Pod CPU/메모리 메트릭을 수집하면, HPA Controller가 기본 15초 주기로 현재 메트릭 값과 Target을 비교한다. 목표 Replica 수는 `ceil[현재 Replicas × (현재 메트릭 / Target 메트릭)]` 공식으로 계산하며, 결과에 따라 Deployment/ReplicaSet의 `replicas` 필드를 업데이트한다.
 
 **설정 예시**:
 
@@ -455,7 +457,7 @@ graph TB
 ```bash
 # CloudFormation Stack 생성
 
-> EKS Auto Scaling (HPA, KEDA, Cluster Autoscaler, Karpenter, VPA)을 학습합니다.
+> EKS Auto Scaling (HPA, KEDA, Cluster Autoscaler, Karpenter, VPA)을 학습한다.
 aws cloudformation deploy \
   --template-file eks-scaling-stack.yaml \
   --stack-name myeks \
@@ -793,7 +795,7 @@ kubectl describe pod fargate-pod
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - [Amazon EKS User Guide](https://docs.aws.amazon.com/eks/)

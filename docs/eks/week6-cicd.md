@@ -1,11 +1,19 @@
+---
+tags:
+  - EKS
+  - CI/CD
+  - GitOps
+---
 
 # CI/CD
 
+> EKS 환경에서 Flux v2와 Terraform 컨트롤러를 활용한 GitOps 기반 CI/CD 파이프라인 구성을 정리한다.
+
 ## 개요
 
-Amazon EKS 환경에서 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현하는 방법을 학습합니다.
+Amazon EKS 환경에서 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현하는 방법을 학습한다.
 
-이번 실습에서는 다음 도구들을 사용합니다:
+이번 실습에서는 다음 도구들을 사용한다:
 
 | 도구 | 역할 |
 |------|------|
@@ -155,12 +163,12 @@ graph TB
 
 #### EKS 클러스터 준비
 
-먼저 EKS 클러스터가 정상적으로 구성되었는지 확인합니다:
+먼저 EKS 클러스터가 정상적으로 구성되었는지 확인한다:
 
 ```bash
 # EKS 클러스터 정보 확인
 
-> EKS GitOps CI/CD (Flux v2, Tofu Controller, Argo Workflows)를 학습합니다.
+> EKS GitOps CI/CD (Flux v2, Tofu Controller, Argo Workflows)를 학습한다.
 $ kubectl cluster-info
 
 Kubernetes control plane is running at https://XXXXXXXXX.gr7.ap-northeast-2.eks.amazonaws.com
@@ -169,7 +177,7 @@ CoreDNS is running at https://XXXXXXXXX.gr7.ap-northeast-2.eks.amazonaws.com/api
 ```
 #### Namespace 확인
 
-GitOps 컨트롤러와 테넌트가 사용할 Namespace를 확인합니다:
+GitOps 컨트롤러와 테넌트가 사용할 Namespace를 확인한다:
 
 ```bash
 # Namespace 목록 확인
@@ -194,7 +202,7 @@ argo-events       Active   30m
 
 #### Flux v2 리소스 확인
 
-Flux v2는 다음과 같은 CRD(Custom Resource Definition)를 제공합니다:
+Flux v2는 다음과 같은 CRD(Custom Resource Definition)를 제공한다:
 
 | Flux v2 리소스 | 역할 |
 |----------------|------|
@@ -238,7 +246,7 @@ terraform-v0-0-1        29m   True    Applied revision: v0.0.1@sha1:def456
 
 #### Gitea Git 저장소 구성
 
-GitOps 방식으로 배포하려면 Git 저장소가 필요합니다. 이번 실습에서는 Gitea(Self-hosted Git)를 사용합니다:
+GitOps 방식으로 배포하려면 Git 저장소가 필요한다. 이번 실습에서는 Gitea(Self-hosted Git)를 사용한다:
 
 ```bash
 # Gitea Pod 확인
@@ -429,7 +437,7 @@ variable "oidc_provider" {
 ```
 #### Terraform CRD 생성
 
-Flux가 Git 저장소를 감지하면 자동으로 Terraform CRD를 생성합니다:
+Flux가 Git 저장소를 감지하면 자동으로 Terraform CRD를 생성한다:
 
 ```yaml
 apiVersion: infra.contrib.fluxcd.io/v1alpha2
@@ -471,7 +479,7 @@ spec:
 
 #### tf-runner Pod 실행
 
-Terraform CRD가 생성되면 **tf-runner Pod**가 실행됩니다:
+Terraform CRD가 생성되면 **tf-runner Pod**가 실행된다:
 
 ```bash
 # tf-runner Pod 확인
@@ -512,7 +520,7 @@ Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 ```
 #### Terraform State 저장
 
-Terraform State는 Kubernetes Secret에 저장됩니다:
+Terraform State는 Kubernetes Secret에 저장된다:
 
 ```bash
 # Terraform State Secret 확인
@@ -661,7 +669,7 @@ hpa:
 ```
 #### ECR에 Helm 차트 업로드
 
-Helm 차트를 Amazon ECR에 OCI 형식으로 업로드합니다:
+Helm 차트를 Amazon ECR에 OCI 형식으로 업로드한다:
 
 ```bash
 # ECR 로그인
@@ -754,7 +762,7 @@ graph TB
 
 #### HelmRepository 생성
 
-먼저 Amazon ECR Helm 차트 저장소를 HelmRepository로 등록합니다:
+먼저 Amazon ECR Helm 차트 저장소를 HelmRepository로 등록한다:
 
 ```yaml
 apiVersion: source.toolkit.fluxcd.io/v1beta2
@@ -946,7 +954,7 @@ metadata:
 ```
 #### kustomization.yaml을 통한 배포
 
-여러 HelmRelease를 한 번에 관리하려면 `kustomization.yaml`을 사용합니다:
+여러 HelmRelease를 한 번에 관리하려면 `kustomization.yaml`을 사용한다:
 
 ```yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -1286,11 +1294,11 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### Argo Image Updater
 
-**ArgoCD Image Updater** 패턴: Git 저장소를 감시하여 새 컨테이너 이미지가 Push되면 자동으로 매니페스트를 업데이트하는 패턴입니다.
+**ArgoCD Image Updater** 패턴: Git 저장소를 감시하여 새 컨테이너 이미지가 Push되면 자동으로 매니페스트를 업데이트하는 패턴이다.
 
 **동작 흐름**:
 1. Build → CI Push → Container Registry
@@ -1305,7 +1313,7 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 
 ### Argo CD App-of-apps
 
-**App-of-Apps 패턴**: Root Application이 Child Applications을 관리하는 구조로, 여러 애플리케이션을 계층적으로 배포합니다.
+**App-of-Apps 패턴**: Root Application이 Child Applications을 관리하는 구조로, 여러 애플리케이션을 계층적으로 배포한다.
 
 **구조**:
 
@@ -1367,7 +1375,7 @@ apps (Root Application)
 
 ---
 
-## 마무리
+## 마무리 {: .no-toc }
 
 이번 실습에서는 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현했습니다.
 
@@ -1394,13 +1402,13 @@ Flux → EKS 배포 (HelmRelease)
 Tofu Controller → AWS 리소스 생성 (SQS, DynamoDB, IAM)
 
 ```
-**핵심**: 모든 티어가 동일한 Helm 차트를 사용하되, **values** 설정만으로 배포 방식이 결정됩니다. 새로운 티어 추가 시 기존 구조 수정 없이 새 템플릿만 추가하면 됩니다 (확장성).
+**핵심**: 모든 티어가 동일한 Helm 차트를 사용하되, **values** 설정만으로 배포 방식이 결정된다. 새로운 티어 추가 시 기존 구조 수정 없이 새 템플릿만 추가하면 된다 (확장성).
 
-GitOps 방식으로 **Git = Single Source of Truth**를 유지하며, 변경 사항은 모두 Git 커밋으로 추적 가능하고 Rollback도 간단합니다 (Declarative + Versioned).
+GitOps 방식으로 **Git = Single Source of Truth**를 유지하며, 변경 사항은 모두 Git 커밋으로 추적 가능하고 Rollback도 간단한다 (Declarative + Versioned).
 
 ---
 
-## 참고 자료
+## 참고 자료 {: .no-toc }
 
 ### 주요 도구
 

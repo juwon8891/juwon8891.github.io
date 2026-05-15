@@ -1,7 +1,13 @@
+---
+tags:
+  - CI/CD
+  - Vault
+  - Security
+---
 
 # Vault Secrets
 
-> HashiCorp Vault를 활용한 시크릿 관리와 CI/CD 파이프라인 보안을 학습합니다.
+> HashiCorp Vault를 활용한 시크릿 관리와 CI/CD 파이프라인 보안을 학습한다.
 
 ---
 
@@ -173,7 +179,7 @@ graph LR
 
 ### 1. Vault의 핵심 워크플로우
 
-**Vault는 토큰(Token) 기반으로 작동**하며, 각 토큰은 클라이언트의 정책(Policy)과 연결됩니다.
+**Vault는 토큰(Token) 기반으로 작동**하며, 각 토큰은 클라이언트의 정책(Policy)과 연결된다.
 
 ```mermaid
 sequenceDiagram
@@ -192,10 +198,10 @@ sequenceDiagram
 ```
 **4단계 워크플로우**:
 
-1. **인증 (Authenticate)**: 클라이언트가 Vault에 자신이 누구인지 증명
-2. **검증 (Validation)**: GitHub, LDAP, AppRole 등 신뢰할 수 있는 외부 소스를 통해 검증
-3. **인가 (Authorize)**: 클라이언트를 Vault의 보안 정책과 비교
-4. **접근 (Access)**: 정책 기반으로 토큰 발급 및 시크릿 접근 허용
+- 클라이언트가 Vault에 자신이 누구인지 증명
+- GitHub, LDAP, AppRole 등 신뢰할 수 있는 외부 소스를 통해 검증
+- 클라이언트를 Vault의 보안 정책과 비교
+- 정책 기반으로 토큰 발급 및 시크릿 접근 허용
 
 ### 2. Vault의 4가지 핵심 요소
 
@@ -317,7 +323,7 @@ kubectl get pod,svc -n vault
 ```
 ### 2. Vault 초기화 및 Unseal
 
-**프로덕션 환경에서는 Vault가 봉인(Sealed) 상태로 시작**됩니다.
+**프로덕션 환경에서는 Vault가 봉인(Sealed) 상태로 시작**된다.
 
 ```bash
 # Vault Pod에 접속
@@ -359,7 +365,7 @@ vault status
 
 **SSS(Shamir Secret Sharing)란?**
 
-마스터 키를 여러 조각으로 나누어 분산 저장하고, 일정 개수 이상의 조각이 모여야만 복원 가능한 암호학적 기법입니다.
+마스터 키를 여러 조각으로 나누어 분산 저장하고, 일정 개수 이상의 조각이 모여야만 복원 가능한 암호학적 기법이다.
 
 ```mermaid
 graph TB
@@ -492,7 +498,7 @@ graph LR
 
 #### Vault Agent의 역할
 
-**Vault Agent**는 애플리케이션과 Vault 사이에서 다음 작업을 대신 수행합니다:
+**Vault Agent**는 애플리케이션과 Vault 사이에서 다음 작업을 대신 수행한다:
 
 ```mermaid
 graph LR
@@ -534,7 +540,7 @@ graph LR
 
 #### Vault Agent Injector
 
-**Vault Agent Injector**는 Kubernetes Admission Webhook을 사용하여 Pod에 자동으로 Vault Agent Sidecar를 주입합니다.
+**Vault Agent Injector**는 Kubernetes Admission Webhook을 사용하여 Pod에 자동으로 Vault Agent Sidecar를 주입한다.
 
 ```mermaid
 sequenceDiagram
@@ -711,10 +717,10 @@ slack_bot_token=xoxb-123...
 - 하드코딩된 GitHub Token 유출로 인한 공급망 공격
 
 **CI/CD 보안 원칙**:
-1. **최소 권한 (Least Privilege)**: 필요한 최소한의 권한만 부여
-2. **최소 시간 (Least Time)**: 시크릿 유효 기간 최소화
-3. **외부 분리 (External Separation)**: Vault와 같은 외부 시스템에 저장
-4. **교체 자동화 (Automated Rotation)**: 주기적으로 자동 교체
+- 필요한 최소한의 권한만 부여
+- 시크릿 유효 기간 최소화
+- Vault와 같은 외부 시스템에 저장
+- 주기적으로 자동 교체
 
 ### 2. Jenkins에서 KV 시크릿 사용
 
@@ -1556,7 +1562,7 @@ kubectl exec -it <myapp-pod> -- env | grep DB_
 
 ### 1. VSO란 무엇인가?
 
-**Vault Secrets Operator (VSO)**는 Vault의 시크릿을 Kubernetes Secret으로 자동 동기화하는 Operator입니다.
+**Vault Secrets Operator (VSO)**는 Vault의 시크릿을 Kubernetes Secret으로 자동 동기화하는 Operator이다.
 
 **VSO vs 다른 방법**:
 
@@ -1855,25 +1861,13 @@ sequenceDiagram
 
 ---
 
-**🎉 7주차 학습 완료!**
+## 7주차 학습 정리
 
-7주간의 CI/CD 및 GitOps 학습을 통해 다음과 같은 역량을 갖추게 되었습니다:
+- Vault 설치 및 Unseal
+- Kubernetes Auth Method (ServiceAccount 인증)
+- KV v2 엔진 (정적 시크릿)
+- Database Secrets Engine (동적 DB Credential, 10분 TTL)
+- Transit Engine (암호화 서비스, 키 Rotation)
+- Vault Secrets Operator (VaultStaticSecret, VaultDynamicSecret)
+- ArgoCD Vault Plugin (Git Manifest Placeholder)
 
-1. **GitOps 철학**: Git을 Single Source of Truth로 사용하는 선언적 배포
-2. **ArgoCD 전문가**: 설치부터 고급 기능, 프로덕션 운영까지
-3. **시크릿 관리**: HashiCorp Vault를 사용한 엔터프라이즈급 시크릿 관리
-4. **보안 강화**: 제로 트러스트 보안 모델 및 동적 시크릿 활용
-5. **실무 적용**: 실제 엔터프라이즈 환경에 적용 가능한 수준
-
-이제 **프로덕션급 GitOps + Vault 플랫폼을 구축하고 운영**할 수 있는 역량을 갖추게 되었습니다! 🚀
-
-다음 단계로는:
-
-| 분야 | 주요 기술 |
-|------|----------|
-| 플랫폼 엔지니어링 | Backstage.io, Internal Developer Portal |
-| FinOps | Kubecost, Cloud Cost Optimization |
-| 고급 보안 | OPA, Kyverno, Falco |
-| Observability | OpenTelemetry, Tempo, Loki |
-
-계속해서 학습하고 발전해 나가시기 바랍니다! 💪

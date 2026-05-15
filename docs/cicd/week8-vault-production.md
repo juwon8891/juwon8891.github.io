@@ -1,7 +1,12 @@
+---
+tags:
+  - CI/CD
+  - Vault
+---
 
 # Vault Production
 
-> Vault HA 구성, LDAP 인증, TLS 보안 설정을 학습합니다.
+> Vault HA 구성, LDAP 인증, TLS 보안 설정을 학습한다.
 
 ---
 
@@ -9,7 +14,7 @@
 
 ### 1. VSO 동작 원리 상세
 
-**Vault Secrets Operator (VSO)**는 Kubernetes CRD를 사용하여 Vault의 시크릿을 Kubernetes Secret으로 자동 동기화하는 Operator입니다.
+**Vault Secrets Operator (VSO)**는 Kubernetes CRD를 사용하여 Vault의 시크릿을 Kubernetes Secret으로 자동 동기화하는 Operator이다.
 
 #### VSO의 핵심 워크플로우
 
@@ -34,32 +39,7 @@ sequenceDiagram
 ```
 **4단계 프로세스**:
 
-1. **Vault에 Secret 요청 처리를 위한 사전 Role(Policy) 설정**
-   - Vault에 Kubernetes 인증 메서드 활성화
-   - Policy 생성 (어떤 경로에 어떤 권한 부여)
-   - Role 생성 (ServiceAccount와 Policy 매핑)
-
-2. **Pod 생성 시 ServiceAccount Token (JWT) 자동 생성**
-   - Kubernetes Admission Controller가 자동으로 SA Token을 Pod에 마운트
-   - Token은 `/var/run/secrets/kubernetes.io/serviceaccount/token` 경로에 위치
-
-3. **Pod의 애플리케이션이 Vault에 로그인 과정**
-   - 3-1) 애플리케이션은 JWT를 전달하여 Vault 로그인 요청
-   - 3-2) Vault는 정보 확인을 위해 K8S API 서버에 TokenReview API 호출
-   - 3-3) K8S API 서버는 ServiceAccount 이름과 네임스페이스 반환
-   - 3-4) Vault는 'SA 이름, 네임스페이스'를 Vault 해당 시크릿 정책과 매칭 확인
-   - 3-5) 확인 후 Vault는 Auth Token을 애플리케이션에게 반환
-
-4. **Pod의 애플리케이션이 Vault에 Secret 요청 과정**
-   - 4-1) 애플리케이션은 Auth Token으로 Vault 해당 시크릿 정보 요청
-   - 4-2) Vault는 Auth Token 확인 및 매칭 정책 확인
-   - 4-3) 확인 후 Vault는 최종적으로 해당 시크릿 정보 반환
-
-### 2. Kubernetes 인증 메커니즘
-
-#### Vault Kubernetes Auth 설정
-
-**Vault에서 K8s Auth 인증 방식 이해**:
+-
 
 ```yaml
 # Vault Role 설정 예시
@@ -101,7 +81,7 @@ kubectl rolesum vault -n vault
 
 #### ServiceAccount (SA) 개념
 
-**ServiceAccount**는 Pod에서 실행되는 애플리케이션 프로세스에 대한 식별자를 제공합니다.
+**ServiceAccount**는 Pod에서 실행되는 애플리케이션 프로세스에 대한 식별자를 제공한다.
 
 - Pod 내부 애플리케이션 프로세스가 자신에게 부여된 SA 식별자로 K8S API 서버 인증
 - kubelet이 kube-apiserver로부터 TokenRequest API를 통해 토큰 발급
@@ -110,7 +90,7 @@ kubectl rolesum vault -n vault
 
 #### Token Controller
 
-**Token Controller**는 `kube-controller-manager`의 일부로 실행되며 비동기적으로 동작합니다.
+**Token Controller**는 `kube-controller-manager`의 일부로 실행되며 비동기적으로 동작한다.
 
 **역할**:
 1. ServiceAccount 삭제 감시 → 모든 SA Token Secret 삭제
@@ -134,13 +114,7 @@ kubectl rolesum vault -n vault
      - 각 컨테이너에 **volumeMount** 추가
      - 리눅스: `/var/run/secrets/kubernetes.io/serviceaccount` 경로에 마운트
 
-4. **imagePullSecrets 복사**
-   - Pod spec에 `imagePullSecrets` 미지정 시
-   - ServiceAccount의 `imagePullSecrets` 복사 추가
-
-#### Service Account Token Volume Projection
-
-**기존 방식의 문제점**:
+-
 - 기본 SA Token은 사용하기에 부족
 - 토큰 대상(audience), 유효 기간(expiration) 등 속성 지정 불가
 
@@ -534,7 +508,7 @@ kubectl rolesum vault -n vault
 | `subjectaccessreviews.authorization.k8s.io` | `create` | 사용자 또는 그룹의 액션 수행 가능 여부 확인 |
 | `tokenreviews.authentication.k8s.io` | `create` | K8S API 서버가 제시된 토큰의 유효성 확인 및 사용자 정보 획득 |
 
-**중요**: Vault가 K8S SA Token의 유효성을 검증하기 위해서는 이 권한이 반드시 필요합니다!
+**중요**: Vault가 K8S SA Token의 유효성을 검증하기 위해서는 이 권한이 반드시 필요한다!
 
 ### 3. Token Volume Projection
 
@@ -581,9 +555,9 @@ spec:
 
 ```
 **장점**:
-1. **audience 지정**: Vault 전용 토큰 생성
-2. **expiration 제어**: 보안을 위한 짧은 수명 주기
-3. **자동 갱신**: kubelet이 자동으로 토큰 갱신
+- Vault 전용 토큰 생성
+- 보안을 위한 짧은 수명 주기
+- kubelet이 자동으로 토큰 갱신
 
 #### TokenRequest API
 
@@ -602,7 +576,7 @@ spec:
 
 #### Vault HA 모드 개요
 
-**Vault HA (High Availability)**는 1대의 **Active** 서버와 나머지 **Standby** 서버로 구성됩니다.
+**Vault HA**는 1대의 **Active** 서버와 나머지 **Standby** 서버로 구성된다.
 
 ```mermaid
 graph TB
@@ -641,7 +615,7 @@ graph TB
 
 #### Raft Consensus Algorithm
 
-**Raft**는 분산 합의 알고리즘으로, Vault HA의 핵심 스토리지 백엔드입니다.
+**Raft**는 분산 합의 알고리즘으로, Vault HA의 핵심 스토리지 백엔드이다.
 
 **Raft의 장점**:
 
@@ -917,7 +891,7 @@ kubectl exec vault-0 -n vault -- vault status | grep "HA Mode"
 
 #### LDAP (Lightweight Directory Access Protocol) 개요
 
-**LDAP**는 조직의 사용자 디렉터리 정보를 중앙에서 관리하는 프로토콜입니다.
+**LDAP**는 조직의 사용자 디렉터리 정보를 중앙에서 관리하는 프로토콜이다.
 
 **Vault LDAP 인증 워크플로우**:
 
@@ -1116,7 +1090,7 @@ kubectl rollout status statefulset/vault -n vault
 
 #### Ingress-Nginx SSL Passthrough 활성화
 
-**SSL Passthrough**는 Ingress가 TLS 종료를 하지 않고, 백엔드 서비스(Vault)로 TLS 트래픽을 그대로 전달하는 방식입니다.
+**SSL Passthrough**는 Ingress가 TLS 종료를 하지 않고, 백엔드 서비스(Vault)로 TLS 트래픽을 그대로 전달하는 방식이다.
 
 ```bash
 # Ingress-Nginx Controller에 --enable-ssl-passthrough flag 추가
@@ -1264,7 +1238,7 @@ func main() {
 
 #### MCP (Model Context Protocol) 개요
 
-**MCP Server**는 AI Agent가 외부 시스템과 통신하기 위한 프로토콜입니다.
+**MCP Server**는 AI Agent가 외부 시스템과 통신하기 위한 프로토콜이다.
 
 - AI Agent별로 개별 시크릿(Token, Password) 관리 필요
 - 시크릿 유출 시 범위가 넓어 보안 위험 증가
@@ -1341,7 +1315,6 @@ graph TB
 #### Demo 코드 분석
 
 **참고 리포지토리**: [mcp-remote-vault-demo](https://github.com/Great-Stone/mcp-remote-vault-demo)
-
 
 **1. Agent별 AppRole 생성**:
 
@@ -1446,22 +1419,10 @@ conn = mysql.connector.connect(
 
 ---
 
-**🎉 8주차 학습 완료!**
+**핵심 내용**:
 
-8주간의 CI/CD 및 GitOps 학습을 통해 다음과 같은 역량을 갖추게 되었습니다:
+- ArgoCD를 활용한 선언적 배포 및 자동화
+- HashiCorp Vault를 사용한 시크릿 관리
+- 제로 트러스트 보안 모델 및 동적 시크릿 활용
+- HA 구성, LDAP 통합, TLS 보안 설정
 
-1. **GitOps 전문가**: ArgoCD를 활용한 선언적 배포 및 자동화
-2. **시크릿 관리 전문가**: HashiCorp Vault를 사용한 엔터프라이즈급 시크릿 관리
-3. **보안 강화**: 제로 트러스트 보안 모델 및 동적 시크릿 활용
-4. **프로덕션 운영**: HA 구성, LDAP 통합, TLS 보안 설정
-5. **실무 적용**: 실제 엔터프라이즈 환경에 적용 가능한 수준
-
-이제 **엔터프라이즈급 GitOps + Vault 플랫폼을 구축하고 운영**할 수 있는 역량을 갖추게 되었습니다! 🚀
-
-다음 단계로는:
-- **플랫폼 엔지니어링**: Backstage.io, Internal Developer Portal
-- **FinOps**: Kubecost, Cloud Cost Optimization
-- **고급 보안**: OPA, Kyverno, Falco
-- **Observability**: OpenTelemetry, Tempo, Loki
-
-계속해서 학습하고 발전해 나가시기 바랍니다! 💪

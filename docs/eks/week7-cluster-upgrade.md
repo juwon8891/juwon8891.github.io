@@ -1,8 +1,12 @@
+---
+tags:
+  - EKS
+  - Upgrade
+---
 
 # EKS Cluster In-place Upgrades (1.30 → 1.31)
 
-
-> **Week 7 학습 주제**: EKS 클러스터를 안전하게 업그레이드하는 전략과 실습. Control Plane, Add-on, Nodes를 순차적으로 업그레이드하며 HA 전략(PDB, TopologySpread)을 적용합니다.
+> **Week 7 학습 주제**: EKS 클러스터를 안전하게 업그레이드하는 전략과 실습. Control Plane, Add-on, Nodes를 순차적으로 업그레이드하며 HA 전략(PDB, TopologySpread)을 적용한다.
 
 ---
 
@@ -23,10 +27,14 @@ graph LR
 
 ```
 **중요 사항**:
+
 - **kube-ops-view** 또는 **ui-web**을 통한 실시간 모니터링
+
 - **노드그룹별** 업그레이드 전략 수립 (관리형 vs 셀프 vs 카펜터)
+
 - **다양한 방법** 비교: eksctl, AWS 콘솔, AWS CLI, Terraform
-- **주의** **주의**: 업그레이드는 **되돌릴 수 없음** (Rollback 불가)
+
+- **주의**: 업그레이드는 **되돌릴 수 없음** (Rollback 불가)
 
 ### 2. In-place Cluster Upgrades: 1.30 → 1.31
 
@@ -50,17 +58,23 @@ graph TB
 
 ```
 **실습 순서**:
+
 1. **EKS Control Plane** Upgrade (10분 소요): 1.30 → 1.31
+
 2. **EKS Add-on** Upgrade (2분 소요): 1.31에 적합한 Add-on 버전으로 업그레이드
    - CoreDNS
    - kube-proxy
    - EBS CSI Driver
+
 3. **EKS Nodes** Upgrade
    - **관리형 노드그룹 업그레이드** (30분 소요): 1.30 → 1.31
      - **In-Place** Managed Node group Upgrade
      - **Blue-Green** approach for Managed node group update (30분 소요): 1.30 → 1.31
+   
    - **카펜터 노드 업그레이드**: 1.30 → 1.31
+   
    - **셀프 노드그룹 업그레이드**: 1.30 → 1.31
+   
    - **파게이트 노드 업그레이드**: 1.30 → 1.31
 
 **⇒ 최종 모든 노드가 1.31 버전임을 확인**
@@ -75,7 +89,7 @@ graph TB
 
 ### 1. 실습 환경 정보 확인
 
-#### 1.1 실습 환경 배포 (CloudFormation)
+#### 1-1. 실습 환경 배포 (CloudFormation)
 
 **IDE-Server 배포**:
 - AWS CloudFormation Stack으로 배포
@@ -90,7 +104,7 @@ graph TB
 **code-server 접속**:
 - UI-web을 통한 시각화 도구 제공
 
-#### 1.2 EKS 클러스터 정보 확인
+#### 1-2. EKS 클러스터 정보 확인
 
 ```bash
 # 실습 환경 변수 설정
@@ -163,7 +177,7 @@ kubectl get nodes -o custom-columns=\
 ```
 ### 2. Sample Application 배포
 
-#### 2.1 Sample Application 아키텍처
+#### 2-1. Sample Application 아키텍처
 
 **애플리케이션 구조**:
 
@@ -220,11 +234,11 @@ graph TB
 | **Orders** | 고객 주문 수신 및 처리 API |
 | **Static assets** | 상품 카탈로그 관련 이미지 제공 |
 
-#### 2.2 이미지 저장소
+#### 2-2. 이미지 저장소
 
 - **ECR (Elastic Container Registry)**: 공개 저장소 정보 제공
 
-#### 2.3 ArgoCD를 사용한 GitOps 배포
+#### 2-3. ArgoCD를 사용한 GitOps 배포
 
 ```mermaid
 graph LR
@@ -302,7 +316,7 @@ argocd app list
 # ui Synced Healthy
 
 ```
-#### 2.4 UI 접속을 위한 NLB 설정
+#### 2-4. UI 접속을 위한 NLB 설정
 
 **UI 서비스 확인**:
 
@@ -318,7 +332,7 @@ kubectl get targetgroupbindings -n argocd
 ```
 ### 3. EKS API/ConfigMap, IRSA 정보 확인
 
-#### 3.1 EKS API 확인
+#### 3-1. EKS API 확인
 
 ```bash
 # EKS API Access Entries
@@ -352,13 +366,13 @@ eksctl get iamidentitymapping --cluster $CLUSTER_NAME
 # ...
 
 ```
-#### 3.2 AWS 관리 콘솔 확인
+#### 3-2. AWS 관리 콘솔 확인
 
 **추가 설명**: AWS 관리 콘솔에서 `964061878287:role/workshop-stack-IdleIdeRoleD654ADD4-PpmNR7nYVBT0` admin 권한 확인.
 
 - `kube-system`: `aws-load-balancer-controller`, `ebs-csi-controller`, `aws-efs-csi-driver` 등 사용
 
-#### 3.3 IRSA (IAM Roles for Service Accounts) 확인
+#### 3-3. IRSA (IAM Roles for Service Accounts) 확인
 
 **실습 과제를 통한 IRSA 패턴 확인**:
 - Role(관리 콘솔) 확인 해보기
@@ -407,7 +421,7 @@ aws iam list-open-id-connect-providers | jq
 
 ### 1. Upgrade Insights 개요
 
-**EKS Upgrade Insights**는 Kubernetes 버전 업그레이드 전 **잠재적 문제점**을 사전에 파악할 수 있는 도구입니다.
+**EKS Upgrade Insights**는 Kubernetes 버전 업그레이드 전 **잠재적 문제점**을 사전에 파악할 수 있는 도구이다.
 
 ```mermaid
 graph LR
@@ -467,7 +481,7 @@ aws eks list-insights --region ${AWS_REGION} \
 
 ### 1. PodDisruptionBudgets (PDB)
 
-**PDB (Pod Disruption Budgets)**는 **계획된 중단**(Voluntary Disruption) 시 **최소 가용 Pod 수** 또는 **최대 중단 Pod 수**를 보장합니다.
+**PDB (Pod Disruption Budgets)**는 **계획된 중단**(Voluntary Disruption) 시 **최소 가용 Pod 수** 또는 **최대 중단 Pod 수**를 보장한다.
 
 ```mermaid
 graph TB
@@ -480,7 +494,7 @@ graph TB
     end
 
 ```
-#### 1.1 PDB 설정 예시
+#### 1-1. PDB 설정 예시
 
 **orders 애플리케이션에 PDB 추가**:
 
@@ -516,7 +530,7 @@ git commit -m "Add PDB to orders"
 argocd app sync orders
 
 ```
-#### 1.2 PDB 검증
+#### 1-2. PDB 검증
 
 ```bash
 # PDB 확인
@@ -545,7 +559,7 @@ kubectl drain $nodeName --ignore-daemonsets --force --delete-emptydir-data
 # 해결: 다른 노드에서 새로운 Pod가 먼저 시작된 후 삭제
 
 ```
-#### 1.3 노드 Drain 시 동작
+#### 1-3. 노드 Drain 시 동작
 
 ```bash
 # 노드 Unschedulable 설정
@@ -562,7 +576,7 @@ kubectl get pod -n orders -o wide
 ```
 ### 2. TopologySpreadConstraints
 
-**TopologySpreadConstraints**는 **Pod를 여러 가용 영역(AZ)**에 분산 배치하여 장애 시 가용성을 보장합니다.
+**TopologySpreadConstraints**는 **Pod를 여러 가용 영역(AZ)**에 분산 배치하여 장애 시 가용성을 보장한다.
 
 ```mermaid
 graph TB
@@ -683,7 +697,7 @@ aws eks describe-update \
 
 **Terraform을 사용한 실제 업그레이드 실행!**
 
-이 랩에서는 **Terraform**을 사용하여 클러스터를 업그레이드합니다. EKS 클러스터는 이미 Terraform을 통해 이 랩에 프로비저닝되었습니다.
+이 랩에서는 **Terraform**을 사용하여 클러스터를 업그레이드한다. EKS 클러스터는 이미 Terraform을 통해 이 랩에 프로비저닝되었습니다.
 
 ```bash
 # Terraform 상태 확인
@@ -736,7 +750,7 @@ terraform plan -no-color > plan-output.txt
 
 ```
 **Terraform Plan 요약**:
-- 클러스터 버전을 변경하면 Terraform이 어떤 변경을 하는지 볼 수 있습니다.
+- 클러스터 버전을 변경하면 Terraform이 어떤 변경을 하는지 볼 수 있다.
 - **AMI나 태그만 변경**, 관리 노드 그룹 및 애드온 등과 같은 관련 리소스를 업데이트하기 쉽습니다.
 - **10분 소요** (Control Plane 1.31 업그레이드)
 
@@ -792,9 +806,9 @@ eksctl get addon --cluster $CLUSTER_NAME
 ```
 **eksctl을 사용하여 EKS 1.30의 기존 애드온을 보려면**:
 
-1. **CoreDNS** (역기서 호환성을 확인할 수 있습니다)
-2. **kube-proxy** (역기서 호환성을 확인할 수 있습니다)
-3. **VPC CNI** (역기서 호환성을 확인할 수 있습니다)
+1. **CoreDNS** (역기서 호환성을 확인할 수 있다)
+2. **kube-proxy** (역기서 호환성을 확인할 수 있다)
+3. **VPC CNI** (역기서 호환성을 확인할 수 있다)
 4. **(옵션) EBS CSI Driver**
 
 ### 2. CoreDNS
@@ -851,7 +865,7 @@ eksctl get addon --cluster $CLUSTER_NAME | grep ebs
 
 ### 1. 관리형 노드그룹 (Managed Node Group)
 
-#### 1.1 In-Place 업그레이드
+#### 1-1. In-Place 업그레이드
 
 **In-Place Managed Node group Upgrade**:
 
@@ -889,7 +903,7 @@ kubectl get ec2nodeclass
 # 파게이트 노드를 통해 1.31 ami를 사용하는 신규 노드 배포되고, 1.30 기준 노드는 삭제
 
 ```
-#### 1.2 Blue-Green 업그레이드
+#### 1-2. Blue-Green 업그레이드
 
 **Blue-Green approach for Managed node group update** (30분 소요): 1.30 → 1.31
 

@@ -1,3 +1,8 @@
+---
+tags:
+  - GPU
+  - CUDA
+---
 
 # NVIDIA CUDA 아키텍처
 
@@ -19,7 +24,7 @@ graph LR
 ```
 ### 1. nvcc (NVIDIA CUDA Compiler)
 
-nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버로, 여러 단계의 컴파일러를 조율합니다.
+nvcc는 CUDA C/C++ 소스 코드를 컴파일하는 컴파일러 드라이버로, 여러 단계의 컴파일러를 조율한다.
 
 **nvcc의 역할**:
 
@@ -137,7 +142,7 @@ SASS는 GPU의 **실제 기계어 코드** (native machine code)
 
 | 특징 | 설명 |
 |------|------|
-| **아키텍처 종속성** | SM 8.0 SASS ≠ SM 9.0 SASS (호환 불가) |
+| **아키텍처 종속성** | SM 8.0 SASS ≠ SM 9.0 SASS |
 | **최대 성능** | GPU의 모든 하드웨어 기능 활용 (Tensor Core, RT Core 등) |
 | **디버깅 어려움** | 16진수 인코딩, 공식 문서 없음 (역공학 필요) |
 
@@ -229,7 +234,6 @@ cuobjdump -arch sm_80 -sass myapp
 
 cuobjdump는 CUDA 바이너리 분석 도구 (objdump의 CUDA 버전)
 - fatbin 내부 구조, PTX, SASS 추출 가능
-
 
 ```bash
 # 1. fatbin 아키텍처 목록 확인
@@ -517,7 +521,6 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ---
 
 ### 3. NCCL Operations
-
 
 #### AllReduce
 

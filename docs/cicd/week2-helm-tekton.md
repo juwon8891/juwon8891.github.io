@@ -1,7 +1,13 @@
+---
+tags:
+  - CI/CD
+  - Helm
+  - Tekton
+---
 
 # Helm & Tekton
 
-> Helm 패키지 관리자와 Tekton CI/CD 파이프라인을 학습합니다.
+> Helm 패키지 관리자와 Tekton CI/CD 파이프라인을 학습한다.
 
 ---
 
@@ -11,7 +17,7 @@
 
 #### Helm이란?
 
-Helm은 쿠버네티스 애플리케이션을 위한 패키지 관리자입니다. Kustomize와 유사하지만 템플릿 기반 솔루션이며, 버전 관리, 공유, 배포 가능한 아티팩트를 생성할 수 있습니다.
+Helm은 쿠버네티스 애플리케이션을 위한 패키지 관리자이다. Kustomize와 유사하지만 템플릿 기반 솔루션이며, 버전 관리, 공유, 배포 가능한 아티팩트를 생성할 수 있다.
 
 #### Kustomize vs Helm 비교
 
@@ -188,7 +194,7 @@ helm uninstall pacman
 ```
 #### Helm의 메타데이터 저장 방식
 
-Helm은 배포 릴리스 메타데이터를 쿠버네티스 Secret에 저장합니다:
+Helm은 배포 릴리스 메타데이터를 쿠버네티스 Secret에 저장한다:
 
 ```bash
 # Secret 확인
@@ -207,7 +213,7 @@ helm get notes pacman      # 차트 notes
 
 #### 문제 상황: 중복 코드
 
-deployment.yaml과 service.yaml에서 동일한 selector 정의가 반복됩니다:
+deployment.yaml과 service.yaml에서 동일한 selector 정의가 반복된다:
 
 ```yaml
 # deployment.yaml
@@ -226,7 +232,7 @@ spec:
     app.kubernetes.io/name: {{ .Chart.Name }}  # 중복 3
 
 ```
-이 경우 selector 필드에 새 레이블을 추가하려면 3곳을 모두 수정해야 합니다.
+이 경우 selector 필드에 새 레이블을 추가하려면 3곳을 모두 수정해야 한다.
 
 #### 해결책: _helpers.tpl 사용
 
@@ -552,7 +558,7 @@ kubectl get all -l app.kubernetes.io/instance=my-postgres
 
 #### 시나리오
 
-PostgreSQL 데이터베이스에 저장된 노래 목록을 반환하는 Java 서비스를 배포합니다. 이 서비스는 PostgreSQL에 의존합니다.
+PostgreSQL 데이터베이스에 저장된 노래 목록을 반환하는 Java 서비스를 배포한다. 이 서비스는 PostgreSQL에 의존한다.
 
 ```mermaid
 graph LR
@@ -690,15 +696,15 @@ kubectl delete pvc --all
 
 #### 문제 상황
 
-쿠버네티스에서 ConfigMap을 수정해도 이를 사용하는 Pod는 자동으로 재시작되지 않습니다. 따라서 애플리케이션은 이전 설정으로 계속 실행됩니다.
+쿠버네티스에서 ConfigMap을 수정해도 이를 사용하는 Pod는 자동으로 재시작되지 않습니다. 따라서 애플리케이션은 이전 설정으로 계속 실행된다.
 
 #### Kustomize의 해결 방법
 
-Kustomize는 `ConfigMapGenerator`를 사용하여 ConfigMap이 수정되면 자동으로 해시 값을 메타데이터 이름에 덧붙이고, Deployment가 그 해시 값을 참조하도록 수정합니다.
+Kustomize는 `ConfigMapGenerator`를 사용하여 ConfigMap이 수정되면 자동으로 해시 값을 메타데이터 이름에 덧붙이고, Deployment가 그 해시 값을 참조하도록 수정한다.
 
 #### Helm의 해결 방법
 
-Helm은 `sha256sum` 템플릿 함수를 사용하여 ConfigMap의 SHA-256 해시를 계산하고, 이를 Pod의 annotation으로 설정합니다.
+Helm은 `sha256sum` 템플릿 함수를 사용하여 ConfigMap의 SHA-256 해시를 계산하고, 이를 Pod의 annotation으로 설정한다.
 
 ```mermaid
 sequenceDiagram
@@ -803,7 +809,7 @@ metadata:
 
 #### Tekton이란?
 
-Tekton은 쿠버네티스 기반 오픈소스 클라우드 네이티브 CI/CD 시스템입니다. 쿠버네티스 클러스터에 확장 모듈 형태로 설치되며, CI/CD 파이프라인 구축에 사용되는 CRD(Custom Resource Definition)를 제공합니다.
+Tekton은 쿠버네티스 기반 오픈소스 클라우드 네이티브 CI/CD 시스템이다. 쿠버네티스 클러스터에 확장 모듈 형태로 설치되며, CI/CD 파이프라인 구축에 사용되는 CRD(Custom Resource Definition)를 제공한다.
 
 #### 전통적인 CI/CD vs 클라우드 네이티브 CI/CD
 
@@ -869,25 +875,25 @@ graph LR
 ```
 #### 주요 개념
 
-1. **Step**: Tekton의 가장 작은 단위, Pod 내의 개별 컨테이너에 대응
+- Tekton의 가장 작은 단위, Pod 내의 개별 컨테이너에 대응
    - 특정 컨테이너 이미지 실행
    - 스크립트 또는 명령 수행
 
-2. **Task**: Pod에 대응, Steps 목록을 포함
+- Pod에 대응, Steps 목록을 포함
    - 재사용 가능한 빌드 블록
    - 입력(params, workspaces), 출력(results) 정의 가능
 
-3. **Pipeline**: Tasks들의 조합
+- Tasks들의 조합
    - Tasks를 순차 또는 병렬로 실행
    - Tasks 간 데이터 공유 설정 가능
 
-4. **TaskRun**: Task의 실행 인스턴스
+- Task의 실행 인스턴스
    - 구체적인 파라미터 값으로 Task 실행
 
-5. **PipelineRun**: Pipeline의 실행 인스턴스
+- Pipeline의 실행 인스턴스
    - 여러 TaskRun 포함
 
-6. **Trigger**: 이벤트 감지 및 자동 실행
+- 이벤트 감지 및 자동 실행
    - 웹훅, Git 이벤트 등에 반응
 
 ### 2. Tekton 설치 (6.1절)
@@ -1096,7 +1102,7 @@ kubectl describe pod -l tekton.dev/task=two-step
 
 #### Tekton Workspace 개념
 
-Workspace는 Task와 Step 간에 파일 시스템을 공유하는 메커니즘입니다.
+Workspace는 Task와 Step 간에 파일 시스템을 공유하는 메커니즘이다.
 
 ```mermaid
 graph LR
@@ -1237,79 +1243,10 @@ kubectl delete pvc --all
 
 ## 2주차 학습 정리
 
-### 1. 핵심 성취 목표
-
-**Helm 마스터**
-- Go 템플릿 기반 차트 작성 능력 습득
-- values.yaml을 통한 환경별 설정 관리
-- _helpers.tpl을 활용한 코드 재사용
-- 차트 패키징 및 저장소 관리
-- OCI Registry를 활용한 최신 차트 배포 방식 이해
-- 의존성 관리 및 복잡한 애플리케이션 배포
-- ConfigMap 변경 시 자동 롤링 업데이트 구현
-
-**Tekton 기초**
-- 클라우드 네이티브 CI/CD 개념 이해
-- Task, Pipeline, Run 리소스 활용
-- Workspace를 통한 데이터 공유
-- Tekton Hub에서 재사용 가능한 Task 활용
-- Git 저장소 연동 및 자동 빌드 파이프라인 구축
-
-### 2. 실무 적용 포인트
-
-#### Helm 활용 전략
-
-```mermaid
-graph TB
-    A[개발 환경] --> B[values-dev.yaml]
-    C[스테이징 환경] --> D[values-staging.yaml]
-    E[프로덕션 환경] --> F[values-prod.yaml]
-
-    G[Base Chart] --> H[helm install -f]
-
-    B --> H
-    D --> H
-    F --> H
-
-    H --> I[환경별 배포]
-
-```
-**환경별 설정 관리**
-
-```bash
-# 개발 환경
-helm install myapp . -f values-dev.yaml
-
-# 스테이징 환경
-helm install myapp . -f values-staging.yaml
-
-# 프로덕션 환경
-helm install myapp . -f values-prod.yaml \
-  --set image.tag="v1.2.3" \
-  --set replicaCount=5
-
-```
-**Tekton을 활용한 GitOps 워크플로우**
-
-1. 코드 Push → Git 웹훅 발생
-2. Tekton Trigger가 웹훅 감지
-3. PipelineRun 자동 생성
-4. Git Clone → Build → Test → Deploy
-5. Helm을 사용한 쿠버네티스 배포
-
-### 3. 다음 단계 학습 방향
-
-**Helm 심화**
-- Helm Hooks (pre-install, post-upgrade 등)
-- 차트 테스트 자동화
-- Helm Secrets를 활용한 민감 정보 관리
-- Umbrella Chart 패턴
-
-**Tekton 심화**
-- Tekton Triggers를 활용한 이벤트 기반 자동화
-- Tekton Chains를 통한 공급망 보안
-- 멀티 클러스터 배포 파이프라인
-- ArgoCD와의 통합 (CI + CD)
+- Helm 차트 구조 및 Go 템플릿 활용
+- values.yaml로 환경별 설정 관리 (dev/staging/prod)
+- Tekton Task, Pipeline, Workspace 개념
+- Git Clone → Build → Deploy CI 파이프라인 구축
 
 ### 4. 주요 명령어 치트시트
 
@@ -1370,6 +1307,3 @@ tkn hub install task git-clone
 
 ---
 
-**🎉 2주차 학습 완료!**
-
-이번 주차에서는 Helm과 Tekton의 기초를 탄탄히 다졌습니다. 이제 GitOps 워크플로우에서 패키지 관리와 CI/CD 자동화를 효과적으로 구현할 수 있는 역량을 갖추게 되었습니다.

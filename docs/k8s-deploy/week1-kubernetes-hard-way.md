@@ -1648,7 +1648,10 @@ sequenceDiagram
     Auth-->>API: 인증 성공
 
     API->>NodeAuthz: 2. 인가 - Node Authorizer 평가
-    NodeAuthz->>NodeAuthz: User 패턴 확인<br/>"system:node:*" NodeAuthz->>NodeAuthz: Group 확인<br/>"system:nodes" NodeAuthz->>NodeAuthz: 자기 노드 리소스? alt Node Authorizer 허용
+    NodeAuthz->>NodeAuthz: User 패턴 확인<br/>"system:node:*"
+    NodeAuthz->>NodeAuthz: Group 확인<br/>"system:nodes"
+    NodeAuthz->>NodeAuthz: 자기 노드 리소스?
+    alt Node Authorizer 허용
         NodeAuthz-->>API: 허용
         API-->>Kubelet: 200 OK
     else Node Authorizer 거부

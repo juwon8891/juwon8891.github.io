@@ -118,6 +118,7 @@ nav:
     - Terragrunt: iac/terragrunt-advanced.md
   - Infrastructure:
     - IPMI: infrastructure/ipmi.md
+    - Redfish: infrastructure/redfish.md
     - PXE: infrastructure/pxe.md
   - Istio:
     - Intro: istio/week1-intro.md

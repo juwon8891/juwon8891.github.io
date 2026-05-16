@@ -39,11 +39,6 @@ plugins:
         - ko
         - en
   - tags
-  - git-revision-date-localized:
-      enable_creation_date: true
-      enable_git_follow: false
-      type: date
-      locale: ko
 
 markdown_extensions:
   - pymdownx.highlight:

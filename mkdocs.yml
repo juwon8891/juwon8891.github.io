@@ -106,6 +106,7 @@ nav:
     - Week 5 - Pod Readiness Gates: eks/week5-pod-readiness-gates.md
     - Week 6 - CI/CD: eks/week6-cicd.md
     - Week 7 - Cluster Upgrade: eks/week7-cluster-upgrade.md
+    - Week 8 - GPU on EKS: eks/week8-gpu.md
   - GPU:
     - GPU 클러스터 용어 사전: gpu/gpu-cluster-glossary.md
     - NVIDIA CUDA 아키텍처: gpu/nvidia-cuda-architecture.md

@@ -4,6 +4,7 @@
 - [Cilium](cilium/week1-concept-setup.md)
 - [EKS](eks/week1-intro-deployment.md)
 - [GPU](gpu/gpu-cluster-glossary.md)
+- [IaC](iac/terraform-basics.md)
 - [Infrastructure](infrastructure/ipmi-pxe.md)
 - [Istio](istio/week1-intro.md)
 - [K8s Deploy](k8s-deploy/week1-kubernetes-hard-way.md)

@@ -111,6 +111,9 @@ nav:
     - NVIDIA CUDA 아키텍처: gpu/nvidia-cuda-architecture.md
     - GPU 인터커넥트: gpu/infiniband-nvlink-nvswitch.md
     - Device Plugin & DRA: gpu/device-plugin-dra.md
+  - IaC:
+    - Terraform Basics: iac/terraform-basics.md
+    - Terragrunt Advanced: iac/terragrunt-advanced.md
   - Infrastructure:
     - IPMI & PXE: infrastructure/ipmi-pxe.md
   - Istio:
@@ -137,5 +140,9 @@ nav:
     - Week 5 - Kubespray HA & Upgrade: k8s-deploy/week5-kubespray-ha-upgrade.md
     - Week 6 - Kubespray Offline: k8s-deploy/week6-kubespray-offline.md
     - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
+  - Monitoring:
+    - Prometheus: monitoring/prometheus.md
+    - Thanos: monitoring/thanos.md
+    - Grafana: monitoring/grafana.md
   - Networking:
     - L2/L3 스위치 & ARP 트러블슈팅: networking/l2-l3-troubleshooting.md

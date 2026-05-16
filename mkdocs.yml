@@ -116,7 +116,8 @@ nav:
     - Terraform: iac/terraform-basics.md
     - Terragrunt: iac/terragrunt-advanced.md
   - Infrastructure:
-    - IPMI & PXE: infrastructure/ipmi-pxe.md
+    - IPMI: infrastructure/ipmi.md
+    - PXE: infrastructure/pxe.md
   - Istio:
     - Intro: istio/week1-intro.md
     - Envoy & Gateway: istio/week2-envoy-gateway.md
@@ -143,7 +144,12 @@ nav:
     - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
+    - Alertmanager: monitoring/alertmanager.md
     - Thanos: monitoring/thanos.md
+    - VictoriaMetrics: monitoring/victoriametrics.md
     - Grafana: monitoring/grafana.md
+    - Loki: monitoring/loki.md
+    - OpenTelemetry: monitoring/opentelemetry.md
+    - SLO / SLI / Error Budget: monitoring/slo-sli-error-budget.md
   - Networking:
     - L2/L3 스위치 & ARP 트러블슈팅: networking/l2-l3-troubleshooting.md

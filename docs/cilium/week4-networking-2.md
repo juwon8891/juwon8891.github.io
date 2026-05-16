@@ -50,12 +50,10 @@ tags:
                                                       └─────────────────┘
 ```
 
-| 구성 요소 | 설명 |
-|-----------|------|
-| k8s-ctr | Control Plane 노드 (192.168.10.100) |
-| k8s-w1 | Worker 노드 1 (192.168.10.101) |
-| k8s-w0 | Worker 노드 2 (192.168.20.100) - 다른 네트워크 대역 |
-| router | 외부 서버 (192.168.10.200, 192.168.20.200) - 두 네트워크 대역을 연결하는 라우터 역할, loop1/loop2 인터페이스를 통한 사내망 시뮬레이션 |
+- **k8s-ctr**: Control Plane 노드 (192.168.10.100)
+- **k8s-w1**: Worker 노드 1 (192.168.10.101)
+- **k8s-w0**: Worker 노드 2 (192.168.20.100) - 다른 네트워크 대역
+- **router**: 외부 서버 (192.168.10.200, 192.168.20.200) - 두 네트워크 대역을 연결하는 라우터 역할, loop1/loop2 인터페이스를 통한 사내망 시뮬레이션
 
 #### 1.2 실습 환경 배포 및 확인
 
@@ -564,11 +562,9 @@ kubectl exec -it curl-pod -- ping -M do -s 1500 $WEBPOD
 kubectl exec -it curl-pod -- ping -M do -s 1422 $WEBPOD
 ```
 
-| 항목 | 설명 |
-|------|------|
-| Don't Fragment (DF) 플래그 | `-M do` 옵션으로 설정하여 조각화 방지 |
-| Payload 크기 | `-s` 옵션으로 ICMP 데이터 크기 지정 |
-| VXLAN 오버헤드 | 50 bytes 추가로 유효 MTU 감소 (1500 → 1450) |
+- **Don't Fragment (DF) 플래그**: `-M do` 옵션으로 설정하여 조각화 방지
+- **Payload 크기**: `-s` 옵션으로 ICMP 데이터 크기 지정
+- **VXLAN 오버헤드**: 50 bytes 추가로 유효 MTU 감소 (1500 → 1450)
 
 ## Kubernetes Service 심화
 
@@ -622,12 +618,10 @@ kubectl exec -it curl-pod -- ping -M do -s 1422 $WEBPOD
 
 kube-proxy는 각 노드에서 실행되는 네트워크 프록시로 Kubernetes Service 개념의 일부를 구현한다:
 
-| 항목 | 내용 |
-|------|------|
-| 실행 위치 | 각 노드에서 데몬셋으로 실행 |
-| 지원 프로토콜 | UDP, TCP, SCTP |
-| 주요 기능 | 로드밸런싱, 서비스 엔드포인트 관리 |
-| 제한사항 | HTTP 레벨 처리는 불가능 |
+- **실행 위치**: 각 노드에서 데몬셋으로 실행
+- **지원 프로토콜**: UDP, TCP, SCTP
+- **주요 기능**: 로드밸런싱, 서비스 엔드포인트 관리
+- **제한사항**: HTTP 레벨 처리는 불가능
 
 #### 2.2 프록시 모드별 특징
 
@@ -695,10 +689,8 @@ kube-proxy는 각 노드에서 실행되는 네트워크 프록시로 Kubernetes
 
 LoadBalancer IP Address Management는 LoadBalancer 타입의 서비스에 External IP를 할당할 수 있게 해주는 기능이다:
 
-| 특징 | 설명 |
-|------|------|
-| 클라우드 제공업체 의존성 해결 | 프라이빗 클라우드 환경에서 LoadBalancer 서비스 지원 |
-| Cilium 통합 | Cilium BGP Control Plane 및 L2 Announcements와 통합 |
+- **클라우드 제공업체 의존성 해결**: 프라이빗 클라우드 환경에서 LoadBalancer 서비스 지원
+- **Cilium 통합**: Cilium BGP Control Plane 및 L2 Announcements와 통합
 
 **동작 방식:**
 
@@ -835,12 +827,10 @@ arping -i eth1 $LBIP -c 100000
 
 **Cilium L2 Announcements 장점:**
 
-| 항목 | 설명 |
-|------|------|
-| MetalLB 대체 | MetalLB를 대체할 수 있는 네이티브 기능 |
-| eBPF 기반 | 고성능 처리 |
-| 통합성 | Cilium 에코시스템과 완전 통합 |
-| 안정성 | 더 나은 성능과 안정성 |
+- **MetalLB 대체**: MetalLB를 대체할 수 있는 네이티브 기능
+- **eBPF 기반**: 고성능 처리
+- **통합성**: Cilium 에코시스템과 완전 통합
+- **안정성**: 더 나은 성능과 안정성
 
 #### 1.2 L2 Announcements 활성화
 
@@ -1106,19 +1096,15 @@ kubectl exec -it curl-pod -- ping -c 100 <target-ip> | tail -1
 
 **네트워킹 모드 이해:**
 
-| 항목 | 내용 |
-|------|------|
-| Native Routing vs Overlay | 두 모드의 차이점 및 적용 시나리오 |
-| VXLAN/GENEVE 터널링 | UDP 기반 오버레이 캡슐화 메커니즘 |
-| autoDirectNodeRoutes | 동일 네트워크 대역 노드 간 직접 경로 자동 생성 |
-| MTU 고려사항 | VXLAN 50 bytes 오버헤드로 인한 유효 MTU 감소 (1500 → 1450) |
+- **Native Routing vs Overlay**: 두 모드의 차이점 및 적용 시나리오
+- **VXLAN/GENEVE 터널링**: UDP 기반 오버레이 캡슐화 메커니즘
+- **autoDirectNodeRoutes**: 동일 네트워크 대역 노드 간 직접 경로 자동 생성
+- **MTU 고려사항**: VXLAN 50 bytes 오버헤드로 인한 유효 MTU 감소 (1500 → 1450)
 
 **Service 외부 노출:**
 
-| 항목 | 내용 |
-|------|------|
-| LoadBalancer IPAM | CiliumLoadBalancerIPPool로 External IP 풀 관리 |
-| L2 Announcements | ARP 기반으로 LoadBalancer IP를 외부에 광고 |
-| kube-proxy 모드 비교 | User Space → iptables → IPVS → nftables → eBPF 성능 진화 |
-| 운영 고려사항 | 규모별 적합한 외부 노출 방식 선택 기준 |
+- **LoadBalancer IPAM**: CiliumLoadBalancerIPPool로 External IP 풀 관리
+- **L2 Announcements**: ARP 기반으로 LoadBalancer IP를 외부에 광고
+- **kube-proxy 모드 비교**: User Space → iptables → IPVS → nftables → eBPF 성능 진화
+- **운영 고려사항**: 규모별 적합한 외부 노출 방식 선택 기준
 

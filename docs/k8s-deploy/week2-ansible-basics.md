@@ -30,12 +30,10 @@ tags:
 
 Ansible은 **오픈소스 자동화 도구**로, 서버 구성, 애플리케이션 배포, 태스크 자동화를 간편하게 수행할 수 있다.
 
-| 특징 | 설명 |
-|------|------|
-| Agentless | Managed Node에 에이전트 설치 불필요 (SSH 기반) |
-| Idempotent | 동일한 플레이북을 여러 번 실행해도 결과가 동일 |
-| Easy to Use | YAML 문법으로 선언적 구성 |
-| Powerful | 모듈과 플러그인을 통한 확장성 |
+- **Agentless**: Managed Node에 에이전트 설치 불필요 (SSH 기반)
+- **Idempotent**: 동일한 플레이북을 여러 번 실행해도 결과가 동일
+- **Easy to Use**: YAML 문법으로 선언적 구성
+- **Powerful**: 모듈과 플러그인을 통한 확장성
 
 ```mermaid
 graph LR

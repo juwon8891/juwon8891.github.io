@@ -434,14 +434,12 @@ graph LR
 ```
 **점검 항목** (6가지):
 
-| 항목 | 설명 |
-|------|------|
-| **kube-proxy version skew** | kube-proxy 버전이 Control Plane 버전과 일치하는지 확인 |
-| **Cluster health issues** | 클러스터 헬스 체크 (Node NotReady 등) |
-| **EKS add-ons compatibility** | 설치된 EKS Add-on이 새 버전과 호환되는지 확인 |
-| **Amazon Linux expiration** | AL 노드가 2025년 11월 26일 이후 지원 종료 (AL2023으로 마이그레이션 필요) |
-| **kubelet version skew** | Worker 노드의 kubelet 버전이 Kubernetes kubelet version skew policy를 준수하는지 확인 |
-| **Deprecated APIs** | v1.32에서 제거될 예정인 Deprecated API 사용 여부 확인 |
+- **kube-proxy version skew**: kube-proxy 버전이 Control Plane 버전과 일치하는지 확인
+- **Cluster health issues**: 클러스터 헬스 체크 (Node NotReady 등)
+- **EKS add-ons compatibility**: 설치된 EKS Add-on이 새 버전과 호환되는지 확인
+- **Amazon Linux expiration**: AL 노드가 2025년 11월 26일 이후 지원 종료 (AL2023으로 마이그레이션 필요)
+- **kubelet version skew**: Worker 노드의 kubelet 버전이 Kubernetes kubelet version skew policy를 준수하는지 확인
+- **Deprecated APIs**: v1.32에서 제거될 예정인 Deprecated API 사용 여부 확인
 
 ### 2. Insights 확인
 

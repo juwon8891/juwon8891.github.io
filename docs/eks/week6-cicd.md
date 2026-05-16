@@ -1227,13 +1227,11 @@ tenant-offboarding-gptkz           Running   9s
 ```
 ### 전체 자동화 흐름 요약
 
-| 구성 요소 | 역할 |
-|-----------|------|
-| **Amazon SQS** | 온보딩/오프보딩 트리거 메시지 수신 |
-| **Argo Events** | SQS 메시지 감지 및 워크플로우 트리거 |
-| **Argo Workflows** | 템플릿 기반 Git 커밋 생성 및 자동 커밋 |
-| **Flux v2** | Git 변경 감지 → EKS 리소스 배포 |
-| **Tofu 컨트롤러** | Terraform CRD 기반 AWS 인프라 프로비저닝 |
+- **Amazon SQS**: 온보딩/오프보딩 트리거 메시지 수신
+- **Argo Events**: SQS 메시지 감지 및 워크플로우 트리거
+- **Argo Workflows**: 템플릿 기반 Git 커밋 생성 및 자동 커밋
+- **Flux v2**: Git 변경 감지 → EKS 리소스 배포
+- **Tofu 컨트롤러**: Terraform CRD 기반 AWS 인프라 프로비저닝
 
 **핵심 흐름**:
 

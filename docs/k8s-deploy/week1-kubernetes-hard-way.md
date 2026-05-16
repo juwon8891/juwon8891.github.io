@@ -46,13 +46,11 @@ tags:
 
 **네트워크 대역**:
 
-| 항목 | 네트워크 대역 / IP |
-|------|-------------------|
-| Cluster CIDR | 10.200.0.0/16 |
-| node-0 Pod CIDR | 10.200.0.0/24 |
-| node-1 Pod CIDR | 10.200.1.0/24 |
-| Service CIDR | 10.32.0.0/24 |
-| kubernetes Service ClusterIP | 10.32.0.1 |
+- **Cluster CIDR**: 10.200.0.0/16
+- **node-0 Pod CIDR**: 10.200.0.0/24
+- **node-1 Pod CIDR**: 10.200.1.0/24
+- **Service CIDR**: 10.32.0.0/24
+- **kubernetes Service ClusterIP**: 10.32.0.1
 
 **컴포넌트 버전**:
 - Kubernetes: v1.32.2

@@ -344,11 +344,9 @@ spec:
 
 **특징**:
 
-| 항목 | 설명 |
-|------|------|
-| **격리** | 메모리는 공유 (서로 영향 가능) |
-| **성능** | Context switching 오버헤드 발생 |
-| **사용 사례** | 추론 워크로드, 개발/테스트 |
+- **격리**: 메모리는 공유 (서로 영향 가능)
+- **성능**: Context switching 오버헤드 발생
+- **사용 사례**: 추론 워크로드, 개발/테스트
 
 #### MPS (Multi-Process Service)
 
@@ -374,12 +372,10 @@ data:
 
 **특징**:
 
-| 항목 | 설명 |
-|------|------|
-| **격리** | 메모리 공유 (격리 없음) |
-| **성능** | Time-slicing보다 오버헤드 적음 |
-| **제한** | Volta (V100) 이상 GPU 필요 |
-| **사용 사례** | 소규모 배치 추론, 경량 워크로드 |
+- **격리**: 메모리 공유 (격리 없음)
+- **성능**: Time-slicing보다 오버헤드 적음
+- **제한**: Volta (V100) 이상 GPU 필요
+- **사용 사례**: 소규모 배치 추론, 경량 워크로드
 
 #### 공유 전략 비교
 
@@ -566,13 +562,11 @@ spec:
 
 **핵심 특징**:
 
-| 특징 | 설명 |
-|------|------|
-| **토폴로지 인식 스케줄링** | GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치하여 대역폭 최대화 |
-| **분산 학습 성능 향상** | All-Gather: 100 GB/s → 159.6 GB/s (+59.6%)<br/>All-Reduce: 80 GB/s → 126.5 GB/s (+58.1%) |
-| **CNI 호환성** | Calico, Cilium 등 기존 CNI 플러그인과 함께 작동 |
-| **Container Runtime 통합** | NRI (Node Resource Interface)를 통해 CRI와 통합 |
-| **성능 향상 원리** | GPU ↔ NIC 간 PCIe 최단거리 배치<br/>Cross-NUMA 트래픽 제거<br/>GPU 통신 대역폭 증가 |
+- **토폴로지 인식 스케줄링**: GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치하여 대역폭 최대화
+- **분산 학습 성능 향상**: All-Gather: 100 GB/s → 159.6 GB/s (+59.6%)<br/>All-Reduce: 80 GB/s → 126.5 GB/s (+58.1%)
+- **CNI 호환성**: Calico, Cilium 등 기존 CNI 플러그인과 함께 작동
+- **Container Runtime 통합**: NRI (Node Resource Interface)를 통해 CRI와 통합
+- **성능 향상 원리**: GPU ↔ NIC 간 PCIe 최단거리 배치<br/>Cross-NUMA 트래픽 제거<br/>GPU 통신 대역폭 증가
 
 **AI/ML 분산 학습 용어**:
 
@@ -620,10 +614,8 @@ graph TB
 
 **토폴로지 최적화**:
 
-| 항목 | 설명 |
-|------|------|
-| **문제** | GPU와 NIC가 서로 다른 NUMA 노드에 있으면 PCIe 대역폭 저하 |
-| **DRANET 해결** | GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치<br/>NUMA 노드 인식으로 cross-NUMA 트래픽 최소화<br/>토폴로지 정보를 DRA ResourceClaim에 포함 |
+- **문제**: GPU와 NIC가 서로 다른 NUMA 노드에 있으면 PCIe 대역폭 저하
+- **DRANET 해결**: GPU와 NIC를 같은 PCIe 루트 컴플렉스에 배치<br/>NUMA 노드 인식으로 cross-NUMA 트래픽 최소화<br/>토폴로지 정보를 DRA ResourceClaim에 포함
 
 **ResourceClass 예시**:
 ```yaml

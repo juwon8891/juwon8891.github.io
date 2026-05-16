@@ -20,14 +20,12 @@ tags:
 
 **핵심 특징**:
 
-| 특징 | 설명 |
-|------|------|
-| 프로덕션급 배포 | Best Practice 기반 설정 |
-| 멀티 플랫폼 | AWS, GCP, Azure, On-Premise, Bare-Metal |
-| CNI 지원 | Calico, Flannel, Cilium, Weave 등 |
-| HA 구성 | Control Plane과 etcd HA 자동 구성 |
-| 폐쇄망 지원 | Air-Gap 환경 배포 가능 |
-| 라이프사이클 관리 | 배포, 업그레이드, 스케일링, 백업/복구 |
+- **프로덕션급 배포**: Best Practice 기반 설정
+- **멀티 플랫폼**: AWS, GCP, Azure, On-Premise, Bare-Metal
+- **CNI 지원**: Calico, Flannel, Cilium, Weave 등
+- **HA 구성**: Control Plane과 etcd HA 자동 구성
+- **폐쇄망 지원**: Air-Gap 환경 배포 가능
+- **라이프사이클 관리**: 배포, 업그레이드, 스케일링, 백업/복구
 
 ### 2. 주요 특징
 
@@ -1179,12 +1177,10 @@ ansible-playbook -i inventory/mycluster/inventory.ini upgrade-cluster.yml \
 
 **업그레이드 주의사항**:
 
-| 항목 | 설명 |
-|------|------|
-| Version Skew Policy 준수 | K8s 버전 호환성 확인 |
-| 백업 필수 | etcd snapshot 백업 |
-| 순차 업그레이드 | 한 번에 하나의 마이너 버전씩 |
-| 테스트 | Dev 환경에서 먼저 테스트 |
+- **Version Skew Policy 준수**: K8s 버전 호환성 확인
+- **백업 필수**: etcd snapshot 백업
+- **순차 업그레이드**: 한 번에 하나의 마이너 버전씩
+- **테스트**: Dev 환경에서 먼저 테스트
 
 ### 2. 노드 스케일링
 
@@ -1285,21 +1281,17 @@ find "$BACKUP_DIR" -name "etcd-snapshot-*.db" -mtime +7 -delete
 
 **Kubespray 장점**:
 
-| 장점 | 설명 |
-|------|------|
-| 프로덕션급 클러스터 빠른 배포 | 자동화된 배포 프로세스 |
-| Best Practice 자동 적용 | 검증된 설정 기본 제공 |
-| 멀티 노드 동시 배포 | 병렬 처리로 빠른 구축 |
-| IaC (Infrastructure as Code) | Git 기반 설정 관리 |
-| 일관된 설정 관리 | Ansible Inventory 기반 |
+- **프로덕션급 클러스터 빠른 배포**: 자동화된 배포 프로세스
+- **Best Practice 자동 적용**: 검증된 설정 기본 제공
+- **멀티 노드 동시 배포**: 병렬 처리로 빠른 구축
+- **IaC (Infrastructure as Code)**: Git 기반 설정 관리
+- **일관된 설정 관리**: Ansible Inventory 기반
 
 **Kubeadm 장점**:
 
-| 장점 | 설명 |
-|------|------|
-| 간단한 사용법 | 최소한의 명령으로 클러스터 구축 |
-| 공식 도구 | Kubernetes 프로젝트 공식 지원 |
-| 작은 클러스터에 적합 | 간단한 환경에서 효율적 |
+- **간단한 사용법**: 최소한의 명령으로 클러스터 구축
+- **공식 도구**: Kubernetes 프로젝트 공식 지원
+- **작은 클러스터에 적합**: 간단한 환경에서 효율적
 
 ### 2. Ansible Role 기반 구조
 

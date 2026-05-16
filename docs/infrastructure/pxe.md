@@ -287,17 +287,15 @@ autoinstall:
 
 **과정**:
 
-| 단계 | 동작 |
-|------|------|
-| 1 | BIOS 진입 (F2 또는 Del) → Boot Sequence 변경 |
-| 2 | Network Boot (PXE IPv4) → 1순위로 이동 → Save & Exit |
-| 3 | 재부팅 → PXE ROM 실행 |
-| 4 | DHCP → IP 할당 받음 (192.168.1.150) |
-| 5 | TFTP → pxelinux.0 다운로드 |
-| 6 | TFTP → vmlinuz + initrd 다운로드 |
-| 7 | 커널 부팅 → HTTP에서 ISO + preseed 받아서 자동 설치 |
-| 8 | 10분 후 설치 완료, 재부팅 |
-| 9 | 로컬 디스크에서 부팅 (PXE 건너뜀) |
+- **1**: BIOS 진입 (F2 또는 Del) → Boot Sequence 변경
+- **2**: Network Boot (PXE IPv4) → 1순위로 이동 → Save & Exit
+- **3**: 재부팅 → PXE ROM 실행
+- **4**: DHCP → IP 할당 받음 (192.168.1.150)
+- **5**: TFTP → pxelinux.0 다운로드
+- **6**: TFTP → vmlinuz + initrd 다운로드
+- **7**: 커널 부팅 → HTTP에서 ISO + preseed 받아서 자동 설치
+- **8**: 10분 후 설치 완료, 재부팅
+- **9**: 로컬 디스크에서 부팅 (PXE 건너뜀)
 
 **자동 설치 검증**:
 

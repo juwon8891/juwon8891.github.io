@@ -34,13 +34,11 @@ Sail Operator는 쿠버네티스 환경에서 Istio의 설치, 업그레이드, 
 
 ## Sail Operator의 장점
 
-| 장점 | 설명 |
-|------|------|
-| **GitOps 친화적** | CR 형태로 선언하면 끝 |
-| **istioctl/Helm 불필요** | 별도 도구 없이 구성 가능 |
-| **버전 업그레이드 간편** | `version` 필드 하나로 관리 |
-| **Argo CD, Kustomize 호환** | 완벽 호환 |
-| **Multi-cluster 관리** | 멀티 클러스터 환경에 적합 |
+- **GitOps 친화적**: CR 형태로 선언하면 끝
+- **istioctl/Helm 불필요**: 별도 도구 없이 구성 가능
+- **버전 업그레이드 간편**: `version` 필드 하나로 관리
+- **Argo CD, Kustomize 호환**: 완벽 호환
+- **Multi-cluster 관리**: 멀티 클러스터 환경에 적합
 
 ---
 

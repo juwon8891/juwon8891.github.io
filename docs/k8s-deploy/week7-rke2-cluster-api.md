@@ -821,12 +821,10 @@ systemctl start rke2-server
 
 **Cluster API (CAPI)** = Kubernetes를 사용하여 Kubernetes 클러스터를 관리하는 프로젝트
 
-| 특징 | 설명 |
-|------|------|
-| 선언적 API | Kubernetes 리소스로 클러스터 정의 |
-| GitOps 친화적 | YAML 기반 Infrastructure as Code |
-| 멀티 클라우드 | AWS, Azure, GCP, vSphere, OpenStack 등 지원 |
-| 일관된 경험 | 모든 인프라에서 동일한 API 사용 |
+- **선언적 API**: Kubernetes 리소스로 클러스터 정의
+- **GitOps 친화적**: YAML 기반 Infrastructure as Code
+- **멀티 클라우드**: AWS, Azure, GCP, vSphere, OpenStack 등 지원
+- **일관된 경험**: 모든 인프라에서 동일한 API 사용
 
 ### 2. CAPI 주요 개념
 
@@ -1200,12 +1198,10 @@ graph LR
 ```
 **준수 항목**:
 
-| 항목 | 설명 |
-|------|------|
-| NIST 승인 알고리즘 | 승인된 암호화 알고리즘만 사용 |
-| FIPS 140-2 라이브러리 | BoringCrypto 인증 암호화 라이브러리 |
-| TLS 1.2+ 강제 | TLS 1.2 이상만 허용 |
-| 안전하지 않은 암호화 비활성화 | 취약한 알고리즘 차단 |
+- **NIST 승인 알고리즘**: 승인된 암호화 알고리즘만 사용
+- **FIPS 140-2 라이브러리**: BoringCrypto 인증 암호화 라이브러리
+- **TLS 1.2+ 강제**: TLS 1.2 이상만 허용
+- **안전하지 않은 암호화 비활성화**: 취약한 알고리즘 차단
 
 #### 1.2 CIS Benchmark 기본 준수
 
@@ -1263,12 +1259,10 @@ spec:
 ```
 **장점**:
 
-| 장점 | 설명 |
-|------|------|
-| GitOps 친화적 | Git = Single Source of Truth |
-| 재현 가능 | 동일한 YAML = 동일한 클러스터 |
-| 버전 관리 | Git History |
-| 자동화 | CI/CD 통합 |
+- **GitOps 친화적**: Git = Single Source of Truth
+- **재현 가능**: 동일한 YAML = 동일한 클러스터
+- **버전 관리**: Git History
+- **자동화**: CI/CD 통합
 
 #### 2.2 멀티 클라우드 일관성
 
@@ -1286,11 +1280,9 @@ graph TB
 ```
 **장점**:
 
-| 장점 | 설명 |
-|------|------|
-| 동일한 API | 모든 클라우드를 하나의 API로 관리 |
-| 멀티 클라우드 전략 | 클라우드 간 이동 용이 |
-| Vendor Lock-in 회피 | 특정 클라우드 종속성 제거 |
+- **동일한 API**: 모든 클라우드를 하나의 API로 관리
+- **멀티 클라우드 전략**: 클라우드 간 이동 용이
+- **Vendor Lock-in 회피**: 특정 클라우드 종속성 제거
 
 #### 2.3 Self-Healing
 

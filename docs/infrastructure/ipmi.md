@@ -71,13 +71,11 @@ graph TB
 
 **BMC가 서버 꺼져 있어도 동작하는 이유**:
 
-| 구성 요소 | 설명 |
-|----------|------|
-| **독립 칩** | 메인보드에 별도로 붙어 있는 ARM 기반 SoC (시스템 온 칩) |
-| **전용 메모리** | BMC 전용 RAM (보통 512MB~1GB) - 메인 시스템 메모리와 무관 |
-| **전용 스토리지** | 펌웨어 저장용 플래시 메모리 (128MB~256MB) |
-| **대기 전원** | 서버 전원이 꺼져 있어도 PSU(전원 공급 장치)가 BMC에 5V 대기 전원 공급 |
-| **전용 NIC** | 관리 포트에 연결된 독립 이더넷 컨트롤러 |
+- **독립 칩**: 메인보드에 별도로 붙어 있는 ARM 기반 SoC (시스템 온 칩)
+- **전용 메모리**: BMC 전용 RAM (보통 512MB~1GB) - 메인 시스템 메모리와 무관
+- **전용 스토리지**: 펌웨어 저장용 플래시 메모리 (128MB~256MB)
+- **대기 전원**: 서버 전원이 꺼져 있어도 PSU(전원 공급 장치)가 BMC에 5V 대기 전원 공급
+- **전용 NIC**: 관리 포트에 연결된 독립 이더넷 컨트롤러
 
 **전원 상태별 동작**:
 
@@ -234,18 +232,16 @@ ipmitool -I lanplus -H 192.168.100.10 -U admin -P <password> sel list | grep -i 
 
 **과정**:
 
-| 단계 | 동작 |
-|------|------|
-| 1 | https://192.168.100.10 접속 (BMC Web GUI) |
-| 2 | Virtual Console 실행 (HTML5 KVM) |
-| 3 | Virtual Media → Connect Virtual Media |
-| 4 | Map CD/DVD → ubuntu-24.04.4-live-server-amd64.iso 선택 |
-| 5 | Boot Sequence → Virtual CD/ROM 1순위 → Apply |
-| 6 | Power On 또는 Reset |
-| 7 | GRUB 메뉴 → "Install Ubuntu Server" 선택 |
-| 8 | 언어, 키보드, 네트워크, 디스크 파티션 설정 |
-| 9 | 사용자 계정 생성, OpenSSH 설치 선택 |
-| 10 | 설치 완료 후 재부팅 |
+- **1**: https://192.168.100.10 접속 (BMC Web GUI)
+- **2**: Virtual Console 실행 (HTML5 KVM)
+- **3**: Virtual Media → Connect Virtual Media
+- **4**: Map CD/DVD → ubuntu-24.04.4-live-server-amd64.iso 선택
+- **5**: Boot Sequence → Virtual CD/ROM 1순위 → Apply
+- **6**: Power On 또는 Reset
+- **7**: GRUB 메뉴 → "Install Ubuntu Server" 선택
+- **8**: 언어, 키보드, 네트워크, 디스크 파티션 설정
+- **9**: 사용자 계정 생성, OpenSSH 설치 선택
+- **10**: 설치 완료 후 재부팅
 
 **설치 후 검증**:
 

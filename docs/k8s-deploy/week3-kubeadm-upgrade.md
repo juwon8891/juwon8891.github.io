@@ -66,11 +66,9 @@ Week 1에서 "The Hard Way"로 모든 컴포넌트를 수동 설치하며 K8s의
 
 #### Kubeadm의 특징
 
-| 특징 | 설명 |
-|------|------|
-| Control Plane as Static Pod | Control Plane 컴포넌트를 Static Pod로 구성 |
-| 사전 설치 필요 | CRI(containerd)와 kubelet은 별도로 설치 필요 |
-| 광범위한 활용 | minikube, kind, ClusterAPI, kubespray 등에서 사용 |
+- **Control Plane as Static Pod**: Control Plane 컴포넌트를 Static Pod로 구성
+- **사전 설치 필요**: CRI(containerd)와 kubelet은 별도로 설치 필요
+- **광범위한 활용**: minikube, kind, ClusterAPI, kubespray 등에서 사용
 
 #### Kubeadm이 배포하는 컴포넌트
 

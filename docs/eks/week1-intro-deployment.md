@@ -157,15 +157,13 @@ graph TB
 
 **Amazon EKS 요금 구조**:
 
-| 항목 | 비용 |
-|------|------|
-| **Control Plane** | $0.10/시간 (약 $73/월) |
-| **EC2 Worker Nodes** | EC2 인스턴스 요금 (온디맨드/예약/Spot) |
-| **Fargate** | vCPU/메모리 사용량 기반 |
-| **EBS Volumes** | EBS 볼륨 요금 (GB당) |
-| **Network LB** | NLB 요금 (시간당 + 데이터 전송) |
-| **Application LB** | ALB 요금 (시간당 + LCU) |
-| **Data Transfer** | VPC 간 데이터 전송 요금 |
+- **Control Plane**: $0.10/시간 (약 $73/월)
+- **EC2 Worker Nodes**: EC2 인스턴스 요금 (온디맨드/예약/Spot)
+- **Fargate**: vCPU/메모리 사용량 기반
+- **EBS Volumes**: EBS 볼륨 요금 (GB당)
+- **Network LB**: NLB 요금 (시간당 + 데이터 전송)
+- **Application LB**: ALB 요금 (시간당 + LCU)
+- **Data Transfer**: VPC 간 데이터 전송 요금
 
 **예시 계산** (Small 클러스터):
 - Control Plane: $73/월
@@ -228,13 +226,11 @@ graph TB
 ```
 **Control Plane 특징**:
 
-| 특징 | 설명 |
-|-----|------|
-| **Multi-AZ HA** | 3개 AZ에 분산 배치 |
-| **Auto Scaling** | API Server 자동 스케일링 |
-| **Automatic Backup** | etcd 자동 백업 (AWS S3) |
-| **Security Patching** | AWS가 보안 패치 자동 적용 |
-| **Monitoring** | Control Plane 메트릭 CloudWatch 전송 |
+- **Multi-AZ HA**: 3개 AZ에 분산 배치
+- **Auto Scaling**: API Server 자동 스케일링
+- **Automatic Backup**: etcd 자동 백업 (AWS S3)
+- **Security Patching**: AWS가 보안 패치 자동 적용
+- **Monitoring**: Control Plane 메트릭 CloudWatch 전송
 
 ### 2. Data Plane 선택
 

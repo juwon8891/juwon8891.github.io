@@ -321,22 +321,18 @@ kubectl describe node myk8s-control-plane | grep -i podcidr
 
 **공식 지원 한계**
 
-| 항목 | 한계 |
-|------|------|
-| 노드 수 | 5,000개 이하 (단일 클러스터 최대) |
-| 노드당 파드 수 | 110개 이하 (기본 maxPods 설정) |
-| 총 파드 수 | 150,000개 이하 (클러스터 전체) |
-| 총 컨테이너 수 | 300,000개 이하 (모든 컨테이너 합계) |
+- **노드 수**: 5,000개 이하 (단일 클러스터 최대)
+- **노드당 파드 수**: 110개 이하 (기본 maxPods 설정)
+- **총 파드 수**: 150,000개 이하 (클러스터 전체)
+- **총 컨테이너 수**: 300,000개 이하 (모든 컨테이너 합계)
 
 #### 1.2 Control Plane 고려사항
 
 **권장 구성**
 
-| 구성 요소 | 권장 사항 |
-|-----------|-----------|
-| Failure Zone별 배치 | 각 Rack에 1-2개의 Control Plane 노드 배치 |
-| 로드밸런서 구성 | Control Plane 앞단에 하드웨어 로드밸런서 배치 |
-| etcd 분리 | 이벤트 객체를 별도의 etcd 인스턴스에 저장 |
+- **Failure Zone별 배치**: 각 Rack에 1-2개의 Control Plane 노드 배치
+- **로드밸런서 구성**: Control Plane 앞단에 하드웨어 로드밸런서 배치
+- **etcd 분리**: 이벤트 객체를 별도의 etcd 인스턴스에 저장
 
 ![](https://velog.velcdn.com/images/juwon8891/post/6af24ac5-d759-4f71-bbee-6c34cb886254/image.png)
 
@@ -489,21 +485,17 @@ spec:
 
 #### etcd 성능 문제 (500노드)
 
-| 항목 | 내용 |
-|------|------|
-| 문제 | kubectl 사용 시 잦은 timeout 발생 |
-| 원인 | etcd 쓰기 작업에서 수백 ms spike |
-| 해결 | 네트워크 스토리지 → 로컬 SSD로 이전 |
-| 결과 | 지연 200us 감소, 1000노드까지 안정 운영 |
+- **문제**: kubectl 사용 시 잦은 timeout 발생
+- **원인**: etcd 쓰기 작업에서 수백 ms spike
+- **해결**: 네트워크 스토리지 → 로컬 SSD로 이전
+- **결과**: 지연 200us 감소, 1000노드까지 안정 운영
 
 #### API 서버 과부하 (1000노드)
 
-| 항목 | 내용 |
-|------|------|
-| 문제 | etcd 높은 지연 시간 재발생 |
-| 원인 | kube-apiserver가 etcd로부터 500MB/s 이상 읽기 |
-| 분석 | Fluentd, Datadog이 모든 노드에서 API 질의 |
-| 해결 | 에이전트들의 API 질의 빈도 감소 / Event API를 별도 etcd 클러스터로 분리 / API 서버 10대로 확장 |
+- **문제**: etcd 높은 지연 시간 재발생
+- **원인**: kube-apiserver가 etcd로부터 500MB/s 이상 읽기
+- **분석**: Fluentd, Datadog이 모든 노드에서 API 질의
+- **해결**: 에이전트들의 API 질의 빈도 감소 / Event API를 별도 etcd 클러스터로 분리 / API 서버 10대로 확장
 
 #### 도커 이미지 Pull 문제
 
@@ -888,11 +880,9 @@ rate(cilium_drop_total[5m])
 
 **StateDB 특징**
 
-| 특징 | 설명 |
-|------|------|
-| In-memory transactional database | 메모리 기반 트랜잭션 DB |
-| Immutable radix trees | 불변 래딕스 트리로 버전 관리 |
-| Channel-based notifications | 채널 기반 변경 알림 |
+- **In-memory transactional database**: 메모리 기반 트랜잭션 DB
+- **Immutable radix trees**: 불변 래딕스 트리로 버전 관리
+- **Channel-based notifications**: 채널 기반 변경 알림
 
 
 ### 핵심 성취

@@ -1170,7 +1170,6 @@ server = "https://192.168.10.10:35000"
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### Week 6: Kubespray Offline 설치
 

@@ -1064,7 +1064,6 @@ kubectl exec -it curl-pod -- sh -c 'while true; do curl -s webpod | grep Hostnam
 | 보안 | 암호화 | WireGuard/IPSec 지원 |
 | 보안 | 제로 트러스트 | 기본적으로 모든 트래픽 제어 |
 
-## 추가 학습 리소스 {: .no-toc }
 
 ### 1. 공식 문서
 

@@ -1440,7 +1440,6 @@ groups:
       summary: "ClusterMesh remote cluster disconnected"
 ```
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취
 
@@ -1483,7 +1482,6 @@ groups:
 | 성능 최적화 | etcd 및 apiserver 튜닝 |
 | 장애 대응 | 클러스터 격리 및 복구 절차 |
 
-## 참고 {: .no-toc }
 
 ### YouTube eCHO Episode 시리즈
 

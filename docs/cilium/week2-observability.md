@@ -1375,7 +1375,6 @@ spec:
 EOF
 ```
 
-## 추가 학습 리소스 및 참고 자료 {: .no-toc }
 
 ### 1. 공식 문서
 
@@ -1654,7 +1653,6 @@ up{job="cilium-agent"}
 rate(cilium_endpoint_regeneration_time_stats_seconds_sum[5m]) / rate(cilium_endpoint_regeneration_time_stats_seconds_count[5m])
 ```
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취 목표
 

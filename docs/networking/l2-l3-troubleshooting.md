@@ -433,7 +433,6 @@ ping <ip>
 4. **arping으로 L3 스위치 MAC 테이블 강제 갱신**
 5. 문제의 70%는 노드(호스트) 문제
 
-## 참고 자료 {: .no-toc }
 
 - [Cisco Switch 기본 설정](https://www.cisco.com/c/en/us/support/docs/switches/catalyst-2900-xl-series-switches/24048-146.html)
 - [Linux ARP 관리](https://linux.die.net/man/8/arp)

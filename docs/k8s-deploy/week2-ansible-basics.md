@@ -1204,7 +1204,6 @@ ansible-playbook site.yml --skip-tags firewall
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 - [Ansible 공식 문서](https://docs.ansible.com/)
 - [Ansible Galaxy](https://galaxy.ansible.com/)

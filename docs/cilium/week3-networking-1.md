@@ -1355,7 +1355,6 @@ helm upgrade cilium cilium/cilium \
   --set enableIPv4Masquerade=false
 ```
 
-## 참고 자료 {: .no-toc }
 
 ### 1. 공식 문서 및 가이드
 
@@ -1441,7 +1440,6 @@ helm upgrade cilium cilium/cilium \
   --set encryption.type=wireguard
 ```
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취 목표
 

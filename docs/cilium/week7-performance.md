@@ -894,7 +894,6 @@ rate(cilium_drop_total[5m])
 | Immutable radix trees | 불변 래딕스 트리로 버전 관리 |
 | Channel-based notifications | 채널 기반 변경 알림 |
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취
 
@@ -918,7 +917,6 @@ rate(cilium_drop_total[5m])
 2. **메트릭 기반 튜닝**: 프로메테우스 메트릭을 활용한 성능 최적화
 3. **대규모 시뮬레이션**: kwok을 활용한 수천 노드 시뮬레이션
 
-## 참고 {: .no-toc }
 
 ### K8S 성능 관련
 

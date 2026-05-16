@@ -2257,7 +2257,6 @@ kubectl patch tracingpolicy comprehensive-security-policy \
 
 - 정기적인 보안 정책 리뷰 미팅
 
-## 마무리 {: .no-toc }
 
 Cilium Security와 Tetragon을 통해 다음 핵심 기술을 습득했다.
 
@@ -2287,7 +2286,6 @@ Cilium Security와 Tetragon을 통해 다음 핵심 기술을 습득했다.
 | 멀티 테넌트 SaaS | 테넌트별 완전한 네트워크 격리, 실시간 보안 모니터링 |
 | DevSecOps | CI/CD 보안 정책 자동 배포, 환경별 보안 수준 차별화 |
 
-## 참고 {: .no-toc }
 
 ### 공식 문서
 

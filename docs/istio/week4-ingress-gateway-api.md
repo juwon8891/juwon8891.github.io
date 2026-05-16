@@ -124,7 +124,6 @@ curl localhost:30001
 
 ---
 
-## 마무리 {: .no-toc }
 
 본 실습을 통해 Istio와 Kubernetes Gateway API를 사용하여 Ingress Gateway를 설정하고 라우팅하는 방법을 확인했다. Gateway API는 Kubernetes 생태계에서 표준화된 Ingress 방식으로 자리잡고 있으며, 이 구조를 이해하고 활용하면 클라우드 네이티브 환경에서 효과적으로 트래픽을 관리할 수 있다.
 

@@ -92,6 +92,5 @@ kubectl apply -f istio.yaml
 - Helm/istioctl 없이 간결한 구성을 원하는 경우
 - Multi-cluster나 Multi-tenant 환경 운영 중
 
-## 마무리 {: .no-toc }
 
 Sail Operator는 YAML만으로 Istio를 설치, 구성, 업그레이드할 수 있는 선언형 솔루션이다. GitOps, Argo CD, Kustomize 기반으로 인프라를 운영한다면 도입을 검토할 만한 도구이다.

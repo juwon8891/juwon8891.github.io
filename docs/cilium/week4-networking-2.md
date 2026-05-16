@@ -973,7 +973,6 @@ ip -s link show dev eth1
 cat /proc/sys/net/ipv4/neigh/eth1/base_reachable_time_ms
 ```
 
-(참고) {: .no-toc } 프로메테우스 스택
 
 ### 모니터링 스택 구성
 
@@ -1042,7 +1041,6 @@ cilium_l2_announcements_total
 kubectl exec -n kube-system ds/cilium -c cilium-agent -- curl -s localhost:9962/metrics | grep l2_announcement
 ```
 
-## 참고 자료 및 추가 학습 {: .no-toc }
 
 ### YouTube eCHO Episode 시리즈
 
@@ -1103,7 +1101,6 @@ kubectl run iperf3-client --image=networkstatic/iperf3 --rm -it -- -c <server-ip
 kubectl exec -it curl-pod -- ping -c 100 <target-ip> | tail -1
 ```
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취 목표
 

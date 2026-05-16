@@ -1294,7 +1294,6 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### Argo Image Updater
 
@@ -1375,7 +1374,6 @@ apps (Root Application)
 
 ---
 
-## 마무리 {: .no-toc }
 
 이번 실습에서는 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현했습니다.
 
@@ -1408,7 +1406,6 @@ GitOps 방식으로 **Git = Single Source of Truth**를 유지하며, 변경 사
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 주요 도구
 

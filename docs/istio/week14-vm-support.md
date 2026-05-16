@@ -2102,7 +2102,6 @@ spec:
 EOF
 ```
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - [Istio VM Support](https://istio.io/latest/docs/setup/install/virtual-machine/)
@@ -2114,7 +2113,6 @@ EOF
 - [SPIFFE/SPIRE Identity](https://spiffe.io/docs/latest/spiffe-about/)
 - [Istio Performance Tuning](https://istio.io/latest/docs/ops/best-practices/performance/)
 
-## 마무리 {: .no-toc }
 
 이번 8주차 스터디를 통해 Istio의 VM Support와 DNS 프록시의 동작 원리를 심도 있게 학습했다. 
 

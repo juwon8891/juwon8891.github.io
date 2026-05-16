@@ -1161,7 +1161,6 @@ net.netfilter.nf_conntrack_tcp_timeout_established = 432000 → 86400
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 

@@ -113,8 +113,8 @@ nav:
     - Device Plugin & DRA: gpu/device-plugin-dra.md
   - IaC:
     - Ansible: iac/ansible-basics.md
-    - Terraform Basics: iac/terraform-basics.md
-    - Terragrunt Advanced: iac/terragrunt-advanced.md
+    - Terraform: iac/terraform-basics.md
+    - Terragrunt: iac/terragrunt-advanced.md
   - Infrastructure:
     - IPMI & PXE: infrastructure/ipmi-pxe.md
   - Istio:

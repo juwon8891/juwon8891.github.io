@@ -1054,6 +1054,5 @@ impl HttpContext for CustomAuthFilter {
 
 ---
 
-## 마무리 {: .no-toc }
 
 다중 클러스터 서비스 메시는 격리성, 장애 경계, 규정 준수, 가용성 향상을 위한 핵심 아키텍처 패턴이다. Envoy 필터와 WebAssembly를 활용한 데이터 플레인 확장을 통해 표준 Istio 기능으로 충족하기 어려운 비즈니스 요구사항을 구현할 수 있다.

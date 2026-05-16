@@ -257,7 +257,6 @@ dynamic_resources:
 
 ---
 
-## 9. 참고 자료 {: .no-toc }
 
 - Envoy 공식 문서: https://www.envoyproxy.io/docs/envoy/latest
 - GitHub 예제: https://github.com/envoyproxy/envoy

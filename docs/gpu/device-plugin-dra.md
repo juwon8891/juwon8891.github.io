@@ -879,7 +879,6 @@ spec:
 | RDMA 네트워크 (기본) | RDMA Device Plugin |
 | AMD GPU | AMD GPU Operator + Device Plugin |
 
-## 참고 자료 {: .no-toc }
 
 - [Kubernetes Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)
 - [Dynamic Resource Allocation (DRA)](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)

@@ -795,7 +795,6 @@ kubectl describe pod fargate-pod
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - [Amazon EKS User Guide](https://docs.aws.amazon.com/eks/)

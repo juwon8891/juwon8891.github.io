@@ -666,7 +666,6 @@ annotations:
 # GKE: NEG 사용 시 자동 IP 모드
 
 ```
-## 6. 참고 자료 {: .no-toc }
 
 ### EKS
 - [AWS Load Balancer Controller - Pod Readiness Gates](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.9/deploy/pod_readiness_gate/)

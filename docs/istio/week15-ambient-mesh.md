@@ -1508,7 +1508,6 @@ kubectl exec -n istio-system daemonset/ztunnel -- \
   curl -s localhost:15000/clusters | grep HEALTHY
 ```
 
-## 6. 결론 및 향후 전망 {: .no-toc }
 
 ## 6.1 Ambient Mesh의 핵심 가치
 
@@ -1527,7 +1526,6 @@ Ambient Mesh는 서비스 메시 기술의 새로운 전환점을 제시한다:
 4. **보안 강화**: 하드웨어 기반 신뢰 루트 통합
 5. **관찰성 향상**: AI/ML 기반 이상 탐지 및 자동 복구
 
-## 6.4 모범 사례 {: .no-toc }
 
 Ambient Mesh를 성공적으로 도입하기 위한 모범 사례:
 
@@ -1539,7 +1537,6 @@ Ambient Mesh를 성공적으로 도입하기 위한 모범 사례:
 
 Ambient Mesh는 서비스 메시의 미래를 제시하는 혁신적인 기술이다. 기존 사이드카 모델의 한계를 극복하면서도 서비스 메시의 핵심 가치를 유지하는 이 기술은, 클라우드 네이티브 애플리케이션의 운영 복잡성을 크게 줄이고 리소스 효율성을 향상시킬 것이다.
 
-## 참고 {: .no-toc }
 
 - [Istio 1.24 공식 문서](https://istio.io/v1.24/docs/)
 - [Istio Ambient Mesh 공식 문서](https://istio.io/latest/docs/ambient/)

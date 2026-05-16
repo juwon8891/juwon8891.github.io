@@ -1176,7 +1176,6 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 
@@ -1206,7 +1205,6 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
 
 ---
 
-## 마무리 {: .no-toc }
 
 Week 4에서는 EKS 환경에서의 **Identity and Access Management**를 학습했습니다.
 

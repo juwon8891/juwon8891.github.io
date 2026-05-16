@@ -489,7 +489,6 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - **CUDA**: [CUDA Toolkit Documentation](https://docs.nvidia.com/cuda/), [CUDA 13.2 Release Notes](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/)
@@ -518,7 +517,6 @@ __global__ void matmul(float *A, float *B, float *C, int N) {
 
 ---
 
-## 문서 이력 {: .no-toc }
 
 - **2026-05-14**: SGLang vs vLLM 비교 추가 (RadixAttention vs PagedAttention, 처리량 29% 차이)
 - **2026-05-13**: 초안 작성, CUDA 13.2, ROCm 7.2.3, NCCL 2.30.4, MI350X, Rubin 정보 포함

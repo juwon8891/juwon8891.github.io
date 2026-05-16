@@ -2100,7 +2100,6 @@ helm upgrade cilium cilium/cilium \
   --set hubble.export.static.backends.jaeger.endpoint="jaeger-collector:14268"
 ```
 
-## 마무리 {: .no-toc }
 
 ### 핵심 성취 내용
 
@@ -2132,7 +2131,6 @@ helm upgrade cilium cilium/cilium \
 | 성능 최적화 | 암호화 오버헤드 측정 및 하드웨어 가속 활용 |
 | 트러블슈팅 | 정책/암호화/Service Mesh 장애 진단 방법론 |
 
-## 참고 {: .no-toc }
 
 ### YouTube eCHO Episode 시리즈
 

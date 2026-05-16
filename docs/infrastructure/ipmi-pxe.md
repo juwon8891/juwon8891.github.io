@@ -700,7 +700,6 @@ cat /proc/cmdline
 
 4. 문제 생기면 IPMI로 개별 서버 디버깅
 
-## 참고 자료 {: .no-toc }
 
 - [IPMI Specification v2.0](https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html)
 - [PXE Specification](http://www.pix.net/software/pxeboot/archive/pxespec.pdf)

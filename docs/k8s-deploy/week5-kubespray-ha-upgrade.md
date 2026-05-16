@@ -1913,7 +1913,6 @@ open "http://192.168.10.10:9000/haproxy_stats"
 
 ---
 
-## 참고 자료 {: .no-toc }
 
 ### 공식 문서
 - [Kubespray GitHub](https://github.com/kubernetes-sigs/kubespray)

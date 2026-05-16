@@ -53,3 +53,7 @@ site/
 solution_*.py
 solution_*.sql
 test.py
+
+# Claude Code
+.claude/
+.omc/

@@ -1,10 +1,10 @@
 학습하며 정리한 기술 스터디 노트입니다.
 
-- [CI/CD](cicd/week1-image-build/)
-- [Cilium](cilium/week1-concept-setup/)
-- [EKS](eks/week1-intro-deployment/)
-- [GPU](gpu/gpu-cluster-glossary/)
-- [Infrastructure](infrastructure/ipmi-pxe/)
-- [Istio](istio/week1-intro/)
-- [K8s Deploy](k8s-deploy/week1-kubernetes-hard-way/)
-- [Networking](networking/l2-l3-troubleshooting/)
+- [CI/CD](cicd/week1-image-build.md)
+- [Cilium](cilium/week1-concept-setup.md)
+- [EKS](eks/week1-intro-deployment.md)
+- [GPU](gpu/gpu-cluster-glossary.md)
+- [Infrastructure](infrastructure/ipmi-pxe.md)
+- [Istio](istio/week1-intro.md)
+- [K8s Deploy](k8s-deploy/week1-kubernetes-hard-way.md)
+- [Networking](networking/l2-l3-troubleshooting.md)

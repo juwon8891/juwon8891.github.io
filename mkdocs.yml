@@ -112,6 +112,7 @@ nav:
     - GPU 인터커넥트: gpu/infiniband-nvlink-nvswitch.md
     - Device Plugin & DRA: gpu/device-plugin-dra.md
   - IaC:
+    - Ansible: iac/ansible-basics.md
     - Terraform Basics: iac/terraform-basics.md
     - Terragrunt Advanced: iac/terragrunt-advanced.md
   - Infrastructure:

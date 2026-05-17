@@ -100,6 +100,7 @@ nav:
     - Week 8 - Security & Tetragon: cilium/week8-security-tetragon.md
   - Container:
     - 리눅스 커널과 컨테이너: container/linux-kernel-container.md
+    - 인프라 변천사 & 트러블슈팅: container/infrastructure-evolution-troubleshooting.md
   - EKS:
     - Week 1 - Intro & Deployment: eks/week1-intro-deployment.md
     - Week 2 - Networking: eks/week2-networking.md

@@ -30,36 +30,45 @@
 
 ```mermaid
 graph TB
-    subgraph UserSpace["유저 스페이스"]
-        Kubelet[Kubelet]
-        Containerd[Containerd]
-        Nginx[Nginx]
-        App[사용자 앱]
+    subgraph UserSpace["🔷 유저 스페이스"]
+        direction LR
+        Kubelet["Kubelet<br/>(쿠버네티스)"]
+        Containerd["Containerd<br/>(컨테이너 런타임)"]
+        Nginx["Nginx<br/>(웹서버)"]
+        App["사용자 앱"]
     end
     
-    subgraph Boundary["시스템 콜 인터페이스"]
-        SysCall[System Call]
+    SysCall["⚡ 시스템 콜 인터페이스<br/>(open, clone, unshare 등)"]
+    
+    subgraph KernelSpace["🔶 커널 스페이스 (OS 핵심)"]
+        direction LR
+        Scheduler["프로세스<br/>스케줄러"]
+        Memory["메모리<br/>관리"]
+        VFS["VFS<br/>(파일시스템)"]
+        Network["네트워크<br/>스택"]
+        Cgroup["Cgroup<br/>(리소스 제한)"]
+        Namespace["Namespace<br/>(격리)"]
     end
     
-    subgraph KernelSpace["커널 스페이스"]
-        Scheduler[프로세스 스케줄러]
-        Memory[메모리 관리]
-        VFS[VFS]
-        Network[네트워크 스택]
-        Cgroup[Cgroup]
-        Namespace[Namespace]
-    end
-    
-    subgraph Hardware["하드웨어"]
+    subgraph Hardware["⚙️ 하드웨어"]
+        direction LR
         CPU[CPU]
         RAM[RAM]
         Disk[Disk]
         NIC[NIC]
     end
     
-    UserSpace --> Boundary
-    Boundary --> KernelSpace
-    KernelSpace --> Hardware
+    Kubelet -->|파드 생성 요청| SysCall
+    Containerd -->|컨테이너 생성 요청| SysCall
+    Nginx -->|파일 읽기 요청| SysCall
+    App -->|시스템 콜 호출| SysCall
+    
+    SysCall -->|커널 모드 전환| KernelSpace
+    
+    Scheduler -->|CPU 할당| CPU
+    Memory -->|메모리 할당| RAM
+    VFS -->|파일 입출력| Disk
+    Network -->|패킷 전송| NIC
 ```
 
 ### 유저 스페이스
@@ -339,28 +348,32 @@ CNI 브리지 통신을 위한 모듈이다.
 
 ```mermaid
 graph TB
-    PodA[파드 A<br/>10.244.1.2]
+    Start["📦 파드 A<br/>10.244.1.2<br/>(Service IP로 요청)"]
     
-    subgraph L2["L2 Bridge (veth)"]
-        Bridge[CBR0]
+    Start -->|"목적지: 10.96.0.10<br/>(가상 IP)"| Bridge
+    
+    subgraph L2["🔵 L2 Bridge Layer"]
+        Bridge["CBR0 브리지<br/>(가상 스위치)"]
     end
     
-    subgraph L3["L3 IP/iptables"]
-        IPtables[iptables<br/>DNAT]
-        Routing[Routing]
+    Bridge -->|"❌ br_netfilter=0"| Fail
+    Bridge -->|"✅ br_netfilter=1"| L3Flow
+    
+    Fail["❌ 실패<br/>목적지 없음<br/>(패킷 드롭)"]
+    
+    subgraph L3Flow["🔶 L3 IP/iptables Layer"]
+        direction TB
+        IPtables["iptables (DNAT)<br/>kube-proxy 규칙"]
+        Routing["라우팅 테이블"]
+        
+        IPtables -->|"NAT 변환"| Routing
     end
     
-    PodB[파드 B<br/>10.244.2.2]
-    PodC[파드 C<br/>10.244.1.5]
+    Routing -->|"✅ 10.244.2.2"| PodB
+    Routing -->|"✅ 10.244.1.5"| PodC
     
-    PodA -->|Service IP<br/>10.96.0.10| Bridge
-    
-    Bridge -->|br_netfilter=0<br/>통신 실패| Fail[목적지 없음<br/>패킷 드롭]
-    
-    Bridge -->|br_netfilter=1<br/>강제 경유| IPtables
-    IPtables -->|NAT 변환| Routing
-    Routing -->|10.244.2.2| PodB
-    Routing -->|10.244.1.5| PodC
+    PodB["📦 파드 B<br/>10.244.2.2<br/>(다른 노드)"]
+    PodC["📦 파드 C<br/>10.244.1.5<br/>(같은 노드)"]
 ```
 
 **br_netfilter 비활성화 (0)**:
@@ -400,13 +413,28 @@ du -sh /proc
 
 ```mermaid
 graph LR
-    App[애플리케이션] -->|cat /proc/cpuinfo| VFS[VFS]
-    VFS -->|read 시스템 콜| Kernel[커널 RAM]
-    Kernel -->|실시간 렌더링| Text[텍스트 출력]
+    subgraph User["유저 스페이스"]
+        App["💻 애플리케이션<br/>(cat /proc/cpuinfo)"]
+    end
+    
+    subgraph Kernel["커널 스페이스"]
+        VFS["VFS<br/>(가상 파일 시스템)"]
+        ProcFS["proc 파일 시스템"]
+        KernelData["커널 RAM<br/>(CPU 정보)"]
+    end
+    
+    App -->|"1. read 시스템 콜"| VFS
+    VFS -->|"2. proc 판별"| ProcFS
+    ProcFS -->|"3. 데이터 조회"| KernelData
+    KernelData -->|"4. 실시간 렌더링"| App
+    
+    Note["📝 디스크 블록: 0 바이트<br/>(메모리만 사용)"]
 ```
 
-- 일반 파일: VFS → EXT4 → 블록 레이어 → 디스크 (실제 블록 점유)
-- `/proc`: VFS → 커널 RAM 데이터 구조 → 실시간 텍스트 렌더링 (디스크 블록 0)
+**일반 파일 vs /proc**:
+
+- **일반 파일** (`/etc/hosts`): VFS → EXT4 → 블록 레이어 → 디스크 (실제 블록 점유)
+- **`/proc` 파일**: VFS → proc → 커널 RAM → 실시간 렌더링 (디스크 블록 0)
 
 `cat /proc/cpuinfo` 엔터를 치는 순간 커널이 RAM 내부 데이터를 텍스트로 변환해서 전달한다.
 

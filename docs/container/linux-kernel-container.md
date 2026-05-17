@@ -30,7 +30,7 @@
 
 ```mermaid
 graph TB
-    subgraph UserSpace["🔷 유저 스페이스"]
+    subgraph UserSpace["유저 스페이스"]
         direction LR
         Kubelet["Kubelet<br/>(쿠버네티스)"]
         Containerd["Containerd<br/>(컨테이너 런타임)"]
@@ -38,9 +38,9 @@ graph TB
         App["사용자 앱"]
     end
     
-    SysCall["⚡ 시스템 콜 인터페이스<br/>(open, clone, unshare 등)"]
+    SysCall["시스템 콜 인터페이스<br/>(open, clone, unshare 등)"]
     
-    subgraph KernelSpace["🔶 커널 스페이스 (OS 핵심)"]
+    subgraph KernelSpace["커널 스페이스 (OS 핵심)"]
         direction LR
         Scheduler["프로세스<br/>스케줄러"]
         Memory["메모리<br/>관리"]
@@ -50,7 +50,7 @@ graph TB
         Namespace["Namespace<br/>(격리)"]
     end
     
-    subgraph Hardware["⚙️ 하드웨어"]
+    subgraph Hardware["하드웨어"]
         direction LR
         CPU[CPU]
         RAM[RAM]
@@ -348,20 +348,20 @@ CNI 브리지 통신을 위한 모듈이다.
 
 ```mermaid
 graph TB
-    Start["📦 파드 A<br/>10.244.1.2<br/>(Service IP로 요청)"]
+    Start["파드 A<br/>10.244.1.2<br/>(Service IP로 요청)"]
     
     Start -->|"목적지: 10.96.0.10<br/>(가상 IP)"| Bridge
     
-    subgraph L2["🔵 L2 Bridge Layer"]
+    subgraph L2["L2 Bridge Layer"]
         Bridge["CBR0 브리지<br/>(가상 스위치)"]
     end
     
-    Bridge -->|"❌ br_netfilter=0"| Fail
-    Bridge -->|"✅ br_netfilter=1"| L3Flow
+    Bridge -->|"br_netfilter=0"| Fail
+    Bridge -->|"br_netfilter=1"| L3Flow
     
-    Fail["❌ 실패<br/>목적지 없음<br/>(패킷 드롭)"]
+    Fail["실패<br/>목적지 없음<br/>(패킷 드롭)"]
     
-    subgraph L3Flow["🔶 L3 IP/iptables Layer"]
+    subgraph L3Flow["L3 IP/iptables Layer"]
         direction TB
         IPtables["iptables (DNAT)<br/>kube-proxy 규칙"]
         Routing["라우팅 테이블"]
@@ -369,11 +369,11 @@ graph TB
         IPtables -->|"NAT 변환"| Routing
     end
     
-    Routing -->|"✅ 10.244.2.2"| PodB
-    Routing -->|"✅ 10.244.1.5"| PodC
+    Routing -->|"10.244.2.2"| PodB
+    Routing -->|"10.244.1.5"| PodC
     
-    PodB["📦 파드 B<br/>10.244.2.2<br/>(다른 노드)"]
-    PodC["📦 파드 C<br/>10.244.1.5<br/>(같은 노드)"]
+    PodB["파드 B<br/>10.244.2.2<br/>(다른 노드)"]
+    PodC["파드 C<br/>10.244.1.5<br/>(같은 노드)"]
 ```
 
 **br_netfilter 비활성화 (0)**:

@@ -677,3 +677,4 @@ VM을 제거한 게 아니라 **VM 위에 컨테이너를 올리는 구조**다.
 - [CFS Bandwidth Control](https://www.kernel.org/doc/html/latest/scheduler/sched-bwc.html)
 - [AWS Nitro System](https://aws.amazon.com/ec2/nitro/)
 - [Docker vs Containerd](https://www.docker.com/blog/what-is-containerd-runtime/)
+- [[Ch-01] Kubernetes 왜 필요한가? 결국 Linux까지 내려가야 이해된다!](https://www.youtube.com/watch?v=XsgYsvgA0Ow)

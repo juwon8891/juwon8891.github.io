@@ -293,4 +293,4 @@ graph TB
 - [Netflix Tech Blog: Linux Performance Analysis in 60,000 Milliseconds](https://netflixtechblog.com/linux-performance-analysis-in-60-000-milliseconds-accc10403c55)
 - [Linux Kernel OverlayFS Documentation](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html)
 - [containerd snapshotter](https://github.com/containerd/containerd/tree/main/docs/snapshotters)
-- [OverlayFS 상세 강의 영상](https://www.youtube.com/watch?v=dhGW3ETfrnk&t=4808s)
+- [[Ch_05] OverlayFS 완전 정복 — lowerdir부터 Mount 병목까지](https://www.youtube.com/watch?v=dhGW3ETfrnk&t=4808s)

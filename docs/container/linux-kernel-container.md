@@ -654,3 +654,5 @@ cat /proc/sys/net/bridge/bridge-nf-call-ip6tables
 - [System Call Table](https://man7.org/linux/man-pages/man2/syscalls.2.html)
 - [cgroup v2 Documentation](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)
 - [Linux Namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)
+- [[Ch-01] Kubernetes 왜 필요한가? 결국 Linux까지 내려가야 이해된다!](https://www.youtube.com/watch?v=XsgYsvgA0Ow)
+- [[Ch-02] 단순 kubectl 명령어 그만! 쿠버네티스 엔지니어가 리눅스 커널을 반드시 알아야 하는 이유](https://www.youtube.com/watch?v=OjoUal1JPcM&t=6331s)

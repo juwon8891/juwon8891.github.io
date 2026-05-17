@@ -98,6 +98,8 @@ nav:
     - Week 6 - Security & Service Mesh: cilium/week6-security-service-mesh.md
     - Week 7 - Performance: cilium/week7-performance.md
     - Week 8 - Security & Tetragon: cilium/week8-security-tetragon.md
+  - Container:
+    - 리눅스 커널과 컨테이너: container/linux-kernel-container.md
   - EKS:
     - Week 1 - Intro & Deployment: eks/week1-intro-deployment.md
     - Week 2 - Networking: eks/week2-networking.md

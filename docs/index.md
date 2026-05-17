@@ -2,6 +2,7 @@
 
 - [CI/CD](cicd/week1-image-build.md)
 - [Cilium](cilium/week1-concept-setup.md)
+- [Container](container/linux-kernel-container.md)
 - [EKS](eks/week1-intro-deployment.md)
 - [GPU](gpu/gpu-cluster-glossary.md)
 - [IaC](iac/ansible-basics.md)

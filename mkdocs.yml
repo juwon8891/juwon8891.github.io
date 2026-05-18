@@ -159,3 +159,4 @@ nav:
     - SLO / SLI / Error Budget: monitoring/slo-sli-error-budget.md
   - Networking:
     - L2/L3 스위치 & ARP 트러블슈팅: networking/l2-l3-troubleshooting.md
+    - BGP: networking/bgp.md

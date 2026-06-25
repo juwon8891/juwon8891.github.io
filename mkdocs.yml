@@ -82,6 +82,7 @@ nav:
   - Home: index.md
   - AI Datacenter Network:
     - Week 1 - AI 모델 생명주기 & RDMA: ai-dc-network/week1-ai-lifecycle-rdma.md
+    - Week 2 - IB, RoCEv2 & GPU 클러스터 네트워크 설계: ai-dc-network/week2-ib-roce-gpu-cluster-network.md
   - CI/CD:
     - Week 1 - Image Build: cicd/week1-image-build.md
     - Week 2 - Helm & Tekton: cicd/week2-helm-tekton.md

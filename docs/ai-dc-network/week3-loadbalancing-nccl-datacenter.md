@@ -260,7 +260,7 @@ graph LR
     subgraph "일반 재계산: intf3 down"
         B1a[Bucket1] --> I1a[intf1]
         B2a[Bucket2] --> I2a[intf2]
-        B3a[Bucket3] -.x.-> I3a[intf3 down]
+        B3a[Bucket3] -.down.-> I3a[intf3 down]
         B3a --> I1a
         B4a[Bucket4] -->|재배치| I2a
     end
@@ -273,7 +273,7 @@ graph LR
     subgraph "Consistent Hashing: intf3 down"
         B1b[Bucket1] --> I1b[intf1]
         B2b[Bucket2] --> I2b[intf2]
-        B3b[Bucket3] -.x.-> I3b[intf3 down]
+        B3b[Bucket3] -.down.-> I3b[intf3 down]
         B3b -->|이 bucket만 재배치| I1b
         B4b[Bucket4] --> I4b[intf4]
     end

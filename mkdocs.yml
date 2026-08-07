@@ -166,3 +166,5 @@ nav:
     - L2/L3 스위치 & ARP 트러블슈팅: networking/l2-l3-troubleshooting.md
     - MetalLB: networking/metallb.md
     - BGP: networking/bgp.md
+  - vLLM:
+    - Week 1 - LLM 기초 & Model Serving: vllm/week1-llm-basics-model-serving.md

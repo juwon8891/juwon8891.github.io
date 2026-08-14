@@ -153,6 +153,8 @@ nav:
     - Week 5 - Kubespray HA & Upgrade: k8s-deploy/week5-kubespray-ha-upgrade.md
     - Week 6 - Kubespray Offline: k8s-deploy/week6-kubespray-offline.md
     - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
+  - LLM Serving:
+    - Week 2 - Model Serving Design & Best Practices: llm-serving/week2-model-serving.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
     - Alertmanager: monitoring/alertmanager.md

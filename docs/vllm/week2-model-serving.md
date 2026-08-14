@@ -1,7 +1,8 @@
 ---
 tags:
-  - LLM Serving
   - vLLM
+  - LLM
+  - Model Serving
   - Ray Serve
   - Batching
   - Streaming

@@ -169,3 +169,4 @@ nav:
   - vLLM:
     - Week 1 - LLM 기초 & Model Serving: vllm/week1-llm-basics-model-serving.md
     - Week 2 - Model Serving Design & Best Practices: vllm/week2-model-serving.md
+    - Week 3 - Serving Challenges & Optimization: vllm/week3-serving-challenges-optimization.md

@@ -54,6 +54,11 @@ solution_*.py
 solution_*.sql
 test.py
 
+# 문서 이미지는 예외 (MkDocs 빌드에 필요)
+!docs/assets/images/**/*.png
+!docs/assets/images/**/*.jpg
+!docs/assets/images/**/*.jpeg
+
 # Claude Code
 .claude/
 .omc/

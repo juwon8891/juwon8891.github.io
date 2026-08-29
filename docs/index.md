@@ -1,4 +1,6 @@
-학습하며 정리한 기술 스터디 노트입니다.
+# 학습 정리
+
+학습하며 정리한 기술 스터디 노트다.
 
 - [AI Datacenter Network](ai-dc-network/week1-ai-lifecycle-rdma.md)
 - [CI/CD](cicd/week1-image-build.md)

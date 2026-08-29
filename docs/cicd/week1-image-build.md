@@ -16,7 +16,7 @@ tags:
 
 #### 1.1 GitOps의 탄생 배경과 발전
 
-**GitOps**라는 용어는 2017년 Weaveworks의 CEO인 Alexis Richardson이 처음 소개했습니다. 클라우드 네이티브 애플리케이션의 복잡성이 증가하면서, 전통적인 배포 방식의 한계가 드러나기 시작했고, 이를 해결하기 위한 새로운 패러다임이 필요했습니다.
+**GitOps**라는 용어는 2017년 Weaveworks의 CEO인 Alexis Richardson이 처음 소개했다. 클라우드 네이티브 애플리케이션의 복잡성이 증가하면서, 전통적인 배포 방식의 한계가 드러나기 시작했고, 이를 해결하기 위한 새로운 패러다임이 필요했다.
 
 ```mermaid
 timeline
@@ -126,7 +126,7 @@ graph LR
 ```
 ### 2. GitOps 3대 핵심 원칙
 
-GitOps의 기본 철학을 이루는 세 가지 핵심 원칙을 상세히 살펴보겠습니다.
+GitOps의 기본 철학을 이루는 세 가지 핵심 원칙을 상세히 정리한다.
 
 #### 2.1 Git은 신뢰할 수 있는 단일 소스 (Git is the single source of truth)
 

@@ -318,7 +318,7 @@ spec:
 ```
 **GKE 1.17+ 버전**에서는 Ingress 생성 시 자동으로 NEG가 사용되며, Pod Readiness Gates (`cloud.google.com/load-balancer-neg-ready`)가 자동으로 주입된다.
 
-**별도의 Namespace annotation이나 readiness gate annotation은 필요하지 않습니다.**
+**별도의 Namespace annotation이나 readiness gate annotation은 필요하지 않다.**
 
 #### 3.2.2 주입된 구조 및 동작 흐름
 

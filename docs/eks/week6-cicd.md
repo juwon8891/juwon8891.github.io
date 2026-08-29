@@ -1421,7 +1421,7 @@ apps (Root Application)
 ---
 
 
-이번 실습에서는 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현했습니다.
+이번 실습에서는 **GitOps 기반 CI/CD 파이프라인**을 구축하고, **Platform Engineering** 개념을 활용하여 **Multi-Tenant SaaS 플랫폼**을 구현했다.
 
 ### 핵심 학습 내용
 

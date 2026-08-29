@@ -695,7 +695,7 @@ aws eks describe-update \
 
 **Terraform을 사용한 실제 업그레이드 실행!**
 
-이 랩에서는 **Terraform**을 사용하여 클러스터를 업그레이드한다. EKS 클러스터는 이미 Terraform을 통해 이 랩에 프로비저닝되었습니다.
+이 랩에서는 **Terraform**을 사용하여 클러스터를 업그레이드한다. EKS 클러스터는 이미 Terraform을 통해 이 랩에 프로비저닝되어 있다.
 
 ```bash
 # Terraform 상태 확인
@@ -749,7 +749,7 @@ terraform plan -no-color > plan-output.txt
 ```
 **Terraform Plan 요약**:
 - 클러스터 버전을 변경하면 Terraform이 어떤 변경을 하는지 볼 수 있다.
-- **AMI나 태그만 변경**, 관리 노드 그룹 및 애드온 등과 같은 관련 리소스를 업데이트하기 쉽습니다.
+- **AMI나 태그만 변경**, 관리 노드 그룹 및 애드온 등과 같은 관련 리소스를 업데이트하기 쉽다.
 - **10분 소요** (Control Plane 1.31 업그레이드)
 
 **Terraform Apply 실행**:

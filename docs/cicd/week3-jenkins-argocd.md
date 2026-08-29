@@ -1954,5 +1954,5 @@ kubectl argo rollouts dashboard
 
 ---
 
-이번 주차에서는 Jenkins CI/CD와 ArgoCD를 활용한 완전한 GitOps 파이프라인을 구축했습니다. 개발 저장소와 운영 저장소를 분리하여 책임을 명확히 하고, ArgoCD의 자동 동기화로 운영 부담을 크게 줄일 수 있었습니다. Argo Rollouts를 통해 안전한 배포 전략도 실습했습니다.
+이번 주차에서는 Jenkins CI/CD와 ArgoCD를 활용한 완전한 GitOps 파이프라인을 구축했다. 개발 저장소와 운영 저장소를 분리하여 책임을 명확히 하고, ArgoCD의 자동 동기화로 운영 부담을 크게 줄일 수 있었다. Argo Rollouts를 통해 안전한 배포 전략도 실습했다.
 

@@ -107,6 +107,14 @@ graph LR
 
 ### 2. EKS 인증 메커니즘
 
+![EKS kubectl 인증/인가 9단계 흐름](/assets/images/posts/eks-week4/eks-authn-authz-flow.png)
+
+AuthN 단계가 둘로 쪼개져 있다는 점이 핵심이다. ⑤⑥에서 `sts:GetCallerIdentity`로 "이 AWS 주체가 누구인지"를 먼저 확인하고, ⑦에서 aws-auth ConfigMap으로 "그 IAM 주체가 어떤 K8S User인지"를 다시 매핑한다. **STS 인증 성공이 곧 클러스터 접근 허가가 아니다.**
+
+![Projected ServiceAccount 토큰 검증 흐름](/assets/images/posts/eks-week4/projected-sa-token.png)
+
+Projected 토큰의 차이는 `Verify audience` 한 단계로 압축된다. TokenReview를 통과하는 것만으로는 부족하고 수신 측이 `aud` 클레임을 직접 대조해야 한다. IRSA가 `sts.amazonaws.com` audience를 따로 요구하는 이유의 원형이 여기 있다.
+
 #### 2.1. AWS IAM Authenticator
 
 **정의**: EKS에서 **AWS IAM → K8S User/Group 매핑**을 담당하는 인증 메커니즘
@@ -257,6 +265,18 @@ spec:
 
 ### 3. IRSA
 
+![IRSA 전체 토큰 흐름](/assets/images/posts/eks-week4/irsa-token-flow.png)
+
+③번 화살표가 IAM에서 OIDC Provider **쪽으로** 향한다는 점을 보자. 토큰 검증에 쓸 공개키를 AWS가 EKS의 JWKS 엔드포인트에서 당겨온다. IRSA는 AWS에 비밀키를 넘기는 구조가 아니라 공개키만 신뢰하는 단방향 Trust로 성립한다.
+
+![Node IAM Role 방식과 IRSA 비교](/assets/images/posts/eks-week4/node-iam-vs-irsa.png)
+
+왼쪽에서 보안 그룹으로 네트워크는 분리했는데도 두 파드가 결국 같은 Node IAM Role로 수렴한다. **보안 그룹을 나눠도 IAM 권한은 나뉘지 않으며**, 같은 노드의 모든 파드가 노드 권한의 합집합을 갖는다.
+
+![Pod Identity Webhook이 주입하는 것](/assets/images/posts/eks-week4/irsa-webhook-injection.png)
+
+IRSA에서 애플리케이션 코드를 고치지 않아도 되는 이유가 여기 있다. Webhook이 환경 변수 두 개(`AWS_ROLE_ARN`, `AWS_WEB_IDENTITY_TOKEN_FILE`)와 볼륨 하나만 주입하면 AWS SDK가 알아서 `AssumeRoleWithWebIdentity`를 선택한다. IRSA는 파드 런타임 기능이 아니라 SDK 기능이다.
+
 **정의**: **Pod(ServiceAccount)**에 **AWS IAM Role** 권한을 부여하는 메커니즘
 
 **기존 방식 문제점**:
@@ -381,6 +401,10 @@ kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 
 ### 4. Authorization (RBAC)
 
+![RoleBinding을 통한 Subject-Role M:N 연결](/assets/images/posts/eks-week4/rolebinding-mn.png)
+
+Subject와 Role 사이의 `M:N`이 점선이라는 게 요점이다. 둘은 서로를 직접 참조하지 않고 오직 RoleBinding을 통해서만 이어진다. Role 하나를 여러 SA에 붙이든 SA 하나에 여러 Role을 붙이든, 조합은 전부 RoleBinding 개수로 결정된다.
+
 **정의**: **Role-Based Access Control**, K8S 리소스에 대한 권한을 Role/RoleBinding으로 관리
 
 #### RBAC 구성 요소
@@ -470,6 +494,10 @@ kubectl auth can-i delete pods --as=system:serviceaccount:dev-team:dev-k8s -n de
 
 ### 5. Admission Control
 
+![Admission Control 파이프라인](/assets/images/posts/eks-week4/admission-pipeline.png)
+
+Mutating 웹훅은 순차 화살표로, Validating 웹훅은 겹친 스택에 다중 화살표로 그려져 있다. **Mutating은 순서에 의존하는 직렬 실행, Validating은 병렬 실행**이며 그 사이에 `Object Schema Validation`이 끼어든다. 텍스트로는 잘 드러나지 않는 실행 순서다.
+
 **정의**: API 요청이 **etcd에 저장되기 전** 검증(Validate) 및 변경(Mutate)
 
 #### Admission Controller 종류
@@ -503,6 +531,14 @@ kubectl get mutatingwebhookconfigurations pod-identity-webhook -o yaml
 ---
 
 ### 6. OAuth 2.0 & OIDC 이론
+
+![OAuth 2.0의 네 가지 역할](/assets/images/posts/eks-week4/oauth2-roles.png)
+
+Resource Server와 Authorization Server가 **별개 역할**로 분리돼 있다. 구글 로그인처럼 한 회사가 둘 다 운영하더라도 프로토콜상으로는 다른 주체이며, 이 분리가 있어야 EKS API Server(RS)와 Keycloak(AS)을 갈아끼우는 구성이 성립한다.
+
+![OAuth 2.0 Authorization Code Flow](/assets/images/posts/eks-week4/oauth2-code-flow.png)
+
+⑥ `Invoke resource`가 Application과 Service 사이에만 그려져 있다. 사용자는 access token을 직접 만지지 않고, 토큰을 쥔 Application이 대신 리소스를 호출한다. OAuth가 "인증"이 아니라 **"위임"**인 이유가 화살표 방향에 드러난다.
 
 #### OAuth 2.0 개요
 
@@ -582,6 +618,10 @@ sequenceDiagram
 ---
 
 ### 7. JWT
+
+![JWT의 Header/Payload/Signature 구조](/assets/images/posts/eks-week4/jwt-structure.png)
+
+Signature 수식이 header와 payload를 **base64url로 인코딩한 문자열 그대로** 서명 입력으로 쓴다는 점에 주목하자. payload는 암호화가 아니라 인코딩일 뿐이라 누구나 디코딩할 수 있고, 서명은 변조 탐지 수단이지 기밀성 수단이 아니다.
 
 **정의**: **Base64 URL-safe** 인코딩된 JSON, **서명(Signature)**을 통해 무결성 보장
 
@@ -811,6 +851,10 @@ graph TB
 ## 실습 내용 요약
 
 ### 실습 1: Namespace별 ServiceAccount 분리
+
+![Namespace별 ServiceAccount와 Role 분리 구성](/assets/images/posts/eks-week4/namespace-sa-rbac.png)
+
+kubectl 파드가 네임스페이스 **안쪽**에 그려져 있다는 점이 실습을 이해하는 열쇠다. 권한을 테스트하는 주체가 외부 사용자가 아니라 SA 토큰을 자동 마운트한 파드 자신이며, 그래서 별도 kubeconfig 없이도 `kubectl auth can-i`가 해당 SA 권한으로 평가된다.
 
 **목표**: 각 팀이 자신의 Namespace만 접근하도록 RBAC 설정
 

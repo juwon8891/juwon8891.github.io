@@ -53,6 +53,14 @@ graph TD
 
 ### Platform Engineering과 DevOps 진화
 
+![DevOps → GitOps → Platform Engineering 진화](/assets/images/posts/eks-week6/devops-gitops-platform-evolution.png)
+
+셋은 경쟁하는 선택지가 아니라 약 8년 간격으로 쌓인 층이다. DevOps는 철학·문화, GitOps는 그것의 기술적 구현(엔진), Platform Engineering은 사용자 경험(IDP)으로 라벨이 붙어 있고, DevOps에서 GitOps로 향하는 "구현 방법론" 화살표가 의존 방향을 명시한다.
+
+![티켓 기반 인프라 요청의 구조적 병목](/assets/images/posts/eks-week6/ticket-based-bottleneck.png)
+
+병목이 절차가 아니라 **구조**에서 온다는 것을 보여준다. 6개 팀의 화살표가 하나의 운영팀으로 모이는데 거기서 8개 AWS 서비스로 나가는 화살표는 하나뿐이다. 프로비저닝 속도를 제한하는 것은 개발팀의 수요가 아니라 운영팀의 처리량이다.
+
 ```mermaid
 graph LR
     A[DevOps<br/>2009~] --> B[GitOps<br/>2017~]
@@ -79,6 +87,10 @@ graph LR
 ---
 
 ### EKS GitOps 전체 아키텍처
+
+![GitOps 기반 SaaS 솔루션 전체 흐름](/assets/images/posts/eks-week6/gitops-solution-architecture.png)
+
+Helm 차트가 Git이 아니라 **ECR에 OCI 아티팩트로** 저장된다는 점이 중요하다. Git에는 Application Template과 Release Config만 있고, Flux는 Git을 watch하면서 차트는 레지스트리에서 당겨온다. 서로 다른 두 소스가 하나의 reconciliation으로 합쳐지는 구조다.
 
 ```mermaid
 graph TB
@@ -137,6 +149,14 @@ graph TB
 ## 실습 환경 구성
 
 ### 실습 환경
+
+![워크숍 VPC 및 컨트롤러 구성](/assets/images/posts/eks-week6/workshop-vpc-architecture.png)
+
+Gitea가 클러스터 VPC **바깥의 독립 EC2**에서 돌고 code-server IDE는 또 다른 VPC에 있다. 이 GitOps 루프에서 "Git 저장소"는 SaaS 엔드포인트가 아니라 워크숍이 직접 프로비저닝하는 인프라라는 뜻이며, 그래서 Argo Events와 TF Controller를 포함한 여섯 개 컨트롤러가 클러스터 안에 따로 배포된다.
+
+![Producer/Consumer 샘플 애플리케이션 구조](/assets/images/posts/eks-week6/producer-consumer-app.png)
+
+Producer와 Consumer는 서로 직접 통신하지 않고 **오직 SQS를 통해서만** 이어진다. 티어별로 `enable_producer`/`enable_consumer`를 독립적으로 꺼도 상대가 깨지지 않는 이유가 이 비동기 경계에 있다.
 
 | 리소스 | 사양 | 용도 |
 |--------|------|------|
@@ -285,6 +305,14 @@ gitops-gitea-repo/
 ---
 
 ### 1.2 Terraform 및 OpenTofu 컨트롤러
+
+![인프라 블루프린트와 개발자 셀프서비스](/assets/images/posts/eks-week6/infra-blueprint-selfservice.png)
+
+Terraform CRD가 Deployment·Ingress와 나란히 **Helm 차트 안에** 패키징돼 있다. 개발자가 Helm 릴리스 하나를 배포하면 애플리케이션 배포와 AWS 인프라 프로비저닝이 함께 일어나며, 두 개의 파이프라인이 하나의 아티팩트로 접힌다.
+
+![Tofu 컨트롤러 reconciliation 6단계](/assets/images/posts/eks-week6/tofu-controller-flow.png)
+
+`tfplan`과 `tfstate`가 S3 백엔드가 아니라 **클러스터 안 두 개의 Secret**으로 저장된다. Terraform 상태가 쿠버네티스 오브젝트가 되어 원격 백엔드가 아닌 클러스터 자체가 상태 저장소 역할을 하며, TF-Runner는 자기 ServiceAccount를 가진 일회성 파드로 뜬다(IRSA 연결 지점).
 
 #### Tofu 컨트롤러 동작 원리
 
@@ -986,6 +1014,10 @@ tenant-releases         5m    True    Applied revision: main@sha1:abc123
 
 ### SaaS 티어 모델 (Silo, Hybrid, Pool)
 
+![Silo / Hybrid / Pool 세 가지 배포 모델](/assets/images/posts/eks-week6/saas-tier-models.png)
+
+Hybrid는 "Silo의 절반"이 아니다. **웹/프레젠테이션 계층은 공유하고 마이크로서비스와 데이터 계층만 격리**한다. 실습에서 Advanced 티어가 전용 Consumer를 두면서도 Pool의 Producer를 재사용하는 구성이 정확히 이 모델이다.
+
 ```mermaid
 graph TB
     subgraph "SaaS Deployment Models"
@@ -1032,6 +1064,10 @@ graph TB
 - **Pool (Basic Tier)**: 완전 공유 환경, 낮은 격리성, 낮은 비용
 
 ### 티어별 설정
+
+![테넌트별 네임스페이스와 티어 매핑](/assets/images/posts/eks-week6/tenant-namespace-mapping.png)
+
+하나의 Git 저장소가 모든 티어에 공급된다. 티어 차이는 **네임스페이스 수준에서만** 구체화되며(tenant-3의 Hybrid 네임스페이스에는 Product가 아예 없다), 티어 전략은 코드 분기가 아니라 배포 대상 선택의 문제가 된다.
 
 | 티어 | Producer | Consumer | 인프라 | 비용 | 격리 수준 |
 |------|----------|----------|--------|------|-----------|
@@ -1132,6 +1168,10 @@ No resources found in tenant-basic namespace.
 ## 실습 3: 자동화된 테넌트 온보딩/오프보딩
 
 ### Argo Workflows 온보딩 워크플로우
+
+![SQS 메시지에서 시작하는 온보딩 워크플로우](/assets/images/posts/eks-week6/argo-onboarding-flow.png)
+
+워크플로우의 최종 산출물이 **git push 하나**라는 점이 핵심이다. 쿠버네티스 API를 직접 호출해 테넌트를 만들지 않는다. SQS 페이로드의 세 필드(`tenant_id`, `tenant_tier`, `release_version`)가 온보딩 계약의 전부이고, 실제 배포는 그 뒤 Flux가 수행한다.
 
 ```mermaid
 graph LR
@@ -1295,6 +1335,10 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 
 ### Argo Image Updater
 
+![Argo CD Image Updater 라이프사이클](/assets/images/posts/eks-week6/argocd-image-updater.png)
+
+Image Updater가 클러스터를 직접 패치하지 않고 **Git에 되써서**(6단계) 루프를 닫는다. 레지스트리 감시가 Config Git Repository를 우회하지 않으므로, 이미지 자동 갱신에도 "Git만이 desired state를 쓴다"는 GitOps 불변식이 유지된다.
+
 **ArgoCD Image Updater** 패턴: Git 저장소를 감시하여 새 컨테이너 이미지가 Push되면 자동으로 매니페스트를 업데이트하는 패턴이다.
 
 **동작 흐름**:
@@ -1309,6 +1353,10 @@ $ aws sqs receive-message --queue-url https://sqs.../tenant-premium-queue --regi
 - [[CD] ArgoCD Image Updater를 활용한 Continuous Delivery w/AWS ECR - Blog](https://productkeycabook.co.kr/detail/47287090)
 
 ### Argo CD App-of-apps
+
+![App-of-apps 패턴](/assets/images/posts/eks-week6/argocd-app-of-apps.png)
+
+Root Application의 git 소스에 들어 있는 것은 워크로드가 아니라 **Application CR들**이다. Refresh/Sync 사이클이 두 겹으로 쌓이며, 그래서 클러스터를 부트스트랩할 때 손으로 적용해야 하는 것은 Application 하나뿐이다.
 
 **App-of-Apps 패턴**: Root Application이 Child Applications을 관리하는 구조로, 여러 애플리케이션을 계층적으로 배포한다.
 

@@ -33,24 +33,9 @@ vLLM, Triton 같은 서빙 프레임워크를 바로 다루기보다, from first
 
 단일 모델 서빙 서비스는 6가지 구성 요소로 이루어진다.
 
-```mermaid
-graph TB
-    CLIENT[Client] -->|Web generation requests| API[API server<br/>HTTP 요청/응답 처리]
-    API -->|Requests prompts| ENGINE[LLM engine<br/>전체 오케스트레이션]
-    ENGINE <-->|Register requests /<br/>Next prompts batch| WM[Workload manager<br/>큐잉·배칭 스케줄링]
-    ENGINE <-->|Prompts / Results| EXEC[Model executor<br/>워커 프로세스 관리]
+![단일 모델 서빙 시스템 아키텍처](/assets/images/posts/vllm-week2/single-model-architecture.png)
 
-    subgraph "Worker Process (별도 프로세스)"
-        IQ[Input queue]
-        RQ[Result queue]
-        WORKER[Model worker<br/>실제 모델 추론]
-    end
-
-    EXEC --> IQ
-    IQ --> WORKER
-    WORKER --> RQ
-    RQ --> EXEC
-```
+그림 가운데를 가로지르는 점선이 Main process와 Worker process의 경계다. Input queue와 Result queue가 그 경계를 넘나드는 유일한 통로라는 점이 이 설계의 핵심이다.
 
 | 구성 요소 | 역할 |
 |-----------|------|

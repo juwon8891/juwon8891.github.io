@@ -92,6 +92,33 @@ Application Tuning은 프로세스 내부(스레드, 힙)를, VPA는 컨테이�
 
 트래픽이 예측 가능하면 CronHPA 같은 예측형 스케일링으로 미리 늘려두고, 예측이 안 되면 즉시 처리가 필요한지를 따진다. 대기가 가능하면 큐로 버퍼링하고, 즉시 처리가 필수인데 비용 제약이 있으면 Karpenter와 KEDA로 고속 반응형 스케일링을 구성한다. 실무에서는 보통 이 중 2~3개를 조합한다.
 
+**EKS Auto Scaling 전체 구조**:
+
+```mermaid
+graph TB
+    subgraph Pod_Level["Pod 레벨 스케일링"]
+        HPA["HPA<br/>메트릭 기반"]
+        VPA["VPA<br/>리소스 최적화"]
+        KEDA["KEDA<br/>이벤트 기반<br/>Scale to Zero"]
+        CPA["CPA<br/>클러스터 비례"]
+    end
+
+    subgraph Node_Level["노드 레벨 스케일링"]
+        CAS["Cluster Autoscaler<br/>ASG 기반<br/>3-5분 소요"]
+        Karpenter["Karpenter<br/>Just-in-time<br/>1-2분 소요<br/>비용 최적화"]
+    end
+
+    subgraph Serverless["서버리스"]
+        Fargate["AWS Fargate<br/>노드 관리 불필요<br/>Pod 격리"]
+    end
+
+    HPA -.->|Pending Pod 발생| CAS
+    KEDA -.->|Pending Pod 발생| Karpenter
+
+    Pod_Level -.->|노드 부족 시| Node_Level
+
+```
+
 ### 1. HPA (Horizontal Pod Autoscaler)
 
 **정의**: CPU, 메모리, 커스텀 메트릭 기반으로 Pod 수를 자동 조정
@@ -148,6 +175,22 @@ spec:
 - API 서버 부하 분산
 - 배치 작업 동적 병렬 처리
 
+**HPA 동작 흐름**:
+
+```mermaid
+graph TD
+    A[Kubelet] -->|메트릭 수집| B[Metrics Server]
+    B -->|메트릭 제공| C[HPA Controller]
+    C -->|주기적 확인<br/>기본 15초| D{현재 메트릭 vs Target}
+    D -->|현재 > Target| E[Scale Up]
+    D -->|현재 < Target| F[Scale Down<br/>5분 안정화]
+    D -->|현재 = Target| G[유지]
+    E -->|replicas 증가| H[ReplicaSet]
+    F -->|replicas 감소| H
+    H -->|Pod 생성/제거| I[Pod]
+
+```
+
 ### 2. VPA (Vertical Pod Autoscaler)
 
 **정의**: Pod의 CPU/메모리 requests/limits를 자동으로 조정
@@ -196,6 +239,27 @@ spec:
 - Pod 재시작 발생 (Recreate/Auto 모드)
 - StatefulSet 지원 제한적
 
+**VPA 컴포넌트 상호작용**:
+
+```mermaid
+graph TD
+    A[Pod] -->|메트릭 수집| B[Metrics Server]
+    B -->|과거 메트릭| C[VPA Recommender]
+    C -->|분석| D[권장 값 계산<br/>Target, Lower, Upper]
+    D -->|VPA 객체 업데이트| E[VPA Status]
+
+    E -->|updateMode: Auto/Recreate| F[VPA Updater]
+    F -->|오래된 Pod 식별| G[Pod Eviction]
+    G -->|Pod 재생성| H[VPA Admission Controller]
+    H -->|권장 값 주입<br/>requests/limits| I[새 Pod]
+
+    E -->|updateMode: Initial| J[신규 Pod 생성 시]
+    J --> H
+
+    E -->|updateMode: Off| K[권장 값만 표시]
+
+```
+
 ### 3. KEDA (Kubernetes Event-driven Autoscaling)
 
 **정의**: 외부 이벤트 소스 메트릭 기반 Pod 스케일링 (0 → N, N → 0 지원)
@@ -241,6 +305,23 @@ spec:
 - 외부 이벤트 소스 직접 통합
 - HPA와 함께 동작 (HPA를 자동 생성/관리)
 
+**KEDA 아키텍처**:
+
+```mermaid
+graph LR
+    A[External Event Source<br/>SQS, Kafka, Prometheus] -->|메트릭 조회| B[KEDA Scaler]
+    B -->|메트릭 변환| C[KEDA Metrics Server]
+    C -->|Kubernetes Metrics API| D[HPA]
+    D -->|replicas 조정| E[Deployment]
+    E -->|Pod 생성/제거| F[Pod]
+
+    G[ScaledObject CRD] -.->|정의| B
+    B -->|HPA 자동 생성| D
+
+    F -->|Scale to Zero<br/>가능| H[0 Replicas]
+
+```
+
 ### 4. CPA (Cluster Proportional Autoscaler)
 
 **정의**: 클러스터 크기(노드/코어 수)에 비례하여 Deployment/ReplicaSet Replica 수 조정
@@ -276,6 +357,28 @@ replicas를 6으로 올렸을 때 4개는 기존 노드에 배치되지만 5·6�
 - 노드 추가 시간 지연 (EC2 인스턴스 부팅)
 - 단일 노드 그룹 환경에서 비효율적
 - Spot Instance 관리 제한적
+
+**Cluster Autoscaler와 Karpenter 비교**:
+
+```mermaid
+graph TB
+    subgraph CAS["Cluster Autoscaler"]
+        A1[Pending Pod 감지] --> A2[ASG 확인]
+        A2 --> A3[ASG Desired 증가]
+        A3 --> A4[EC2 인스턴스 부팅<br/>3-5분 소요]
+        A4 --> A5[노드 등록]
+        A5 --> A6[Pod 스케줄링]
+    end
+
+    subgraph Karpenter["Karpenter"]
+        B1[Pending Pod 감지] --> B2[NodePool 평가]
+        B2 --> B3[최적 인스턴스 타입 선택<br/>Spot/On-Demand 혼합]
+        B3 --> B4[EC2 직접 생성<br/>1-2분 소요]
+        B4 --> B5[노드 등록]
+        B5 --> B6[Pod 스케줄링]
+    end
+
+```
 
 ### 6. Karpenter
 
@@ -329,82 +432,7 @@ spec:
 - **Expiration**: 노드 수명 만료 시 자동 교체
 - **Interruption**: Spot Interruption 대응
 
-### 7. AWS Fargate
-
-**정의**: 서버리스 컨테이너 컴퓨팅 엔진, Pod별 격리된 실행 환경 제공
-
-- **노드 관리 불필요**: EC2 인스턴스 없이 Pod 직접 실행
-- **보안 격리**: 각 Pod가 독립된 microVM에서 실행
-- **자동 스케일링**: Pod 수만큼 컴퓨팅 리소스 자동 할당
-
-**제약 사항**:
-- Daemonset 사용 불가
-- Privileged Container 지원 안 함
-- HostNetwork, HostPort 사용 제한
-- EBS 볼륨 미지원 (EFS 사용 가능)
-- GPU 미지원
-
-**비용**:
-- vCPU 및 메모리 사용량 기준 과금
-- 최소 과금 단위: vCPU 0.25, 메모리 0.5GB
-
----
-
-## Mermaid 다이어그램
-
-### 1. HPA 동작 흐름
-
-```mermaid
-graph TD
-    A[Kubelet] -->|메트릭 수집| B[Metrics Server]
-    B -->|메트릭 제공| C[HPA Controller]
-    C -->|주기적 확인<br/>기본 15초| D{현재 메트릭 vs Target}
-    D -->|현재 > Target| E[Scale Up]
-    D -->|현재 < Target| F[Scale Down<br/>5분 안정화]
-    D -->|현재 = Target| G[유지]
-    E -->|replicas 증가| H[ReplicaSet]
-    F -->|replicas 감소| H
-    H -->|Pod 생성/제거| I[Pod]
-
-```
-### 2. KEDA 아키텍처
-
-```mermaid
-graph LR
-    A[External Event Source<br/>SQS, Kafka, Prometheus] -->|메트릭 조회| B[KEDA Scaler]
-    B -->|메트릭 변환| C[KEDA Metrics Server]
-    C -->|Kubernetes Metrics API| D[HPA]
-    D -->|replicas 조정| E[Deployment]
-    E -->|Pod 생성/제거| F[Pod]
-
-    G[ScaledObject CRD] -.->|정의| B
-    B -->|HPA 자동 생성| D
-
-    F -->|Scale to Zero<br/>가능| H[0 Replicas]
-
-```
-### 3. Cluster Autoscaler vs Karpenter
-
-```mermaid
-graph TB
-    subgraph CAS["Cluster Autoscaler"]
-        A1[Pending Pod 감지] --> A2[ASG 확인]
-        A2 --> A3[ASG Desired 증가]
-        A3 --> A4[EC2 인스턴스 부팅<br/>3-5분 소요]
-        A4 --> A5[노드 등록]
-        A5 --> A6[Pod 스케줄링]
-    end
-
-    subgraph Karpenter["Karpenter"]
-        B1[Pending Pod 감지] --> B2[NodePool 평가]
-        B2 --> B3[최적 인스턴스 타입 선택<br/>Spot/On-Demand 혼합]
-        B3 --> B4[EC2 직접 생성<br/>1-2분 소요]
-        B4 --> B5[노드 등록]
-        B5 --> B6[Pod 스케줄링]
-    end
-
-```
-### 4. Karpenter Provisioning 워크플로우
+**Provisioning 워크플로우**:
 
 ```mermaid
 sequenceDiagram
@@ -427,7 +455,8 @@ sequenceDiagram
     P->>N: Pod 실행
 
 ```
-### 5. Karpenter Disruption 메커니즘
+
+**Disruption 메커니즘**:
 
 ```mermaid
 graph TD
@@ -449,52 +478,25 @@ graph TD
     K --> F
 
 ```
-### 6. VPA 컴포넌트 상호작용
 
-```mermaid
-graph TD
-    A[Pod] -->|메트릭 수집| B[Metrics Server]
-    B -->|과거 메트릭| C[VPA Recommender]
-    C -->|분석| D[권장 값 계산<br/>Target, Lower, Upper]
-    D -->|VPA 객체 업데이트| E[VPA Status]
+### 7. AWS Fargate
 
-    E -->|updateMode: Auto/Recreate| F[VPA Updater]
-    F -->|오래된 Pod 식별| G[Pod Eviction]
-    G -->|Pod 재생성| H[VPA Admission Controller]
-    H -->|권장 값 주입<br/>requests/limits| I[새 Pod]
+**정의**: 서버리스 컨테이너 컴퓨팅 엔진, Pod별 격리된 실행 환경 제공
 
-    E -->|updateMode: Initial| J[신규 Pod 생성 시]
-    J --> H
+- **노드 관리 불필요**: EC2 인스턴스 없이 Pod 직접 실행
+- **보안 격리**: 각 Pod가 독립된 microVM에서 실행
+- **자동 스케일링**: Pod 수만큼 컴퓨팅 리소스 자동 할당
 
-    E -->|updateMode: Off| K[권장 값만 표시]
+**제약 사항**:
+- Daemonset 사용 불가
+- Privileged Container 지원 안 함
+- HostNetwork, HostPort 사용 제한
+- EBS 볼륨 미지원 (EFS 사용 가능)
+- GPU 미지원
 
-```
-### 7. EKS Auto Scaling 전체 구조
-
-```mermaid
-graph TB
-    subgraph Pod_Level["Pod 레벨 스케일링"]
-        HPA["HPA<br/>메트릭 기반"]
-        VPA["VPA<br/>리소스 최적화"]
-        KEDA["KEDA<br/>이벤트 기반<br/>Scale to Zero"]
-        CPA["CPA<br/>클러스터 비례"]
-    end
-
-    subgraph Node_Level["노드 레벨 스케일링"]
-        CAS["Cluster Autoscaler<br/>ASG 기반<br/>3-5분 소요"]
-        Karpenter["Karpenter<br/>Just-in-time<br/>1-2분 소요<br/>비용 최적화"]
-    end
-
-    subgraph Serverless["서버리스"]
-        Fargate["AWS Fargate<br/>노드 관리 불필요<br/>Pod 격리"]
-    end
-
-    HPA -.->|Pending Pod 발생| CAS
-    KEDA -.->|Pending Pod 발생| Karpenter
-
-    Pod_Level -.->|노드 부족 시| Node_Level
-
-```
+**비용**:
+- vCPU 및 메모리 사용량 기준 과금
+- 최소 과금 단위: vCPU 0.25, 메모리 0.5GB
 
 ---
 

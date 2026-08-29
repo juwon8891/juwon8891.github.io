@@ -105,6 +105,27 @@ graph LR
 
 ---
 
+**K8S API 접근 제어 흐름**:
+
+```mermaid
+graph LR
+    Request[kubectl get pods] --> AuthN[Authentication<br/>인증]
+    AuthN --> AuthZ[Authorization<br/>RBAC]
+    AuthZ --> Admission[Admission Control<br/>Webhook]
+    Admission --> etcd[(etcd<br/>저장)]
+
+    AuthN -.-> X509[X.509 Client Cert]
+    AuthN -.-> SA[ServiceAccount JWT]
+    AuthN -.-> IAM[AWS IAM Authenticator]
+    AuthN -.-> OIDC[OIDC Token]
+
+    AuthZ -.-> RBAC[Role + RoleBinding]
+
+    Admission -.-> Mutating[MutatingWebhook<br/>요청 변경]
+    Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
+
+```
+
 ### 2. EKS 인증 메커니즘
 
 ![EKS kubectl 인증/인가 9단계 흐름](/assets/images/posts/eks-week4/eks-authn-authz-flow.png)
@@ -263,6 +284,35 @@ spec:
 
 ---
 
+**EKS kubectl 인증 흐름 (AWS IAM Authenticator)**:
+
+```mermaid
+sequenceDiagram
+    participant User as kubectl
+    participant Plugin as aws-iam-authenticator<br/>(Client Plugin)
+    participant STS as AWS STS
+    participant API as K8S API Server
+    participant Webhook as aws-iam-authenticator<br/>(Webhook Server)
+    participant ConfigMap as ConfigMap<br/>aws-auth
+
+    User->>Plugin: kubectl get nodes
+    Plugin->>STS: GetCallerIdentity<br/>(Presigned URL 생성)
+    STS-->>Plugin: Presigned URL<br/>(15분 유효)
+    Plugin->>Plugin: JWT Token 생성<br/>(URL을 Payload에 포함)
+    Plugin->>API: Authorization: Bearer <JWT>
+
+    API->>Webhook: Token Review 요청
+    Webhook->>STS: GetCallerIdentity<br/>(Presigned URL 실행)
+    STS-->>Webhook: IAM User/Role ARN
+    Webhook->>ConfigMap: ARN → K8S User/Group 조회
+    ConfigMap-->>Webhook: Username: arn:aws:iam::...<br/>Groups: system:masters
+    Webhook-->>API: Authenticated ✓
+
+    API->>API: RBAC 검증<br/>(system:masters → Full Access)
+    API-->>User: Node List
+
+```
+
 ### 3. IRSA
 
 ![IRSA 전체 토큰 흐름](/assets/images/posts/eks-week4/irsa-token-flow.png)
@@ -399,6 +449,37 @@ kubectl exec -it aws-cli -n dev-team -- aws s3 ls
 
 ---
 
+**IRSA 전체 흐름**:
+
+```mermaid
+sequenceDiagram
+    participant Pod
+    participant Webhook as Pod Identity<br/>MutatingWebhook
+    participant Kubelet
+    participant STS as AWS STS
+    participant OIDC as EKS OIDC<br/>Provider
+    participant IAM as AWS IAM
+    participant S3 as AWS S3
+
+    Note over Pod: 1. Pod 생성
+    Pod->>Webhook: Pod Create Request
+    Webhook->>Pod: Env 주입:<br/>AWS_ROLE_ARN<br/>AWS_WEB_IDENTITY_TOKEN_FILE
+    Kubelet->>Pod: Projected Volume 마운트<br/>(JWT Token)
+
+    Note over Pod: 2. AWS SDK 호출
+    Pod->>STS: AssumeRoleWithWebIdentity<br/>(JWT + Role ARN)
+    STS->>OIDC: JWT 검증 요청<br/>(iss, aud, sub 확인)
+    OIDC-->>STS: Valid ✓
+    STS->>IAM: Trust Policy 확인
+    IAM-->>STS: Allow ✓
+    STS-->>Pod: 임시 자격 증명<br/>(AccessKeyId, SecretAccessKey, SessionToken)
+
+    Note over Pod: 3. AWS API 호출
+    Pod->>S3: ListBuckets<br/>(임시 자격 증명)
+    S3-->>Pod: Bucket List
+
+```
+
 ### 4. Authorization (RBAC)
 
 ![RoleBinding을 통한 Subject-Role M:N 연결](/assets/images/posts/eks-week4/rolebinding-mn.png)
@@ -491,6 +572,42 @@ kubectl auth can-i delete pods --as=system:serviceaccount:dev-team:dev-k8s -n de
 | **cluster-admin** | 클러스터 전체 슈퍼유저 권한 |
 
 ---
+
+**Namespace별 ServiceAccount 분리**:
+
+```mermaid
+graph TB
+    subgraph EKS Cluster
+        subgraph Namespace: dev-team
+            SA1[ServiceAccount<br/>dev-k8s]
+            Role1[Role<br/>pod-viewer]
+            RB1[RoleBinding]
+            Pod1[Pod<br/>kubectl-pod]
+
+            SA1 --> Pod1
+            RB1 --> SA1
+            RB1 --> Role1
+        end
+
+        subgraph Namespace: infra-team
+            SA2[ServiceAccount<br/>infra-k8s]
+            Role2[Role<br/>pod-viewer]
+            RB2[RoleBinding]
+            Pod2[Pod<br/>kubectl-pod]
+
+            SA2 --> Pod2
+            RB2 --> SA2
+            RB2 --> Role2
+        end
+    end
+
+    Pod1 -.->|kubectl get pods<br/>-n dev-team| Allow1[Allow]
+    Pod1 -.->|kubectl get pods<br/>-n infra-team| Deny1[Forbidden]
+
+    Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[Allow]
+    Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[Forbidden]
+
+```
 
 ### 5. Admission Control
 
@@ -617,6 +734,62 @@ sequenceDiagram
 
 ---
 
+**OIDC Authorization Code Flow (상세)**:
+
+```mermaid
+sequenceDiagram
+    participant User as Resource Owner
+    participant Browser as User-Agent<br/>(Browser)
+    participant App as Client<br/>(Application)
+    participant Keycloak as Authorization Server<br/>(Keycloak)
+    participant API as Resource Server<br/>(API Server)
+
+    User->>Browser: 1. "로그인" 클릭
+    Browser->>App: 2. GET /login
+    App->>Browser: 3. Redirect to Keycloak<br/>(client_id, redirect_uri, scope=openid)
+    Browser->>Keycloak: 4. Authorization Request
+    Keycloak->>Browser: 5. 로그인 페이지
+    User->>Browser: 6. ID/PW 입력
+    Browser->>Keycloak: 7. POST /auth (Credentials)
+    Keycloak->>Browser: 8. Redirect to App<br/>(authorization_code)
+    Browser->>App: 9. GET /callback?code=XXXXX
+    App->>Keycloak: 10. Token Request<br/>(code + client_secret)
+    Keycloak->>App: 11. Access Token<br/>+ ID Token (JWT)<br/>+ Refresh Token
+    App->>App: 12. ID Token 검증<br/>(사용자 인증 완료)
+    App->>API: 13. API Request<br/>(Bearer Access Token)
+    API->>Keycloak: 14. Token Introspection<br/>(Optional)
+    Keycloak-->>API: 15. Token Valid ✓
+    API-->>App: 16. API Response
+
+```
+
+**OAuth 2.0 vs OIDC vs IRSA 비교**:
+
+```mermaid
+graph TB
+    subgraph oauth["OAuth 2.0"]
+        OA1[인가<br/>Authorization]
+        OA2[Access Token]
+        OA3[권한 위임]
+    end
+
+    subgraph oidc["OIDC"]
+        OIDC1[인증 + 인가<br/>Authentication + Authorization]
+        OIDC2[ID Token JWT<br/>+ Access Token]
+        OIDC3[사용자 신원 확인]
+    end
+
+    subgraph irsa["IRSA"]
+        IRSA1[Pod → AWS 인증<br/>AssumeRoleWithWebIdentity]
+        IRSA2[ServiceAccount JWT<br/>→ AWS 임시 자격 증명]
+        IRSA3[Pod별 최소 권한]
+    end
+
+    oauth -.->|+ ID Token| oidc
+    oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
+
+```
+
 ### 7. JWT
 
 ![JWT의 Header/Payload/Signature 구조](/assets/images/posts/eks-week4/jwt-structure.png)
@@ -654,122 +827,7 @@ graph LR
 
 ---
 
-## Mermaid 다이어그램 모음
-
-### 1. K8S API 접근 제어 흐름
-
-```mermaid
-graph LR
-    Request[kubectl get pods] --> AuthN[Authentication<br/>인증]
-    AuthN --> AuthZ[Authorization<br/>RBAC]
-    AuthZ --> Admission[Admission Control<br/>Webhook]
-    Admission --> etcd[(etcd<br/>저장)]
-
-    AuthN -.-> X509[X.509 Client Cert]
-    AuthN -.-> SA[ServiceAccount JWT]
-    AuthN -.-> IAM[AWS IAM Authenticator]
-    AuthN -.-> OIDC[OIDC Token]
-
-    AuthZ -.-> RBAC[Role + RoleBinding]
-
-    Admission -.-> Mutating[MutatingWebhook<br/>요청 변경]
-    Admission -.-> Validating[ValidatingWebhook<br/>요청 검증]
-
-```
-### 2. IRSA 전체 흐름
-
-```mermaid
-sequenceDiagram
-    participant Pod
-    participant Webhook as Pod Identity<br/>MutatingWebhook
-    participant Kubelet
-    participant STS as AWS STS
-    participant OIDC as EKS OIDC<br/>Provider
-    participant IAM as AWS IAM
-    participant S3 as AWS S3
-
-    Note over Pod: 1. Pod 생성
-    Pod->>Webhook: Pod Create Request
-    Webhook->>Pod: Env 주입:<br/>AWS_ROLE_ARN<br/>AWS_WEB_IDENTITY_TOKEN_FILE
-    Kubelet->>Pod: Projected Volume 마운트<br/>(JWT Token)
-
-    Note over Pod: 2. AWS SDK 호출
-    Pod->>STS: AssumeRoleWithWebIdentity<br/>(JWT + Role ARN)
-    STS->>OIDC: JWT 검증 요청<br/>(iss, aud, sub 확인)
-    OIDC-->>STS: Valid ✓
-    STS->>IAM: Trust Policy 확인
-    IAM-->>STS: Allow ✓
-    STS-->>Pod: 임시 자격 증명<br/>(AccessKeyId, SecretAccessKey, SessionToken)
-
-    Note over Pod: 3. AWS API 호출
-    Pod->>S3: ListBuckets<br/>(임시 자격 증명)
-    S3-->>Pod: Bucket List
-
-```
-### 3. EKS kubectl 인증 흐름 (AWS IAM Authenticator)
-
-```mermaid
-sequenceDiagram
-    participant User as kubectl
-    participant Plugin as aws-iam-authenticator<br/>(Client Plugin)
-    participant STS as AWS STS
-    participant API as K8S API Server
-    participant Webhook as aws-iam-authenticator<br/>(Webhook Server)
-    participant ConfigMap as ConfigMap<br/>aws-auth
-
-    User->>Plugin: kubectl get nodes
-    Plugin->>STS: GetCallerIdentity<br/>(Presigned URL 생성)
-    STS-->>Plugin: Presigned URL<br/>(15분 유효)
-    Plugin->>Plugin: JWT Token 생성<br/>(URL을 Payload에 포함)
-    Plugin->>API: Authorization: Bearer <JWT>
-
-    API->>Webhook: Token Review 요청
-    Webhook->>STS: GetCallerIdentity<br/>(Presigned URL 실행)
-    STS-->>Webhook: IAM User/Role ARN
-    Webhook->>ConfigMap: ARN → K8S User/Group 조회
-    ConfigMap-->>Webhook: Username: arn:aws:iam::...<br/>Groups: system:masters
-    Webhook-->>API: Authenticated ✓
-
-    API->>API: RBAC 검증<br/>(system:masters → Full Access)
-    API-->>User: Node List
-
-```
-### 4. Namespace별 ServiceAccount 분리 실습
-
-```mermaid
-graph TB
-    subgraph EKS Cluster
-        subgraph Namespace: dev-team
-            SA1[ServiceAccount<br/>dev-k8s]
-            Role1[Role<br/>pod-viewer]
-            RB1[RoleBinding]
-            Pod1[Pod<br/>kubectl-pod]
-
-            SA1 --> Pod1
-            RB1 --> SA1
-            RB1 --> Role1
-        end
-
-        subgraph Namespace: infra-team
-            SA2[ServiceAccount<br/>infra-k8s]
-            Role2[Role<br/>pod-viewer]
-            RB2[RoleBinding]
-            Pod2[Pod<br/>kubectl-pod]
-
-            SA2 --> Pod2
-            RB2 --> SA2
-            RB2 --> Role2
-        end
-    end
-
-    Pod1 -.->|kubectl get pods<br/>-n dev-team| Allow1[Allow]
-    Pod1 -.->|kubectl get pods<br/>-n infra-team| Deny1[Forbidden]
-
-    Pod2 -.->|kubectl get pods<br/>-n infra-team| Allow2[Allow]
-    Pod2 -.->|kubectl get pods<br/>-n dev-team| Deny2[Forbidden]
-
-```
-### 5. Bearer Token (JWT) 동작 원리
+**Bearer Token (JWT) 동작 원리**:
 
 ```mermaid
 graph TB
@@ -791,62 +849,6 @@ graph TB
     RBAC -->|6. Allow/Deny| Response[API Response]
 
 ```
-### 6. OIDC Authorization Code Flow (상세)
-
-```mermaid
-sequenceDiagram
-    participant User as Resource Owner
-    participant Browser as User-Agent<br/>(Browser)
-    participant App as Client<br/>(Application)
-    participant Keycloak as Authorization Server<br/>(Keycloak)
-    participant API as Resource Server<br/>(API Server)
-
-    User->>Browser: 1. "로그인" 클릭
-    Browser->>App: 2. GET /login
-    App->>Browser: 3. Redirect to Keycloak<br/>(client_id, redirect_uri, scope=openid)
-    Browser->>Keycloak: 4. Authorization Request
-    Keycloak->>Browser: 5. 로그인 페이지
-    User->>Browser: 6. ID/PW 입력
-    Browser->>Keycloak: 7. POST /auth (Credentials)
-    Keycloak->>Browser: 8. Redirect to App<br/>(authorization_code)
-    Browser->>App: 9. GET /callback?code=XXXXX
-    App->>Keycloak: 10. Token Request<br/>(code + client_secret)
-    Keycloak->>App: 11. Access Token<br/>+ ID Token (JWT)<br/>+ Refresh Token
-    App->>App: 12. ID Token 검증<br/>(사용자 인증 완료)
-    App->>API: 13. API Request<br/>(Bearer Access Token)
-    API->>Keycloak: 14. Token Introspection<br/>(Optional)
-    Keycloak-->>API: 15. Token Valid ✓
-    API-->>App: 16. API Response
-
-```
-### 7. OAuth 2.0 vs OIDC vs IRSA 비교
-
-```mermaid
-graph TB
-    subgraph oauth["OAuth 2.0"]
-        OA1[인가<br/>Authorization]
-        OA2[Access Token]
-        OA3[권한 위임]
-    end
-
-    subgraph oidc["OIDC"]
-        OIDC1[인증 + 인가<br/>Authentication + Authorization]
-        OIDC2[ID Token JWT<br/>+ Access Token]
-        OIDC3[사용자 신원 확인]
-    end
-
-    subgraph irsa["IRSA"]
-        IRSA1[Pod → AWS 인증<br/>AssumeRoleWithWebIdentity]
-        IRSA2[ServiceAccount JWT<br/>→ AWS 임시 자격 증명]
-        IRSA3[Pod별 최소 권한]
-    end
-
-    oauth -.->|+ ID Token| oidc
-    oidc -.->|K8S SA JWT<br/>+ OIDC Provider| irsa
-
-```
-
----
 
 ## 실습 내용 요약
 
@@ -1250,7 +1252,7 @@ kubectl create clusterrolebinding dev-k8s-cluster-view \
 ---
 
 
-Week 4에서는 EKS 환경에서의 **Identity and Access Management**를 학습했습니다.
+Week 4에서는 EKS 환경에서의 **Identity and Access Management**를 학습했다.
 
 ### 핵심 요약
 

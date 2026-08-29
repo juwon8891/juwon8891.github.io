@@ -115,6 +115,16 @@ rke2 --version
 
 **Server 노드** = Control Plane 노드
 
+![RKE2 Server/Agent 노드 아키텍처](/assets/images/posts/k8s-deploy-week7/rke2-server-agent-architecture.png)
+
+이 그림에서 눈여겨볼 것은 control plane 컴포넌트들이 systemd 유닛이 아니라 kubelet의 **Static pods 경계 안쪽**에 그려져 있다는 점이다. 실제로 supervisor가 직접 관리하는 프로세스는 kubelet 하나뿐이고, etcd·api-server·scheduler는 그 kubelet이 static pod로 띄운다. 반대로 kube-proxy·CoreDNS·CNI(canal)는 서버 노드 프로세스가 아니라 Helm 또는 raw manifest로 배포되는 워크로드로 분류돼 있다.
+
+서버 노드가 부팅될 때 이 컴포넌트들이 어떤 순서로 올라오는지는 아래와 같다.
+
+![RKE2 Server 노드 기동 시퀀스](/assets/images/posts/k8s-deploy-week7/rke2-server-boot-sequence.png)
+
+선형 스크립트가 아니라 **goroutine 의존 사슬**이라는 게 핵심이다. 모든 컴포넌트 goroutine이 대기 상태로 먼저 등록된 뒤(etcd는 kubelet 대기, apiserver는 etcd 대기, kcm·scheduler·helm-controller는 apiserver 대기) 앞 단계의 ready 신호를 받아야 차례로 풀린다. 특히 마지막 `par` 블록에서 kcm·scheduler·helm-controller 셋이 apiserver ready 하나로 **동시에** 해제된다. `encryption-provider-config`가 apiserver 기동보다 먼저 작성된다는 점도 함께 드러난다.
+
 #### 컴포넌트 구성
 
 ```mermaid
@@ -173,6 +183,10 @@ graph TB
 ### 2. Agent 노드 구성
 
 **Agent 노드** = Worker 노드
+
+![RKE2 Agent 노드 기동 시퀀스](/assets/images/posts/k8s-deploy-week7/rke2-agent-boot-sequence.png)
+
+Server 시퀀스와 나란히 보면 Agent 경로가 확연히 짧다. `Initialize Server` 단계 자체가 없고 `Initialize Agent`가 곧 진입점이며, 런타임 이미지에서 `bin/`만 꺼내고 `charts/`는 꺼내지 않는다. Canal DaemonSet에 "server의 helm-controller가 배포한" 주석이 붙어 있는 것도 그래서다. 에이전트는 차트를 직접 렌더링하지 않는다.
 
 #### 컴포넌트 구성
 
@@ -252,6 +266,10 @@ disable: rke2-servicelb
 
 ```
 ### 4. 고가용성(HA) 구성
+
+![Fixed Registration Address 기반 HA 구성](/assets/images/posts/k8s-deploy-week7/rke2-ha-registration-address.png)
+
+하나의 Fixed Registration Address가 서로 다른 두 종류의 트래픽을 받는다는 점이 중요하다. Agent가 클러스터에 **등록**할 때도 이 주소를 쓰고, 사용자가 `kubectl`로 API를 호출할 때도 같은 주소를 쓴다. 반면 Server들끼리는 점선 메시로 직접 연결돼 embedded etcd 쿼럼을 유지하므로 이 로드밸런서에 의존하지 않는다. 결국 **첫 Agent가 join하기 전에 이 주소가 먼저 존재해야 한다**.
 
 #### 4.1 Embedded etcd (권장)
 
@@ -828,6 +846,14 @@ systemctl start rke2-server
 
 ### 2. CAPI 주요 개념
 
+![노드를 파드처럼 다루는 Cluster API](/assets/images/posts/k8s-deploy-week7/capi-node-as-pod.png)
+
+`apps/v1`의 Deployment → ReplicaSet → Pod 3계층을 `cluster.x-k8s.io/v1beta1`이 MachineDeployment → MachineSet → Machine으로 그대로 옮겨온 구조다. 다만 오른쪽 트리를 보면 **매핑이 대칭이 아니다**. Worker Nodes는 3계층을 온전히 거치지만 Master Nodes는 중간 계층이 없어 `KubeadmControlPlane`이 `Machine`을 직접 소유한다. 컨트롤 플레인에는 MachineSet이 존재하지 않는다.
+
+![CAPI 커스텀 리소스 관계 (Self-provisioned)](/assets/images/posts/k8s-deploy-week7/capi-resources-self-provisioned.png)
+
+주목할 것은 아래쪽 `ownerReferences` 화살표가 `infrastructureRef` 화살표들과 **반대 방향**이라는 점이다. 참조는 Cluster에서 말단으로 내려가지만 소유권은 말단에서 Cluster로 올라온다. `Cluster` 오브젝트 하나만 지워도 그 아래 모든 AWSMachine과 EC2 인스턴스가 가비지 컬렉션되는 이유가 이 역방향 간선에 있다.
+
 #### 2.1 Management Cluster vs Workload Cluster
 
 ```mermaid
@@ -866,6 +892,10 @@ graph TB
 | **InfrastructureTemplate** | 인프라별 설정 | AWS EC2 인스턴스 타입 |
 
 ### 3. CAPI 아키텍처
+
+![Management 클러스터가 Workload 클러스터를 프로비저닝하는 흐름](/assets/images/posts/k8s-deploy-week7/capi-management-workload.png)
+
+Core System과 각 Provider를 잇는 화살표가 점선이고 방향이 Provider → Core라는 점이 중요하다. Core가 Provider를 명령형으로 호출하는 게 아니라, Provider가 Core의 리소스를 watch하며 reconcile한다. 또 AWS에 만든 클러스터와 IDC(BYOH)에 만든 클러스터가 똑같이 `v1.25`로 표기돼 있다 — Provider만 갈아끼우면 동일한 매니페스트로 퍼블릭 클라우드와 온프레미스에 버전이 같은 클러스터를 얻는다.
 
 ```mermaid
 graph TB
@@ -923,6 +953,14 @@ graph TB
 | **CAPV** | vSphere Provider | VMware vSphere |
 | **CAPO** | OpenStack Provider | OpenStack |
 | **CAPD** | Docker Provider | Docker 컨테이너 (개발/테스트) |
+
+![Provider 카탈로그와 리소스별 참조 방식](/assets/images/posts/k8s-deploy-week7/capi-provider-catalog.png)
+
+Provider 선택이 하나의 축이 아니라 Bootstrap·Control Plane·Infrastructure **세 축의 독립적인 조합**이라는 점이 이 카탈로그에서 드러난다. 같은 Kubeadm을 Bootstrap과 Control Plane 양쪽에 쓰면서 Infrastructure만 따로 고를 수 있고, 어느 필드가 무엇을 선택하는지는 우측 YAML의 `controlPlaneRef`와 `infrastructureRef`가 보여준다.
+
+![관리형 서비스(EKS)를 쓸 때의 CAPI 리소스 구성](/assets/images/posts/k8s-deploy-week7/capi-resources-eks.png)
+
+앞의 self-provisioned 구성과 비교하면 관리형 Provider는 이름만 바뀌는 게 아니라 **그래프 모양 자체가 달라진다**. `AWSManagedCluster`에 `(dummy)`가 붙은 것은 인프라를 AWS가 소유하기 때문이고, VPC·NAT·IGW 책임은 `AWSManagedControlPlane` 안으로 들어간다. 무엇보다 `MachineDeployment → MachineSet → Machine` 사슬이 `MachinePool → AWSManagedMachinePool` 하나로 접혀 EKS 관리형 노드그룹에 대응되므로, EC2 인스턴스마다 대응하는 `Machine` 오브젝트가 아예 존재하지 않는다.
 
 #### 4.2 Bootstrap Providers
 

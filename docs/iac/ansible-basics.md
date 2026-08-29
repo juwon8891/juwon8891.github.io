@@ -6,6 +6,10 @@
 
 Ansible은 Red Hat이 개발한 오픈소스 IT 자동화 도구로, 서버 구성 관리, 애플리케이션 배포, 오케스트레이션을 지원한다. Python 기반으로 작성되었으며, 에이전트 설치 없이 SSH를 통해 원격 노드를 관리한다.
 
+![Ansible Server와 Target의 관계](/assets/images/posts/iac-ansible/ansible-server-target.png)
+
+SSH 화살표가 양방향인 점이 핵심이다. Ansible은 Module 코드를 대상 서버로 밀어 넣고 실행 결과를 같은 연결로 되받아온다. 또 Inventory와 Playbook의 역할 분담이 드러나는데, Inventory는 IP·user·Password 같은 **접속 정보**를 갖고 Playbook은 Host·Role·Tasks 같은 **수행할 작업**을 갖는다. 동일한 Playbook을 Inventory만 바꿔 다른 서버군에 그대로 돌릴 수 있는 이유가 이 분리에 있다.
+
 ### Terraform vs Ansible
 
 | 항목 | Terraform | Ansible |

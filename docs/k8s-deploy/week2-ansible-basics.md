@@ -68,6 +68,10 @@ graph LR
 
 ### Control Node vs Managed Node
 
+![Control Node와 Managed Node 구성](/assets/images/posts/k8s-deploy-week2/control-node-managed-node.png)
+
+이 그림이 "에이전트리스"의 실제 의미를 정확히 보여준다. Control Node와 각 Managed Node 사이에 있는 것은 SSH 하나뿐이고, 상주 데몬은 어디에도 없다. 대신 **각 Managed Node에 Python이 그려져 있다** — 에이전트가 필요 없다는 말이 사전 조건이 전혀 없다는 뜻은 아니며, 대상 노드에 Python은 미리 있어야 한다. Ansible은 Module 코드를 그 SSH 세션으로 실어 보내 원격에서 실행시킨다. 관리 대상이 CentOS·Ubuntu뿐 아니라 Windows까지 포함된다는 점도 함께 드러난다.
+
 ```mermaid
 graph TB
     subgraph ControlNode["Control Node (ansible-server)"]

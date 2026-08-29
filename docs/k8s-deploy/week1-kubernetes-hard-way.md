@@ -35,6 +35,18 @@ tags:
 
 ### 3. 실습 환경 구성
 
+![실습 랩 전체 토폴로지](/assets/images/posts/k8s-deploy-week1/lab-architecture.png)
+
+두 가지가 눈에 띈다. 첫째, etcd만 `(:2379, http)` — **평문 HTTP**로 표시돼 있고 나머지 링크는 모두 인증서 기반이다. 둘째, 초록색 "Watch" 화살표 네 개가 전부 kube-apiserver:6443 **안쪽으로** 향한다. 컴포넌트는 당겨오지 밀어 넣지 않으며, 반대 방향인 빨간 Status/Logs 화살표(apiserver → kubelet:10250)만 별도의 역방향 채널이다.
+
+![Jumpbox에서 대상 인프라로의 준비 과정](/assets/images/posts/k8s-deploy-week1/jumpbox-provisioning.png)
+
+컨트롤 플레인 행에 `Pod Network: None`이 명시돼 있다. server에는 Pod CIDR이 아예 배정되지 않으며, 그래서 뒤에서 수동으로 추가하는 라우트가 `10.200.0.0/24`와 `10.200.1.0/24` 둘뿐이다. 빌드 전체가 의존하는 바이너리 버전(etcd 3.6.0, containerd 2.1.0, runc 1.3.0)도 여기 고정된다.
+
+![kind - Kubernetes IN Docker 구조](/assets/images/posts/k8s-deploy-week1/kind-in-docker.png)
+
+중첩이 두 단계다. 노드 컨테이너 **안에서** systemd가 돌고 그것이 또 다른 docker 데몬을 띄운다. kind의 "노드"는 그 자체로 컨테이너 런타임을 품은 컨테이너다. 범례의 색 구분을 보면 kubelet은 일반 프로세스인 반면 apiserver·scheduler·controller-manager는 파드로 뜬다.
+
 **가상머신 구성** (VirtualBox + Vagrant, Debian 12):
 
 | 호스트명 | IP 주소 | 역할 | vCPU | Memory |
@@ -102,6 +114,10 @@ graph TB
 ## CA 및 TLS 인증서 구성
 
 ### 1. Root CA 생성
+
+![Root CA와 API Server 인증서 비교](/assets/images/posts/k8s-deploy-week1/root-ca-vs-apiserver.png)
+
+두 인증서가 동일한 Authority Key Identifier를 공유한다는 점이 체인의 증거이고, `CA:TRUE`와 `CA:FALSE`라는 Basic Constraints 한 줄이 **남을 서명할 수 있는지 없는지**를 가른다. 유효기간도 같은 날 발급이지만 10년 대 1년으로 갈린다.
 
 Kubernetes 클러스터의 모든 인증서를 서명하는 **Root CA** 생성:
 
@@ -258,6 +274,10 @@ X509v3 Subject Alternative Name:
 
 ### 4. 컴포넌트별 인증서 생성
 
+![인증서 계층과 배포 대상](/assets/images/posts/k8s-deploy-week1/certificate-hierarchy.png)
+
+`service-accounts`만 인증서가 아닌 **키 아이콘**으로 그려져 있다. TLS 신원이 아니라 SA 토큰 발급용 서명 키 쌍이기 때문이다. 그리고 kube-proxy가 컨트롤 플레인이 아니라 **Worker 계층**에 node-0/node-1과 나란히 있어 두 워커 노드 모두로 배포된다.
+
 **생성해야 할 인증서 목록**:
 
 | 컴포넌트 | CN | O | 용도 |
@@ -364,6 +384,10 @@ scp ca.key ca.crt \
 ## Kubeconfig 파일 생성
 
 ### 1. Kubeconfig 구조 이해
+
+![kubectl config 명령의 비유](/assets/images/posts/k8s-deploy-week1/kubeconfig-analogy.png)
+
+출입증 그림에 이름과 부서(IT팀)가 **별도 필드**로 그려진 것이 클라이언트 인증서의 CN과 O에 그대로 대응한다. `use-context`가 이미 발급된 세 장 중 하나를 고르는 모습으로 표현된 것도 정확한데, kubeconfig는 여러 신원+클러스터 조합을 동시에 보관하고 그중 하나만 활성화한다.
 
 Kubeconfig는 Kubernetes API Server와 통신하기 위한 **클라이언트 인증 설정 파일**이다.
 
@@ -994,6 +1018,10 @@ kubectl describe clusterrolebindings system:kube-apiserver \
 ## Worker Node 구성
 
 ### 1. Container Runtime 설치
+
+![kubelet → containerd → runc 체인](/assets/images/posts/k8s-deploy-week1/kubelet-containerd-runc.png)
+
+watch 화살표가 API 서버가 아니라 로컬 `manifests` 디렉터리를 향한다. kubelet이 스스로 컨트롤러 역할을 하는 **static pod 경로**를 그린 것이다. 또 runc(OCI)가 containerd(CRI) 다음의 세 번째 홉으로 놓여 있어, 컨테이너를 실제로 만드는 주체가 kubelet도 containerd도 아님을 보여준다.
 
 **설치 컴포넌트** (node-0, node-1):
 
@@ -1726,6 +1754,10 @@ sequenceDiagram
 
 ```
 ### 3. Certificate Subject와 RBAC 관계
+
+![인증서 발급부터 RBAC 평가까지](/assets/images/posts/k8s-deploy-week1/cert-to-rbac-flow.png)
+
+API 서버에서 CN → User와 O → Group이 **두 번의 별도 조회**로 갈라진다는 점이 명확히 드러난다. 그리고 admin 권한의 출처는 인증서 자체가 아니라 `system:masters` 그룹이 cluster-admin에 미리 바인딩돼 있다는 사실이다. 실제로 권한을 주는 것은 CN이 아니라 **O 필드**다.
 
 **인증서 Subject 필드가 Kubernetes에 매핑되는 방식**:
 

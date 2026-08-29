@@ -628,7 +628,7 @@ spec:
 
 ---
 
-## ⬆ Control Plane 업그레이드
+## Control Plane 업그레이드
 
 ### 1. 업그레이드 방법 1: eksctl
 

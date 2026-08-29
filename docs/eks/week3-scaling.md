@@ -80,6 +80,18 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 
 ## 핵심 개념 정리
 
+스케일링 기법은 무엇을 조정하는지에 따라 네 층위로 나뉜다.
+
+![스케일링 기법별 조정 대상 비교](/assets/images/posts/eks-week3/scaling-techniques.png)
+
+Application Tuning은 프로세스 내부(스레드, 힙)를, VPA는 컨테이너 리소스를, HPA는 Pod 개수를, Cluster Autoscaler는 노드 개수를 조정한다. 아래로 갈수록 조정 단위가 커지고 반영에 걸리는 시간도 길어진다.
+
+실무에서 어떤 기법을 고를지는 트래픽 패턴의 예측 가능성에서 출발한다.
+
+![스케일링 전략 의사결정 프레임워크](/assets/images/posts/eks-week3/scaling-decision-framework.png)
+
+트래픽이 예측 가능하면 CronHPA 같은 예측형 스케일링으로 미리 늘려두고, 예측이 안 되면 즉시 처리가 필요한지를 따진다. 대기가 가능하면 큐로 버퍼링하고, 즉시 처리가 필수인데 비용 제약이 있으면 Karpenter와 KEDA로 고속 반응형 스케일링을 구성한다. 실무에서는 보통 이 중 2~3개를 조합한다.
+
 ### 1. HPA (Horizontal Pod Autoscaler)
 
 **정의**: CPU, 메모리, 커스텀 메트릭 기반으로 Pod 수를 자동 조정
@@ -91,6 +103,22 @@ Week 1에서 EKS 클러스터 배포와 기본 구성을 익히고, Week 2에서
 - 최소/최대 Replica 수 지정 가능
 
 **동작 원리**: Metrics Server가 kubelet으로부터 Pod CPU/메모리 메트릭을 수집하면, HPA Controller가 기본 15초 주기로 현재 메트릭 값과 Target을 비교한다. 목표 Replica 수는 `ceil[현재 Replicas × (현재 메트릭 / Target 메트릭)]` 공식으로 계산하며, 결과에 따라 Deployment/ReplicaSet의 `replicas` 필드를 업데이트한다.
+
+![HPA 동작 메커니즘](/assets/images/posts/eks-week3/hpa-mechanism.png)
+
+HPA가 Pod을 직접 만들거나 지우지 않는다는 점이 중요하다. HPA는 Deployment의 replicas 값만 바꾸고, 실제 Pod 생성/삭제는 Deployment가 한다.
+
+메트릭을 여러 개 지정하면 각각에 대해 replica 수를 계산한 뒤 가장 큰 값을 택한다.
+
+![다중 메트릭에서의 replica 수 계산](/assets/images/posts/eks-week3/hpa-multi-metrics.png)
+
+CPU 기준으로는 평균 사용률 (60+90+50)/50 = 200/50이라 4개가 필요하고, QPS 기준으로는 (15+30+12)/20 = 57/20이라 3개가 필요하다. 최종적으로 `Max(4, 3) = 4`가 선택된다. 어느 한 메트릭이라도 과부하면 그쪽에 맞추는 보수적 동작이다.
+
+HPA가 읽는 메트릭은 세 종류이고 각각 경로가 다르다.
+
+![Metrics API 계층 구조](/assets/images/posts/eks-week3/metrics-api-architecture.png)
+
+Resource Metrics API는 cAdvisor → Metrics Server 경로로 CPU/메모리를 제공하고, Custom/External Metrics API는 Prometheus Adapter를 거친다. HPA에서 CPU 외의 메트릭을 쓰려면 이 어댑터 계층이 필요한 이유다.
 
 **설정 예시**:
 
@@ -127,6 +155,10 @@ spec:
 - **Recommender**: 과거 메트릭 분석, 권장 값 계산
 - **Updater**: 오래된 Pod 제거 (재생성 트리거)
 - **Admission Controller**: 새 Pod 생성 시 권장 값 주입
+
+![VPA 동작 메커니즘](/assets/images/posts/eks-week3/vpa-mechanism.png)
+
+VPA는 메트릭과 이벤트를 보고 Pod spec의 리소스 값을 갱신한 뒤, Deployment가 그 새 spec으로 Pod을 재생성하게 한다. HPA가 개수를 바꾸는 것과 달리 VPA는 spec을 바꾸므로 **Pod 재시작이 불가피**하다는 점이 그림에 그대로 드러난다.
 
 **Update Mode**:
 - `Off`: 권장 값만 계산 (적용 안 함)
@@ -171,6 +203,10 @@ spec:
 - **Metrics Server**: 외부 메트릭을 Kubernetes Metrics API로 변환
 - **Controller**: ScaledObject/ScaledJob CRD 관리
 - **Admission Webhooks**: 리소스 검증
+
+![KEDA 구성 요소](/assets/images/posts/eks-week3/keda-components.png)
+
+KEDA가 HPA를 대체하는 게 아니라 그 위에 얹힌다는 구조가 핵심이다. Scaler가 이벤트 소스를 관찰하고, KEDA가 ScaledObject로부터 HPA를 생성하며, 1↔n 구간의 스케일링은 HPA 컨트롤러가 외부 메트릭을 받아 처리한다. 반면 **0↔1 구간만은 KEDA Operator가 직접 담당**한다. HPA 자체는 0으로 줄이지 못하기 때문이며, 이것이 Scale to Zero가 KEDA의 차별점인 이유다.
 
 **지원 Scaler (60+ 종류)**:
 - AWS SQS, CloudWatch, Kinesis
@@ -224,6 +260,14 @@ spec:
 - **Scale Up**: Pending Pod 발생 시 노드 추가 (약 3~5분 소요)
 - **Scale Down**: 노드 사용률 낮을 시 제거 (10분 안정화 후)
 
+![Cluster Autoscaler 동작 메커니즘](/assets/images/posts/eks-week3/cas-mechanism.png)
+
+CAS의 트리거는 CPU 사용률이 아니라 **스케줄 실패**다. 스케줄러가 배치할 노드를 찾지 못해 Pod이 Pending으로 남고, CAS가 그 이벤트를 감지해 클라우드 프로바이더에 노드를 요청한다.
+
+![Pending Pod 감지에서 노드 추가까지](/assets/images/posts/eks-week3/cas-pending-pods.png)
+
+replicas를 6으로 올렸을 때 4개는 기존 노드에 배치되지만 5·6번은 자리가 없어 Pending이 된다(3단계). CAS가 이 상태를 관찰하고(4단계) 노드를 추가하면(5단계) 그제서야 스케줄된다(6단계). **노드가 EC2로 부팅되는 시간이 통째로 지연에 포함**되는 이유가 이 순서에 있다.
+
 **필수 설정**:
 - Auto Scaling Group 태그: `k8s.io/cluster-autoscaler/enabled`, `k8s.io/cluster-autoscaler/myeks`
 - IAM 권한: `autoscaling:DescribeAutoScalingGroups`, `autoscaling:SetDesiredCapacity`, `ec2:DescribeInstanceTypes`
@@ -245,6 +289,10 @@ spec:
 
 - **NodePool**: 노드 프로비저닝 정책 정의
 - **EC2NodeClass**: AWS 인프라 설정 (AMI, UserData, Security Group 등)
+
+![Karpenter 동작 방식](/assets/images/posts/eks-week3/karpenter-workflow.png)
+
+위쪽 경로가 기존 CAS 방식이다. Pending Pod → 클러스터 오토스케일러 → 오토스케일링 그룹 → EC2를 거친다. Karpenter는 이 중간 두 단계를 걷어내고 Pending Pod에서 EC2 플릿으로 직행한다. Auto Scaling Group이라는 간접 계층이 사라지는 것이 속도 차이의 근본 원인이며, 무엇을 띄울지는 NodePool과 EC2NodeClass 두 CRD가 결정한다.
 
 **NodePool 예시**:
 

@@ -69,6 +69,10 @@ NUMA(Non-Uniform Memory Access)는 CPU마다 로컬 메모리를 두어 병목�
 
 ### 멀티 GPU 환경에서 NUMA의 중요성
 
+![8x A100 노드의 내부 토폴로지](/assets/images/posts/ai-dc-week2/8x-a100-topology.png)
+
+각 NIC이 두 CPU 소켓 중 **특정 PCIe 스위치 아래에** 붙어 있다는 점이 핵심이다. GPU와 NIC을 잘못 짝지으면 소켓 경계를 넘어 느린 64GB/s PCIe 경로를 타게 된다. NUMA를 고려한 NIC 어피니티가 왜 필요한지의 구체적 메커니즘이 여기 있다.
+
 GPU와 NIC가 서로 다른 CPU 소켓에 붙으면 모든 통신이 소켓 간 링크(UPI/xGMI)를 거쳐야 한다.
 
 ```
@@ -107,6 +111,10 @@ graph TB
 ```
 
 ### 멀티 GPU 연결 스펙트럼
+
+![GB200 NVL72 인터커넥트 구조](/assets/images/posts/ai-dc-week2/gb200-nvl72.png)
+
+하단 수치에서 All-Reduce 총량(260TB/s)이 All-to-All(130TB/s)의 **정확히 2배**다. All-Reduce가 reduce-scatter와 all-gather 두 단계로 데이터를 두 번 옮기기 때문이며, 스위치 패브릭이 그 2배를 감당하도록 설계돼 있다는 뜻이다.
 
 같은 서버에 GPU 8개가 있어도 연결 구조에 따라 성능이 완전히 다르다.
 
@@ -467,6 +475,10 @@ ECN의 왕복 지연과 PFC의 Class 단위 영향을 줄이기 위해 제안된
 | SFC | 혼잡 스위치 → 송신자 직접 | Flow | NIC/스위치 지원 필요 |
 
 ## GPU 클러스터 네트워크 설계
+
+![AI 클러스터 트래픽과 일반 클라우드 트래픽 비교](/assets/images/posts/ai-dc-week2/ai-vs-cloud-traffic.png)
+
+여러 축에서 차이가 나지만 가장 결정적인 것은 **텔레메트리 주기의 약 600배 격차**다. 일반 클라우드는 SNMP·sFlow로 60초 주기를 쓰는 반면 AI 패브릭은 INT·gRPC로 100ms 미만을 요구한다. AI에서 혼잡은 마이크로초 단위로 발생하고 해소되므로, SNMP 시대의 모니터링으로는 집합 통신을 멈춰 세우는 사건을 **관측 자체가 불가능**하다. 트래픽 패턴이 N-S 성형에서 N×(N-1) 동기화 파동으로 바뀐 것, 손실이 "재전송하면 됨"에서 "RDMA에 치명적"으로 바뀐 것도 같은 맥락이다.
 
 ### 서버 내부 구조: Shared NIC vs Dedicated NIC
 

@@ -88,6 +88,10 @@ GPU 클러스터의 통신 패브릭은 단계적으로 확장되어 왔다.
 
 ### CPU vs GPU
 
+![CPU와 GPU 아키텍처 비교](/assets/images/posts/ai-dc-week1/cpu-vs-gpu.png)
+
+하단 막대가 중요하다. 같은 행렬 곱셈이 GPU 한 장에서 45배 빠른 데 그치지만, **트랜스포머 규모에서는 1000배 이상**으로 벌어진다. GPU의 우위는 고정 배수가 아니라 문제 크기의 함수다.
+
 AI 워크로드 연산에 CPU 대신 GPU를 쓰는 이유는 딥러닝의 핵심 연산이 대규모 병렬 행렬 연산이기 때문이다.
 
 GPU 내부의 연산 코어(Compute Core) 처리 능력은 세대마다 기하급수적으로 증가해 왔다. 이 능력은 FLOPS(Floating-Point Operations Per Second), 즉 1초에 처리할 수 있는 부동소수점 연산 횟수로 측정한다.
@@ -100,6 +104,10 @@ GPU 내부의 연산 코어(Compute Core) 처리 능력은 세대마다 기하�
 
 
 ### 메모리 장벽
+
+![The Memory Wall - 연산과 대역폭의 성장 격차](/assets/images/posts/ai-dc-week1/memory-wall.png)
+
+2012~2022년 동안 연산은 80배 늘었는데 메모리 대역폭은 17배에 그쳤다. 더 눈여겨볼 것은 **인터커넥트가 약 10배로 메모리보다도 느리게 성장**했다는 점이다. 두 번째 벽은 HBM이 아니라 네트워크다. HBM 가격이 35% 오르는 동안 일반 DDR은 반값이 됐다는 주석은, 이 병목이 공학으로 해소되기보다 가격으로 전가되고 있음을 보여준다.
 
 #### 데이터 기아
 
@@ -245,6 +253,10 @@ flowchart TB
 
 ### 훈련 vs 추론 vs 에이전틱
 
+![LLM 추론의 Prefill과 Decode](/assets/images/posts/ai-dc-week1/prefill-decode.png)
+
+입력 토큰과 출력 토큰의 **4배 가격 차이**가 이 단계 분리를 그대로 읽어낸 결과다. Prefill은 연산 바운드라 병렬화·배칭이 되고, Decode는 메모리 대역폭 바운드에 순차적이다. 가격표가 사실은 하드웨어 병목표인 셈이다.
+
 훈련은 데이터를 이용해 가중치 자체를 학습·변경하는 과정이고, 추론은 가중치를 고정한 채 입력을 받아 결과를 생성하는 과정이다. 에이전틱 AI는 별도의 단계가 아니라 LLM 추론을 여러 번 호출하면서 계획·도구 사용·메모리·상태 관리·결과 검증을 반복하는 시스템 아키텍처다.
 
 | 구분 | AI 훈련 | AI 추론 | 에이전틱 AI |
@@ -293,6 +305,10 @@ KV Cache 크기 ∝ 배치 크기 × 레이어 수 × 컨텍스트 길이 × Hid
 
 ### 에이전틱 AI가 만드는 병목
 
+![KV Cache가 만드는 메모리 병목](/assets/images/posts/ai-dc-week1/kv-cache-cost.png)
+
+KV 캐시는 연산 문제를 **메모리 대역폭 문제로 바꾼다**. 32K 컨텍스트의 70B 모델에서 캐시가 약 8GB이고 이것을 토큰 하나 생성할 때마다 다시 읽는다. 추가 연산(FLOPs)이 전혀 없는데도 컨텍스트가 길수록 생성이 느려지는 이유다.
+
 에이전트는 추론 호출 수와 토큰 수, 컨텍스트 상태를 폭발적으로 증가시킨다. 그 결과 GPU 연산뿐 아니라 메모리·네트워크·스토리지·전력·보안이 동시에 병목이 된다.
 
 | 병목 | 설명 |
@@ -312,6 +328,18 @@ KV Cache 크기 ∝ 배치 크기 × 레이어 수 × 컨텍스트 길이 × Hid
 
 
 ### 2조 파라미터 학습
+
+![2조 파라미터 모델의 상태 저장에 필요한 GPU](/assets/images/posts/ai-dc-week1/400-h100-32tb.png)
+
+H100 400장이라는 하한선은 처리량 요구와 무관하게 **상태 용량만으로** 정해진다. 가중치·그래디언트·옵티마이저 상태를 합쳐 32TB이며, 빠르게 학습하기 위해서가 아니라 모델을 얹어두기 위해 수백 장이 필요하다.
+
+![60일 학습 중 발생한 하드웨어 장애](/assets/images/posts/ai-dc-week1/training-failures.png)
+
+한 번의 60일 학습에서 **409건**의 장애, 몇 시간에 한 번꼴이다. 이 수치는 체크포인팅을 "있으면 좋은 것"에서 학습을 성립시키는 전제로 바꿔놓는다. 장애가 예외가 아니라 정상 상태다.
+
+![전체 학습 시스템 한 장 요약](/assets/images/posts/ai-dc-week1/end-to-end-training.png)
+
+체크포인트가 메모리 5분 / SSD 30분 / 스토리지 수 시간의 **계층 사다리**로 구성돼 있다. 복구 granularity가 곧 스토리지 계층 설계 문제이며, 한 스텝이 2초이므로 메모리 체크포인트로 잃는 작업은 최대 150스텝 남짓이다.
 
 #### 메모리 제약
 
@@ -387,6 +415,10 @@ NVLink/NVSwitch/InfiniBand 하드웨어 세대별 스펙은 [GPU 인터커넥트
 
 ### RDMA란
 
+![RDMA의 커널 우회 구조](/assets/images/posts/ai-dc-week1/rdma-kernel-bypass.png)
+
+RDMA는 단순히 복사를 줄이는 것이 아니다. L5·L6·L7에 **애초에 도달하지 않고**, L3·L4가 RNIC 실리콘 안으로 들어간다. 전송 계층이 최적화되는 게 아니라 CPU에서 NIC으로 물리적으로 이전한다.
+
 RDMA를 이해하려면 먼저 일반 Linux 프로세스가 데이터를 다루는 과정과 비교해야 한다.
 
 **일반 Linux 프로세스**:
@@ -448,6 +480,10 @@ graph TB
 
 ### GPUDirect RDMA
 
+![GPUDirect RDMA 경로와 RoCEv2 프레임](/assets/images/posts/ai-dc-week1/gpudirect-rocev2.png)
+
+프레임 구조를 보면 InfiniBand 전송 헤더(IB BTH+)가 **UDP 데이터그램 안에** 실려 있다. RoCEv2는 IB 전송을 평범한 IP/UDP로 캡슐화한 것이고, 그래서 IB 시맨틱을 유지한 채 표준 이더넷 위에서 라우팅된다.
+
 RDMA가 원격 메모리에 직접 접근한다면, 그 메모리가 GPU의 VRAM이 되면 어떻게 될까. GPUDirect RDMA는 RNIC가 host RAM을 거치지 않고 GPU VRAM을 직접 read/write 하도록 해, GPU VRAM ↔ RNIC ↔ Network ↔ RNIC ↔ GPU VRAM 경로를 만든다.
 
 ```mermaid
@@ -500,6 +536,10 @@ InfiniBand는 SHARP(Scalable Hierarchical Aggregation and Reduction Protocol)도
 
 ### NCCL과 집합 통신
 
+![NCCL 집합 통신 프리미티브](/assets/images/posts/ai-dc-week1/nccl-collectives.png)
+
+일곱 개를 나란히 놓으면 화살표 밀도가 곧 비용 모델이 된다. Reduce와 Gather는 한 GPU로 수렴해 N-1개 링크만 쓰지만, All-Gather와 All-to-All은 모든 쌍 사이에 화살표가 생긴다. **"All-" 계열만 N×(N-1)로 증가**하며 패브릭 부하를 지배하는 이유다.
+
 NCCL(NVIDIA Collective Communications Library)은 GPU 간 집합 통신(collective communication)을 구현한 라이브러리로, 위에서 본 NVLink·PCIe·SHM·RDMA 경로를 추상화해 AllReduce 같은 연산을 제공한다. 분산 학습 프레임워크는 NCCL을 통해 GPU들의 gradient와 parameter를 주고받는다.
 
 집합 통신은 기본 4패턴의 조합으로 구성된다.
@@ -550,6 +590,10 @@ graph TB
 ```
 
 ### Intra-node vs Inter-node 데이터 경로
+
+![노드 내부와 노드 간 대역폭 격차](/assets/images/posts/ai-dc-week1/nvlink-vs-infiniband.png)
+
+노드 안 900GB/s와 노드 간 50GB/s의 **18배 절벽**이 두꺼운 메시와 가느다란 실선으로 그려져 있다. 텐서 병렬화를 노드 안에 가두고 파이프라인·데이터 병렬화를 노드 간으로 미는 결정이 이 그림 하나로 설명된다.
 
 NCCL은 통신하는 두 GPU의 위치에 따라 transport를 다르게 고른다. 같은 노드 안인지, 노드 사이인지에 따라 경로가 완전히 달라진다.
 

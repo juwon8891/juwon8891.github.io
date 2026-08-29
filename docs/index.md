@@ -12,3 +12,4 @@
 - [K8s Deploy](k8s-deploy/week1-kubernetes-hard-way.md)
 - [Monitoring](monitoring/prometheus.md)
 - [Networking](networking/l2-l3-troubleshooting.md)
+- [vLLM](vllm/week1-llm-basics-model-serving.md)

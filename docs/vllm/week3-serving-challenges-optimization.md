@@ -317,6 +317,8 @@ A10은 병렬 요청 4개만 처리 가능하지만 L40S는 16개를 처리할 �
 
 Serving에서 흔한 문제는 weight는 GPU에 올라가지만, 높은 concurrency와 긴 context에서 KV cache가 memory를 초과하는 상황이다. 따라서 `max_num_seqs`, `max_model_len`, `max_num_batched_tokens`, GPU memory utilization 같은 설정이 중요하다.
 
+![GPU 메모리 사용량 구성](/assets/images/posts/vllm-week3/gpu-memory-breakdown.png)
+
 일반적인 경험칙(rule of thumb): GPU 메모리 요구량을 추정할 때 **모델 크기의 약 2배 정도의 GPU 메모리를 확보하는 것을 시작점으로 권장**한다. 이렇게 하면 더 나은 병렬성을 얻고 GPU 성능을 더 잘 끌어낼 수 있으며, prefix caching 같은 기법들이 요구하는 추가 메모리도 수용할 수 있다.
 
 ## 모델 실행의 병목
@@ -344,6 +346,8 @@ graph LR
     HBM[GPU memory HBM<br/>GBs / Slow / Global] --> L2[L2 cache<br/>MBs / Fast / Global] --> L1[L1/shared memory<br/>Hundred KBs / Faster / Local] --> REG[Registers<br/>A few KBs / Fastest / Local]
 ```
 
+![GPU 메모리 계층 구조](/assets/images/posts/vllm-week3/gpu-memory-hierarchy.png)
+
 - 온칩(on-chip) 메모리: L2 캐시, L1 캐시, 공유 메모리 → SRAM으로 구성. 용량은 작고 비싸지만 훨씬 빠르며 연산 유닛 바로 옆에 위치한다.
 
 - HBM: 속도를 희생하고 용량을 확보한다. SRAM은 저지연 연산을 지원하고, HBM은 모델 가중치 같은 대용량 데이터 저장을 담당한다.
@@ -365,6 +369,10 @@ L40S 스펙(FP16 Tensor Core 362.05 TFLOPS, Memory Bandwidth 864 GB/s)만으로 
 - **Prefill**: 입력 프롬프트의 토큰들을 병렬로 처리해 높은 산술 강도를 달성한다 → compute-bound 워크로드
 
 - **Decode**: 자기회귀적(autoregressive) 특성 때문에 토큰 하나를 생성하기 위해 수십억 개 파라미터 전체를 훑어야 하므로 memory bandwidth-bound다 → GPU 메모리 대역폭 관점에서 매우 비효율적
+
+![Prefill과 Decode의 처리 방식 차이](/assets/images/posts/vllm-week3/prefill-decode.png)
+
+입력 프롬프트 전체는 한 번에 병렬 처리되지만, 생성되는 토큰은 하나씩 순차적으로 나온다. 이 비대칭이 두 단계의 병목이 갈리는 근본 원인이다.
 
 ## 요청 배칭과 스케줄링 최적화
 
@@ -436,9 +444,13 @@ graph TB
 
 동적 배칭은 대부분의 전통적인 ML 서빙에는 잘 작동하지만, LLM은 입력·출력 길이가 요청마다 크게 달라 배치 안 요청들이 처리 완료까지 걸리는 시간이 제각각이다. 동적 배칭에서는 배치의 전체 완료 시간이 가장 길고 느린 요청에 의해 결정되므로, 짧은 요청들이 가장 긴 요청 하나가 끝날 때까지 대기하며 큰 GPU 유휴 시간(idle time)이 발생한다.
 
+![요청 길이가 다를 때 발생하는 GPU 유휴 시간](/assets/images/posts/vllm-week3/static-batching-idle.png)
+
 연속 배칭(inflight batching, iterative batching이라고도 불림)은 정해진 배치 크기·시간을 기다리지 않고, 요청을 백엔드 모델에 즉시 추가하고 그때그때 유동적으로 그룹핑한다. 핵심 동작은 **배치 내 실행 중인 요청 하나가 끝나는 즉시 → 대기열에 있던 요청이 바로 그 자리에 추가**되는 것이다.
 
 - 처음에 요청 1, 2, 3이 처리 시작 → 요청 1이 끝나면 새로 도착한 요청 4가 즉시 추가 → 요청 2가 끝나면 요청 5 추가 → 요청 5가 끝나면 요청 6 추가. (동적 배칭이었다면 4, 5, 6 모두 요청 3이 끝날 때까지 대기해야 했을 것)
+
+![연속 배칭으로 GPU 유휴 시간을 줄이는 방식](/assets/images/posts/vllm-week3/continuous-batching.png)
 
 - 나룻배 비유: "10인승 배 1척"이 아니라 "1인승 배 10척". 사람이 도착하는 즉시 배 한 척이 바로 출발하고, 목적지(거리)가 제각각이어도 낭비 없이 데려다주고 돌아오면 바로 다음 사람을 태운다.
 
@@ -472,6 +484,10 @@ vllm serve Qwen/Qwen2.5-7B-Instruct \
 - **방안 2: Prefill과 Decode를 함께 배칭**. 그래도 큰 도움은 안 된다. 토큰 하나를 디코딩하는 것은 prefill을 끝내는 것보다 훨씬 빠르기 때문에, 특히 입력 프롬프트가 길 경우 지연이 여전히 두드러진다.
 
 해법이 **청크 프리필**이다. 긴 입력 프롬프트를 더 작은 청크(chunk)로 나누어, 긴 prefill을 여러 chunk로 쪼개 decode와 interleave할 수 있게 한다. 기존 요청은 계속 decode를 진행하고, 새 요청은 자신만의 작은 청크 단위 prefill을 시작한다.
+
+![청크 프리필을 적용한 연속 배칭](/assets/images/posts/vllm-week3/chunked-prefill.png)
+
+그림에서 요청 1의 긴 prefill이 세 개의 작은 Prefill 박스로 쪼개졌고, 이후 iteration마다 요청 1의 Decode와 요청 2·3의 Prefill 청크가 한 배치 안에 나란히 들어간다. Decode가 긴 prefill이 끝나기를 기다리며 멈춰 있지 않게 되는 것이 핵심이다.
 
 효과와 트레이드오프(결국 use case와 SLA 요구사항에 따라 선택해야 하는 트레이드오프):
 
@@ -511,6 +527,10 @@ Decode 단계에서는 매 iteration마다 KV 캐시가 HBM에서 온칩 레지�
 
 5. **Hybrid Attention**: KDA와 Gated MLA를 3:1로 결합한 Kimi K3 방식 같은 최신 시도들이 있다. 기본 어텐션은 계산이 제곱에 비례해 Long Context에서 너무 비싸므로, Linear Attention/Recurrent State 계열로 계산량을 줄이면서 중간중간 전역 어텐션을 섞어주는 방향으로 발전 중이다(Gated Attention은 Qwen 3 Next에서도 Attn Sink를 피하기 위해 사용).
 
+![MHA, GQA, MQA, MLA 비교](/assets/images/posts/vllm-week3/attention-mha-mqa-gqa-mla.png)
+
+그림에서 진한 색으로 칠해진 부분이 추론 중 실제로 캐싱되는 영역이다. MHA는 쿼리마다 KV가 하나씩 붙어 캐시가 가장 크고, MQA는 KV가 단 한 쌍으로 줄며, GQA는 그 중간이다. MLA는 KV 헤드 수를 줄이는 대신 압축된 latent KV 하나만 캐싱하고 필요할 때 projection으로 복원한다.
+
 MHA → MQA → GQA → MLA로 이어지는 흐름은 모두 "모델 품질을 최대한 유지하면서 KV 캐시(=메모리 대역폭·용량 부담)를 얼마나 줄일 수 있는가"라는 단일한 목표를 향한 진화다. 모델이 어떤 방식을 쓰는지는 config.json의 `num_key_value_heads` 값 하나만 봐도 확인할 수 있다.
 
 ```json
@@ -548,6 +568,10 @@ FlashAttention의 핵심은 알고리즘을 하드웨어를 인식하도록(hard
 
 - GPT-2 어텐션 기준 PyTorch 대비 큰 폭의 시간 단축을 보였고(Matmul·Dropout·Softmax·Mask·Matmul이 하나의 fused kernel로), FlashAttention 2·3로 계속 발전하며 GEMM(General Matrix Multiply) 계산과 소프트맥스 계산을 오버랩(중첩)시키는 등의 기법이 추가되고 있다.
 
+![FlashAttention의 SRAM 기반 타일링과 성능 개선](/assets/images/posts/vllm-week3/flashattention.png)
+
+왼쪽은 Q·K·V를 블록 단위로 SRAM에 복사해 계산하고 최종 출력만 HBM에 쓰는 구조이고, 오른쪽은 PyTorch의 5개 개별 연산(각각 HBM 왕복 발생)이 하나의 fused kernel로 합쳐져 실행 시간이 크게 줄어든 결과다.
+
 커널 최적화는 GPU 아키텍처, CUDA, 성능 프로파일링, 컴파일러 등 다방면 전문성이 필요한 큰 연구 영역이라 이 장의 범위를 넘어서지만, 실무자로서는 LLM을 서빙할 때는 효율적인 커널을 활용하는 것이 실무적으로 중요하다는 점, 그리고 FlashInfer, xFormers, Triton(Triton Inference Server와는 다른 개념) 같은 다른 최적화된 커널들도 있다는 점을 기억하면 된다.
 
 ### PagedAttention
@@ -570,6 +594,10 @@ KV 캐시 메모리 관리의 어려움에서 출발한다.
 
 - vLLM이 GPU 메모리에 KV 캐시를 블록 단위로 저장·관리하는 근본 메커니즘이라서 별도의 on/off가 없다.
 
+![PagedAttention의 논리 블록·블록 테이블·물리 블록 매핑](/assets/images/posts/vllm-week3/pagedattention.png)
+
+"Alan Turing is a" (논리 Block 0)가 물리 Block 7에, "computer scientist and mathematician" (논리 Block 1)이 물리 Block 1에 저장된 것처럼, 논리적으로 연속된 시퀀스가 물리 메모리에서는 흩어져 있어도 블록 테이블이 이를 이어준다. 마지막 블록만 부분적으로 채워지므로(4칸 중 2칸) 낭비가 블록 하나 미만으로 줄어든다.
+
 요지: 이 절의 세 층위 최적화 — 커널 퓨전(메모리 왕복 제거), FlashAttention(타일링으로 SRAM 안에서 연산, HBM 접근 최소화), PagedAttention(OS 페이징 방식으로 KV 캐시 메모리 파편화 제거) — 는 셋 다 결국 "GPU 메모리 대역폭이 병목"이라는 근본 문제를, 각자 다른 층위(연산 융합·타일링·메모리 관리)에서 공략하는 기법들이다.
 
 ## 모델 압축
@@ -591,6 +619,12 @@ LLM의 방대한 크기 자체가 실제 프로덕션 환경에서 많은 문제
 메모리 사용량은 FP32 대비 INT8이 4배, INT4가 8배 줄어든다. 정밀도를 낮추면서 양자화 오차(Quantization Error)가 발생하므로 정확도 트레이드오프를 함께 측정해야 하며, Weight-only 양자화와 Weight-and-Activation 양자화로 나뉜다.
 
 **실측 벤치마크: Qwen2.5-7B-Instruct — 원본(BF16) vs GPTQ W4A16 vs FP8 W8A8 (vLLM)**
+
+![동시성별 Median TTFT 비교](/assets/images/posts/vllm-week3/quantization-ttft.png)
+
+![동시성별 요청 처리량 비교](/assets/images/posts/vllm-week3/quantization-throughput.png)
+
+TTFT 차트에서 동시성 1·10일 때는 GPTQ-Int4가 가장 빠르지만(27.6ms vs 원본 70.4ms), 동시성 100·300으로 가면 역전되어 원본보다도 느려진다(10,410ms vs 6,753ms). 반면 FP8은 고동시성에서 일관되게 가장 낮은 TTFT를 유지한다. 처리량 차트에서는 동시성 300일 때 GPTQ(5.86)와 FP8(5.93)이 비슷해지는데, GPTQ가 TTFT를 크게 희생한 대가라는 점이 두 차트를 함께 봐야 드러난다.
 
 결과 해석은 단순하지 않다. Quantization은 memory footprint를 줄이지만, kernel 지원이 부족하면 latency 개선이 제한될 수 있다. Weight-only INT4는 memory 절감이 크지만 activation/compute 경로의 이점은 제한될 수 있고, FP8은 hardware support가 좋을 때 강력하다.
 
@@ -657,6 +691,10 @@ graph LR
 
 - 하드웨어 지원: NVIDIA GPU 아키텍처(Ampere, Hopper)는 이런 구조적 희소성을 가속하는 스파스 텐서 코어(sparse Tensor Cores)를 탑재해, 50% 희소성으로 행렬 곱셈 속도를 직접적으로 2배까지 끌어올릴 수 있다.
 
+![2:4 structured sparsity 패턴과 압축](/assets/images/posts/vllm-week3/pruning-2to4-sparsity.png)
+
+R×C 행렬에서 0이 아닌 값만 R×(C/2)로 압축하고, 원래 위치를 가리키는 2비트 인덱스를 따로 둔다. 압축 후에도 밀집 행렬 형태라 텐서 코어가 그대로 연산할 수 있는 것이 이 포맷의 핵심이다.
+
 ## 프리픽스 캐싱 (Prefix Caching)
 
 ### 개념
@@ -682,6 +720,10 @@ RadixAttention은 SGLang 서빙 프레임워크와 함께 소개된 대표적인
 - 예: "You are a helpful assistant"라는 공통 접두사를 가진 두 요청은 같은 루트 노드를 공유하고 이후 분기한다. 두 요청이 같은 접두사를 공유할 경우, 트리 구조 내에서 해당 노드를 찾아 재계산 없이 KV 캐시 데이터를 재사용한다.
 
 - 시간이 지나면서 새로운 요청이 들어오면 트리는 리프 노드를 추가해 성장하고, 너무 커지면 leaf 노드에 재귀적으로 LRU를 적용해 정리된다.
+
+![동일 프리픽스를 공유하는 두 요청의 radix tree](/assets/images/posts/vllm-week3/prefix-cache-radix-tree.png)
+
+두 요청이 "You are a helpful assistant"까지는 같은 노드를 공유하다가, 사용자 발화가 갈리는 지점에서 분기한다. 공유 구간의 KV 캐시는 재계산 없이 그대로 재사용된다.
 
 구현체별 활성화 방법:
 

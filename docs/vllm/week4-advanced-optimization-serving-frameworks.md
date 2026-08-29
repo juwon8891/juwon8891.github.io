@@ -142,6 +142,33 @@ vllm serve Qwen/Qwen3-32B \
 
 - 최적의 방법과 K값은 데이터셋·워크로드에 크게 의존하므로, 반드시 실제 트래픽 패턴으로 수락률을 측정하며 튜닝해야 한다.
 
+VRAM이 작은 환경에서는 결과가 정반대로 나올 수 있다. RTX 16GB에 Qwen3-8B-FP8을 올려 동시성 1로 측정했을 때 바닐라 상태에서 이미 GPU 사용률이 98%에 달했고(Tensor Core utilization 또는 VRAM bandwidth utilization이 원인으로 추정), 이 상태에서 추측적 디코딩을 켜자 오히려 역효과가 났다. 동시성이 1이라도 GPU가 이미 포화 상태면 memory-bound가 아니므로 드래프팅 연산이 공짜가 아니게 된다.
+
+### vLLM이 지원하는 방식
+
+| 방식 | Low QPS (지연시간 중심) | High QPS (처리량 중심) | 비고 |
+|------|------------------------|----------------------|------|
+| EAGLE | High gain | Medium to high gain | 범용적으로 강력한 모델 기반 방식 |
+| MTP (Multi-Token Prediction) | High gain | Medium to high gain | 타깃 모델이 MTP를 네이티브 지원할 때 최선 |
+| Draft model | High gain | Medium gain | 별도 드래프트 모델 필요 |
+| Parallel Draft Model (PARD) | High gain | Medium to high gain | 드래프트 모델 지연시간이 낮음 |
+| MLP speculator | Medium to high gain | Medium gain | 호환되는 MLP speculator가 있을 때 유용 |
+| N-gram | Low to medium gain | Medium gain | 가볍고 활성화가 쉬움 |
+| Suffix decoding | Low to medium gain | Medium gain | — |
+| Dynamic Speculative Decoding | High gain | 기본 SD보다 높음 | 추가 드래프트 모델 없이 추측 깊이를 동적 조절, QPS 변동이 큰 워크로드나 RL에 유용 |
+
+기본 스키마는 다음과 같다.
+
+```bash
+vllm serve <target-model> \
+  --speculative-config '{"method": "draft_model", "model": "<draft-model>",
+    "num_speculative_tokens": 5}'
+```
+
+드래프트 모델을 직접 학습하려면 vLLM과 통합된 [speculators](https://github.com/vllm-project/speculators) 라이브러리를 쓸 수 있다. vLLM으로 은닉 상태 생성 데이터를 오프라인 생성하고, 단일/다중 레이어 드래프트 모델을 학습하며, Hugging Face 호환 표준 포맷으로 내보내 vLLM에 바로 배포하는 흐름을 지원한다.
+
+여러 기법을 동일 환경에서 공정하게 비교하려면 [Spec-Bench](https://github.com/hemingkx/Spec-Bench)가 있다. EAGLE-1/2/3, Medusa, Hydra, SpS, Prompt Lookup Decoding, REST, Lookahead Decoding, TokenRecycling, SAM-Decoding 등을 실제 구현체로 포함하며, `evaluation/speed.py`로 speedup을, `evaluation/equal.py`로 추측적 디코딩 결과가 일반 자기회귀 디코딩과 동일한지를 검증한다. 앞서 설명한 "정확도를 훼손하지 않는다"는 이론적 보장을 실제로 확인하는 스크립트가 후자다.
+
 ## Multi-GPU and Multi-Node Inferencing
 
 모델이 GPU 한 대에 안 들어가거나 한 대로는 SLA를 충족할 수 없을 때, 추론 시스템은 네 가지 병렬화 전략을 사용한다.
@@ -294,6 +321,17 @@ vllm serve deepseek-ai/DeepSeek-V3-0324 \
   --tensor-parallel-size 1 --data-parallel-size 8 --enable-expert-parallel
 ```
 
+EP를 쓰려면 사전 준비가 필요하다. DeepEP(EP 커널, `tools/ep_kernels`), DeepGEMM(최적화된 연산 라이브러리), gdrcopy(분리 서빙용, 선택이지만 권장), 그리고 `deepep_v2` 백엔드를 쓸 경우 NCCL 2.30.4 이상(PyTorch 기본 NCCL은 더 낮은 버전이라 업그레이드 필요)이 요구된다.
+
+자주 마주치는 문제와 해결책은 다음과 같다.
+
+| 증상 | 해결 |
+|------|------|
+| InfiniBand 클러스터에서 동작 안 함 | `export GLOO_SOCKET_IFNAME=eth0` 설정 |
+| "Register CQ buffer" 에러 | `ulimit -l`을 `unlimited`로 설정 |
+| IBGDA 커널 문제 | `tools/ep_kernels/configure_system_drivers.sh` 실행 |
+| Kubernetes 파드에서 실패 | `hostNetwork: true`, `securityContext.privileged: true` 필요 |
+
 ## Prefill-Decode Disaggregation
 
 ### 왜 분리하는가
@@ -390,6 +428,14 @@ prefill/decode를 같은 노드 안에만 배치하면 NVLink로 안전하지만
 - vLLM에서는 `--kv-transfer-config '{"kv_connector":"NixlConnector","kv_role":"kv_both"}'`로 설정한다.
 
 캐싱은 LMCache가, 실제 전송은 NIXL이 담당하는 계층 구조이며, Moonshot AI(Kimi)의 Mooncake처럼 Prefill/Decode 풀 사이에 전용 KV 캐시 풀을 두는 사례도 있다.
+
+Kubernetes에서 PD 분리를 배포하는 경로는 세 가지다.
+
+| 방식 | 배포 형태 |
+|------|-----------|
+| llm-d (Well-Lit-Path) | Kustomize 기반 매니페스트로 직접 배포 |
+| KServe (내부적으로 llm-d 활용) | CRD 기반 (InferenceService / LLMInferenceService) |
+| NVIDIA Dynamo | CRD 기반 (DynamoGraphDeployment / DynamoGraphDeploymentRequest) |
 
 ### 언제 사용하나
 
@@ -570,7 +616,35 @@ NVIDIA가 만든 자사 GPU 전용 고성능 LLM 추론 라이브러리다.
 | SGLang | RadixAttention 프리픽스 재사용, 구조화된 출력 | 에이전트/멀티턴 워크플로우, 구조화 생성 |
 | llama.cpp | 경량, CPU/로컬 실행 | edge/local inference |
 
-"어떤 프레임워크가 절대적으로 최고인가"가 아니라 "내 SLO·워크로드·운영 현실에 어떤 프레임워크가 맞는가"를 물어야 한다. 판단 축은 하드웨어 벤더, prefill/decode 비중, 구조화 출력 필요성, 동시성 수준이다. 그리고 이 분야는 발전 속도가 매우 빠르므로 3~6개월마다 재평가가 필요하다 — 정답이 없는 것이 아니라, 정답이 계속 바뀐다.
+"어떤 프레임워크가 절대적으로 최고인가"가 아니라 "내 SLO·워크로드·운영 현실에 어떤 프레임워크가 맞는가"를 물어야 한다.
+
+## GPU 실습 환경 구성
+
+이번 주차의 기법 대부분은 멀티 GPU가 있어야 실측이 가능하다. 로컬에 GPU가 없을 때 쓸 수 있는 두 가지 경로를 정리한다.
+
+### Runpod
+
+컨테이너(Pod) 단위로 GPU를 빌려 vLLM을 바로 띄울 수 있다.
+
+- **템플릿 선택**: vLLM Verified(Runpod 팀/파트너가 검증·유지보수, 이미지 빌드·호환성·보안 점검이 정기적으로 이뤄짐)를 쓴다. Community 템플릿은 검증되지 않아 오래된 vLLM 버전이나 깨진 의존성이 있을 수 있고, 특히 `cmd`에 API 키가 하드코딩된 경우가 있으니 Dockerfile·이미지 태그·최근 업데이트 날짜를 직접 확인해야 한다.
+
+- **GPU 선택 예시**: L40S (Ada Lovelace, FP8 지원, VRAM 48GB, 메모리 대역폭 864GB/s, 약 $0.99/hr). Region은 `Any region`으로 두면 선택지가 넓어진다.
+
+- **API 키**: `VLLM_API_KEY`를 환경 변수로 직접 넣으면 템플릿 정보에 노출되므로 Secret으로 설정해 참조한다.
+
+- **정리**: Stop만 하면 워크스페이스 디스크가 남아 비용이 계속 부과된다. Terminate Pod로 볼륨까지 삭제하고, Storage 항목에 잔여 볼륨이 없는지 확인한다.
+
+### AWS GPU EC2
+
+- **인스턴스**: `g5.xlarge`(vCPU 4, RAM 16GB, NVIDIA A10G 24GB, 온디맨드 약 $1.006/hr)가 무난하다. A10G는 bfloat16을 지원해 vLLM 기본 설정이 그대로 동작한다. `g4dn.xlarge`(T4)는 더 싸지만 bf16이 없어 `--dtype half`를 강제해야 한다. 단일 노드 멀티 GPU 실습에는 `g6.12xlarge`(GPU 4장 × 24GB = 96GB, vCPU 48, NIC 40Gbps, FP8 지원, 약 $4.6/hr)를 쓴다.
+
+- **AMI**: Deep Learning Base OSS Nvidia Driver GPU AMI(Ubuntu 22.04). AMI ID를 문서에서 그대로 베끼면 안 된다. `ssm get-parameter`의 `latest`가 가리키는 값은 AWS가 새 DLAMI를 낼 때마다 바뀐다.
+
+- **루트 볼륨**: 200GB gp3를 권장한다. venv 하나가 8GB를 차지해 100GB 이하는 빠듯하다.
+
+- **접속**: SSM Session Manager를 쓰면 인바운드 포트를 하나도 열지 않고 SSH 키 없이 접속할 수 있다. IAM 역할에 `AmazonSSMManagedInstanceCore`를 붙이고 송신만 허용하는 보안 그룹을 만들면 된다.
+
+- **쿼터**: GPU 인스턴스는 기본 쿼터가 0인 경우가 많다. `aws service-quotas get-service-quota --service-code ec2 --quota-code L-DB2E81BA`로 On-Demand G/VT 인스턴스 vCPU 한도를 미리 확인하고 필요하면 증설을 신청한다. 판단 축은 하드웨어 벤더, prefill/decode 비중, 구조화 출력 필요성, 동시성 수준이다. 그리고 이 분야는 발전 속도가 매우 빠르므로 3~6개월마다 재평가가 필요하다 — 정답이 없는 것이 아니라, 정답이 계속 바뀐다.
 
 ## 마무리
 

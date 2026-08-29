@@ -142,6 +142,10 @@ Sequence
 
 이 구조가 중요한 이유는 웹 요청과 실제 GPU 실행 순서를 분리할 수 있기 때문이다. 덕분에 Dynamic Batching, Priority Scheduling, Continuous Batching 같은 최적화를 적용할 수 있다.
 
+![배칭을 처리하는 서비스 설계](/assets/images/posts/vllm-week2/batching-service-design.png)
+
+위 그림은 요청 2건(프롬프트 5개)이 들어와 Workload manager가 배치를 구성하고, 생성된 텍스트가 다시 원래 웹 요청으로 매핑되기까지의 6단계 흐름을 보여준다. Workload manager가 관리하는 세 자료구조(`incoming_queue`, `active_sequence`, `sequence_map`)가 이 매핑의 핵심이다.
+
 **WorkloadManager의 배치 스케줄링**:
 
 ```python
@@ -210,6 +214,10 @@ sequenceDiagram
 - 각 프롬프트는 자체 이벤트 큐(`asyncio.Queue`)를 가지며, 백그라운드 배치 스레드(`requests_processing_loop`)가 GPU 배치 실행을 담당하고 API 코루틴이 사용자 연결을 담당한다. 큐가 두 실행 영역을 연결한다.
 
 - 응답 형식은 SSE(Server-Sent Events): `data: {"token":" a","sequence_id":"..."}\n\n`
+
+![배칭과 스트리밍을 함께 처리하는 토큰 스트리밍 워크플로우](/assets/images/posts/vllm-week2/token-streaming-workflow.png)
+
+그림에서 보듯 백그라운드 배치 처리 스레드가 `[prompt1, prompt2]`를 한 번에 모델에 넣고 `[token1, token2]`를 받아오지만, 각 토큰은 자기 이벤트 큐를 거쳐 서로 다른 SSE 스트림으로 나간다. 내부는 배치, 외부는 요청별 스트림이라는 구조가 그대로 드러난다.
 
 **토큰 단위 배치 슬라이딩 윈도우** — 시간에 따른 배치 변화:
 
@@ -333,6 +341,10 @@ graph TB
 
 - **Model serving performance**: LLM 특화 성능(지연·처리량·최적화). vLLM, Triton 같은 프레임워크가 담당한다.
 
+![단일 모델 서빙의 일반 설계](/assets/images/posts/vllm-week2/single-model-general-design.png)
+
+(A) 분산 컴퓨팅 인프라(AWS/GCP/Kubernetes)가 스케일링·장애 허용·모니터링을 담당하고, (B) Serving frontend가 Web API·인증·트래픽 스로틀링을, (C) Serving backend(vLLM, SGLang, TRT-LLM)가 모델 추론과 최적화를 담당하는 구조다.
+
 LLM 서빙 요구사항은 모델 아키텍처와 함께 자주 변하므로, 변화하는 구성 요소를 안정적인 인프라와 분리하는 것이 중요하다.
 
 ## 멀티 모델 서빙 서비스
@@ -393,6 +405,8 @@ sequenceDiagram
 | Model store | 모델 메타데이터 저장·조회 (실제 환경에서는 원격 DB나 메타데이터 서비스) |
 | Model engine | 메타데이터 기반으로 프레임워크별 ModelWorker 인스턴스를 생성하는 워커 팩토리 |
 | Model worker | 모델을 메모리에 로드하고 추론 실행 (TransformerWorker, TorchVisionWorker, TritonWorker) |
+
+![멀티 모델 서빙 아키텍처](/assets/images/posts/vllm-week2/multi-model-architecture.png)
 
 **ModelManager의 LRU 캐시** — 이 설계에서 가장 중요한 컴포넌트다:
 
@@ -530,6 +544,10 @@ graph TB
 
 - **질의/검색 (온라인)**: 쿼리 임베딩 → 코사인 유사도로 최근접 벡터 검색 → 관련 청크를 쿼리와 함께 LLM에 전달해 답변 생성.
 
+![RAG의 인덱스 빌딩 워크플로우와 질의/검색 워크플로우](/assets/images/posts/vllm-week2/rag-workflows.png)
+
+두 워크플로우가 같은 임베딩 모델을 공유한다는 점이 중요하다. 인덱싱 시점과 질의 시점의 임베딩 모델이 다르면 벡터 공간이 달라져 검색이 의미를 잃는다.
+
 **청킹이 필요한 이유**: LLM은 입출력 합산 토큰 수에 상한(컨텍스트 윈도우)이 있어, 문서 전체가 아니라 가장 관련성 높은 청크 몇 개만 골라 보내야 한다.
 
 - 작은 청크: 검색 정밀도 ↑, 문맥 손실 위험
@@ -545,6 +563,10 @@ graph TB
 RAG의 한계(검색 단계로 인한 추가 지연, 문서 선택 오류 위험, 임베딩·인덱스·벡터 DB 유지 부담)를 배경으로, 컨텍스트 윈도우가 100만 토큰 수준으로 커지면서 등장한 접근이다.
 
 CAG는 쿼리 시점에 검색하는 대신, 지식을 미리 LLM의 KV 캐시에 프리로드해두고 추론 시 캐시된 컨텍스트로 바로 답한다. 검색 지연을 없애고 시스템 복잡도를 줄이면서도 외부 지식 기반 응답은 유지한다. 대가로 큰 컨텍스트 윈도우 + 캐시 관리에 따른 메모리/연산 요구량이 늘어난다.
+
+![RAG와 CAG 비교](/assets/images/posts/vllm-week2/rag-vs-cag.png)
+
+RAG는 임베딩 모델·인덱스·벡터 DB라는 별도 시스템 일체가 쿼리 경로에 놓이는 반면, CAG는 지식을 LLM 내부 knowledge cache에 미리 적재(preload)해두어 쿼리 경로에서 그 시스템들이 사라진다.
 
 | 구분 | RAG | CAG |
 |------|-----|-----|
@@ -601,9 +623,13 @@ graph TB
 | Model Optimization | 재학습 없이 성능/효율 향상 (양자화, speculative decoding 등) | 모델별 최적화 기법 선택 |
 | Model | 학습된 모델을 서빙 시스템에 공급, 분류·추적·버전 관리 | 모델 진화에 따른 버전 관리 |
 
+![엔터프라이즈 모델 서빙 계층 구조](/assets/images/posts/vllm-week2/enterprise-serving-layers.png)
+
 새로운 모델과 기술이 시스템 설계를 재편하더라도, 관심사를 분리하는 계층형 아키텍처 패턴은 여전히 필수적이다. 서로 다른 역할의 팀들이 독립적으로 혁신하면서도 통합된 플랫폼에 기여할 수 있게 한다.
 
 ## 오픈소스 스택으로 구축
+
+![오픈소스 스택으로 구현한 모델 서빙](/assets/images/posts/vllm-week2/opensource-stack.png)
 
 설계의 근간은 Kubernetes다. 배포/스케일링/관리 자동화라는 핵심 기능과, 그 위에 쌓인 메트릭·로깅·네트워킹·인가·하드웨어 관리 생태계 덕분에 클라우드 프로바이더와 파운데이션 모델 벤더 모두의 백본으로 채택됐다. Kubernetes 한 층이 레이어 1(Public API)의 라우팅/네트워킹과 레이어 2(Resource Management) 전체를 실제 오픈소스 컴포넌트로 구현해주는 기반 계층 역할을 한다.
 

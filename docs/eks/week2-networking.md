@@ -14,6 +14,10 @@ tags:
 
 ### 1. VPC CNI
 
+![VPC CNI와 L-IPAM 구조](/assets/images/posts/eks-week2/vpc-cni-lipam.png)
+
+aws-node가 두 역할로 나뉜다는 점이 핵심이다. **L-IPAM은 EC2 컨트롤 플레인**에 ENI와 IP 할당을 요청하고, **CNI 바이너리는 커널 API**만 건드린다. 노드 자신의 IP는 eth0에 있고 eth1의 초록색 IP들은 오직 파드용으로 예약된다. 즉 ENI 부착은 쿠버네티스가 아니라 EC2 API 작업이다.
+
 **AWS VPC CNI**는 EKS에서 기본으로 사용하는 Container Network Interface 플러그인이다.
 
 - Pod에 VPC IP 주소를 직접 할당
@@ -50,6 +54,14 @@ graph TB
 - **보안**: Pod별 Security Group 적용 가능
 
 ### 2. CNI Plugin 동작 원리
+
+![파드 IP 할당 7단계](/assets/images/posts/eks-week2/pod-ip-allocation.png)
+
+3~4단계에서 IP가 **로컬 L-IPAM 워밍풀**에서 먼저 나오고, 네트워크 네임스페이스 설정(5단계)은 그 뒤라는 순서가 중요하다. 파드 스케줄링이 EC2 API 호출을 기다리지 않는다는 뜻이며, 그래서 워밍풀 설정이 파드 기동 지연을 좌우한다.
+
+![파드 네트워크 네임스페이스와 veth 쌍](/assets/images/posts/eks-week2/pod-network-namespace.png)
+
+각 파드 네임스페이스가 **자기만의 127.0.0.1**을 갖는다 — 노드 하나에 localhost가 셋이다. 같은 파드 안 컨테이너끼리는 localhost로 통신되지만 다른 파드끼리는 안 되는 이유가 이 그림에 그대로 있다.
 
 **CNI Plugin 호출 시점**:
 - Pod 생성 시: `ADD` 명령어
@@ -187,6 +199,10 @@ kubectl get ds aws-node -n kube-system -o yaml | grep ENABLE_PREFIX_DELEGATION
 ```
 ### 4. 보안 그룹 관리
 
+![Security Groups for Pods](/assets/images/posts/eks-week2/security-groups-for-pods.png)
+
+파드에 **Branch ENI**를 따로 붙이는 방식이라는 게 요점이다. 그 파드는 Node Security Group을 더 이상 상속하지 않으므로, 파드별 RDS 접근 제어가 쿠버네티스 정책이 아니라 ENI 수준에서 강제된다. 빨간 경로가 막히고 초록 경로만 통과하는 것이 그 결과다.
+
 **Pod 단위 보안 그룹** (Security Groups for Pods):
 - VPC CNI가 기본적으로 AWS VPC의 보안 그룹과 연동
 - Pod별로 다른 보안 그룹 적용 가능
@@ -284,6 +300,10 @@ default via 192.168.1.1 dev eth0                     # 기본 게이트웨이
 ## 노드 간 파드 통신
 
 ### 1. 파드 통신 흐름
+
+![노드 간 파드 통신 경로](/assets/images/posts/eks-week2/pod-to-pod-cross-node.png)
+
+출발지 IP가 `192.168.1.249`로 **끝까지 그대로 유지**된다. 캡슐화 헤더도, 주소 재작성도 없다. 노드의 ENI0에서 tcpdump를 떠도 파드 IP가 그대로 보인다는 것이 VPC CNI에 오버레이가 없다는 실질적 증거다.
 
 **동일 노드 내 Pod 간 통신**:
 
@@ -409,6 +429,10 @@ sudo iptables -t nat -S
 
 ### 1. 외부 통신 흐름
 
+![파드에서 외부로 나갈 때의 SNAT 시퀀스](/assets/images/posts/eks-week2/pod-external-snat.png)
+
+파드의 default gateway MAC이 브리지나 라우터가 아니라 **veth 짝**이라는 점, 그리고 SNAT이 veth1과 eth0 사이에서 일어난다는 점이 드러난다. 파드 네임스페이스를 빠져나가는 시점까지는 출발지가 여전히 파드 IP이고, 호스트 인터페이스에 이르러서야 노드 IP로 바뀐다.
+
 **Pod → Internet 통신 시**:
 
 ```mermaid
@@ -528,6 +552,10 @@ Max Pods = (3 × (10 - 1)) + 2 = 29개
 
 ### 2. Prefix Delegation mode
 
+![보조 IP 방식과 Prefix 위임 방식 비교](/assets/images/posts/eks-week2/secondary-ip-vs-prefix.png)
+
+Prefix 모드는 **ENI 하나(ENI0)만으로** 파드 110개에 도달하는 반면, 보조 IP 방식은 15개를 위해 ENI 3개를 쓴다. 제약이 ENI 부착 한도에서 서브넷의 /28 블록 확보 가능성으로 옮겨간다.
+
 **최대 Pod 수 계산**:
 
 ```
@@ -556,6 +584,10 @@ kubectl get ds aws-node -n kube-system -o yaml | grep ENABLE_PREFIX_DELEGATION
 - **빠른 스케일**: Prefix 단위 할당으로 속도 향상
 
 ### 3. maxPods 계산 방법
+
+![maxPods 계산식 비교](/assets/images/posts/eks-week2/maxpods-formula.png)
+
+공식의 `+2`는 aws-node와 kube-proxy가 호스트 네트워크를 쓰기 때문에 붙는다. 그리고 Prefix 위임으로 계산상 432개가 나와도 **30vCPU 미만 인스턴스는 110개로 잘린다** — IP 산술과 실제 maxPods가 갈라지는 지점이다.
 
 **kubelet의 maxPods 제한 확인**:
 
@@ -817,6 +849,10 @@ graph TB
 
 ### 3. IPVS 모드
 
+![IPVS의 Virtual Server / Real Server 매핑](/assets/images/posts/eks-week2/ipvs-virtual-server.png)
+
+IPVS는 쿠버네티스 오브젝트를 고전적인 LVS 용어에 얹는다. **ClusterIP가 Virtual Server**이고 **각 파드가 Real Server**다. iptables 모드가 제공하지 못하는 rr·lc·sh 같은 실제 로드밸런싱 알고리즘을 IPVS 모드에서 쓸 수 있는 이유가 이 대응 관계에 있다.
+
 **IPVS**(IP Virtual Server)는 Linux Kernel의 Layer 4 로드밸런서이다.
 
 ```mermaid
@@ -866,6 +902,10 @@ kubectl delete pod -n kube-system -l k8s-app=kube-proxy
 
 ### 5. eBPF/XDP 모드
 
+![XDP가 커널 네트워킹 계층을 우회하는 지점](/assets/images/posts/eks-week2/ebpf-xdp-bypass.png)
+
+XDP는 **L2 디바이스 드라이버 계층, TC ingress보다 아래**에서 후킹한다. netfilter 체인 전체와 skb 할당을 건너뛴다는 뜻이며, 흔히 함께 묶여 언급되는 TC 기반 eBPF 프로그램보다 엄밀히 더 낮은 지점이다.
+
 **eBPF**(Extended Berkeley Packet Filter)는 Kernel Networking Layer를 우회한다.
 
 ```mermaid
@@ -901,6 +941,14 @@ graph TB
 **AWS Load Balancer Controller**는 Kubernetes Service를 AWS NLB/ALB와 연동한다.
 
 ### 1. Instance mode vs IP mode
+
+![Instance mode](/assets/images/posts/eks-week2/alb-instance-mode.png)
+
+Instance mode는 타깃 그룹에 **모든 노드의 NodePort를 등록**한다. 파드가 실제로 어디 떠 있는지와 무관하므로, 해당 파드가 없는 노드로 트래픽이 떨어져 kube-proxy 홉을 한 번 더 타는 일이 생긴다.
+
+![IP target mode](/assets/images/posts/eks-week2/alb-ip-mode.png)
+
+반면 IP mode의 타깃 그룹에는 Pod C가 실제로 떠 있는 node 2·3만 들어가고 **node 1은 아예 없다**. 타깃 수가 노드 수가 아니라 파드 레플리카 수를 따라간다는 뜻이고, 그러려면 파드 IP가 ALB에서 라우팅 가능해야 하므로 오버레이가 아닌 VPC CNI가 전제된다.
 
 #### (1) Instance mode
 
@@ -1045,6 +1093,10 @@ curl http://$NLB_DNS
 ## Ingress (L7 HTTP)
 
 ### 1. Ingress Controller
+
+![Ingress Controller의 제어 경로와 데이터 경로](/assets/images/posts/eks-week2/ingress-controller.png)
+
+제어 경로와 데이터 경로가 분리돼 있다. Ingress Controller는 점선으로 표시된 watch/provision만 담당하고, 실제 요청 트래픽(파란 화살표)은 L7 리버스 프록시에서 파드로 곧장 흐른다. **컨트롤러가 죽어도 이미 뜬 트래픽은 끊기지 않는** 구조다.
 
 **Ingress Controller**는 L7 HTTP/HTTPS 로드밸런싱을 제공한다.
 

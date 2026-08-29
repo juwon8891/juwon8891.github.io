@@ -21,6 +21,10 @@ tags:
 - **자동 업그레이드, 패치, 백업** 지원
 - AWS 서비스와 **네이티브 통합**
 
+![AWS 위에서 동작하는 Kubernetes 클러스터 전체 흐름](/assets/images/posts/eks-week1/k8s-cluster-in-action.png)
+
+관리자와 개발자의 동선이 다르다는 점이 눈에 띈다. 클러스터 관리자는 control plane을 상대하고, 애플리케이션 개발자는 이미지를 ECR에 올린 뒤 워크로드를 배포한다. control plane은 AWS 소유 VPC에, 노드는 고객 VPC에 각각 놓이며, 사용자 트래픽은 public subnet의 로드밸런서를 통해 들어온다.
+
 **EKS 클러스터는 두 가지로 구성된다**:
 
 1. **Managed Control Plane** (AWS 관리):
@@ -319,6 +323,10 @@ graph TB
 | **CNI 플러그인** | AWS VPC CNI (기본), Calico, Cilium 등 |
 
 ### 4. 클러스터 구성 요소
+
+![Kubernetes 클러스터 구성 요소](/assets/images/posts/eks-week1/cluster-components.png)
+
+kubectl은 kube-apiserver로만 말을 걸고, apiserver가 etcd·controller manager·scheduler와 워커 노드의 kubelet 사이를 중계한다. 즉 apiserver가 유일한 관문이며, EKS에서 AWS가 관리해주는 영역이 왼쪽 Control Plane 박스에 해당한다.
 
 **EKS 클러스터를 구성하는 주요 컴포넌트**:
 
@@ -1009,6 +1017,11 @@ graph LR
     ENI -.Private Link.-> CP
 
 ```
+
+![X-ENI를 포함한 EKS 네트워크 아키텍처](/assets/images/posts/eks-week1/eks-network-architecture.png)
+
+실제 배치를 보면 X-ENI가 두 VPC 사이에 걸쳐 있는 이유가 분명해진다. 왼쪽 VPC(Amazon EKS)의 control plane과 오른쪽 VPC(Customer)의 노드는 서로 다른 계정 소유이므로 직접 통신할 수 없고, X-ENI가 그 경계를 잇는다. 운영자는 NLB를 거쳐 IPv4로 control plane에 접근하고, 애플리케이션 사용자 트래픽은 public subnet의 로드밸런서로 들어와 private subnet의 Pod에 도달한다.
+
 ### 4. 보안 그룹 설정
 
 **EKS 보안 그룹 구성**:
@@ -1083,6 +1096,10 @@ graph TB
 
 ### 3. Standard Mode vs Auto Mode
 
+![Standard 클러스터와 Auto Mode 클러스터의 책임 경계 비교](/assets/images/posts/eks-week1/standard-vs-automode.png)
+
+두 그림에서 EKS 계정(분홍)과 고객 계정(파랑)을 가르는 선이 어디에 있는지를 비교하면 차이가 명확하다. Standard에서는 Karpenter, CNI, EBS CSI Driver 같은 Add-on과 EC2 인스턴스가 전부 고객 계정 쪽에 있다. Auto Mode에서는 Storage·Compute·Load Balancing이 Managed Capabilities로 EKS 계정 쪽으로 넘어가고, EC2도 관리형 인스턴스가 된다. 관리 부담이 줄어드는 대신 통제권도 함께 넘어간다는 트레이드오프가 경계선의 이동으로 드러난다.
+
 | 항목 | Standard Mode | Auto Mode |
 |------|---------------|-----------|
 | **Control Plane** | AWS 관리 | AWS 관리 |
@@ -1115,7 +1132,7 @@ aws eks create-cluster \
 
 ---
 
-## 🆕 EKS 최신 기능
+## EKS 최신 기능
 
 ### 1. Cluster Insights
 

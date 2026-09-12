@@ -40,6 +40,8 @@ Device Plugin과 kubelet은 클러스터 API 서버를 거치지 않고 **노드
 
 ![Device Plugin API 동작](/assets/images/posts/vllm-week6/device-plugin-api-sequence.svg)
 
+`Allocate()` 응답을 실제로 컨테이너 안에 반영하는 건 Device Plugin이 아니라 컨테이너 런타임 쪽 몫이다. 예전에는 벤더마다 제각각인 OCI prestart 훅으로 이 작업을 처리했는데, 최근에는 **CDI(Container Device Interface)**라는 표준 스펙으로 정리되는 추세다. `/etc/cdi/nvidia.yaml` 같은 파일에 "이 디바이스를 쓰려면 어떤 파일을 마운트하고 어떤 환경 변수를 심어야 하는지"를 미리 선언해 두면, `runc`가 그 스펙을 그대로 따라 실행한다. Device Plugin이 "몇 개 줄지"를 정한다면, CDI는 "그걸 실제로 어떻게 주입할지"를 표준화한 것이다.
+
 이 API가 다루는 정보는 딱 여기까지다. "GPU가 몇 개 있다"와 "이 컨테이너에 어떤 디바이스를 마운트하라"만 표현할 수 있고, 그 사이에 있는 "어떤 조건의 GPU를 원하는가"는 이 API의 영역이 아니다. 이 한계는 뒤에서 **DRA**로 다시 등장한다.
 
 ## NVIDIA GPU Operator
@@ -73,6 +75,8 @@ GPU 한 장을 여러 Pod가 나눠 쓰는 방법은 격리 경계를 어디에 
 
 - **MIG**: GPU 다이 자체를 물리적으로 분할한다. SM(Streaming Multiprocessor)·메모리·캐시가 인스턴스별로 완전히 독립돼, 한쪽 장애가 다른 쪽으로 전혀 넘어가지 않는다.
 
+네 가지 모두 NVIDIA가 제공하는 방식이라 벤더 종속적이다. **HAMi** 같은 오픈소스 프로젝트는 NVIDIA·AMD·Cambricon 등 여러 벤더의 GPU를 동일한 방식으로 가상 메모리·코어 단위까지 나눠 쓸 수 있게 해주는 벤더 중립적인 레이어를 표방한다. 다만 이 글에서는 NVIDIA 생태계 안의 네 가지 방식에 집중한다.
+
 네 방식 중 격리 수준이 가장 높은 MIG만 조금 더 들여다볼 가치가 있다.
 
 ## MIG: 하드웨어 파티셔닝
@@ -98,6 +102,14 @@ Device Plugin API는 NVIDIA 전용이 아니라 **Kubernetes 표준 인터페이
 | Google(GKE) | TPU 전용 디바이스 플러그인(관리형 자동 배포) | `google.com/tpu` | TPU v5e/v6e(Trillium) |
 
 Pod 입장에서 보면 벤더가 바뀌어도 패턴은 동일하다. `resources.limits`에 `<벤더>/<디바이스>: N` 한 줄을 적으면 된다. 차이는 그 뒤에 있다 — MIG 같은 하드웨어 파티셔닝 유무, 오퍼레이터의 성숙도, 관리형 클라우드에 얼마나 통합돼 있는지가 벤더마다 다르다. 특히 Google TPU는 사용자가 직접 플러그인을 설치하는 게 아니라 GKE가 TPU 노드 풀을 만들 때 자동으로 구성해 준다는 점에서 나머지 넷과 운영 방식이 가장 다르다.
+
+NVIDIA와 AWS Neuron을 나란히 놓고 보면 **개입 레벨 자체가 다르다**는 점이 드러난다.
+
+- **NVIDIA**: Device Plugin은 "몇 개 줄지"만 정하고, 실제 주입은 Container Toolkit이 컨테이너 런타임(OCI prestart 훅 또는 CDI) 레벨까지 내려가서 처리한다. 드라이버 라이브러리(`libcuda.so` 등)가 호스트에만 있고 컨테이너 이미지 안에는 없기 때문에, 런타임이 그걸 컨테이너 파일시스템으로 복사·마운트해 줘야 하기 때문이다.
+
+- **AWS Neuron**: 순수하게 **Kubernetes Device Plugin 레벨에서만** 개입한다. Neuron SDK의 유저스페이스 라이브러리는 애초에 pip로 컨테이너 이미지 안에 들어가 있어서, Device Plugin이 `Allocate()` 응답으로 `NEURON_RT_VISIBLE_CORES` 같은 환경 변수만 넣어 주면 끝난다. 별도 컨테이너 런타임 훅이 필요 없다.
+
+Neuron은 여기에 한 가지를 더 얹는다. 기본 kube-scheduler만으로는 어떤 Trainium/Inferentia 칩의 어떤 NeuronCore가 비어 있는지를 세밀하게 고려하기 어렵기 때문에, **Neuron Scheduler Extension**이라는 커스텀 스케줄러(`my-scheduler`)를 별도로 배포해 Pod의 `schedulerName`으로 지정해 쓴다. Device Plugin API 하나로는 부족해서 벤더가 스케줄링 로직 자체를 확장한 사례로, 뒤에서 볼 DRA가 풀려는 문제와 방향이 비슷하다.
 
 ## Device Plugin의 한계와 DRA의 등장
 
@@ -158,6 +170,8 @@ DRA는 한 번에 지금 모습으로 나온 게 아니다. 설계를 한 번 �
 
 - Device Plugin이 표현하지 못하는 "어떤 조건의 디바이스인가"를 채우기 위해 **DRA**가 등장했고, Classic 설계를 한 번 갈아엎은 뒤 v1.34에서 GA에 도달했다.
 
+- 벤더마다 개입 레벨도 다르다. NVIDIA는 컨테이너 런타임까지 내려가 드라이버 라이브러리를 주입하고, AWS Neuron은 순수 Device Plugin 레벨에서 환경 변수만 넣는다. 이런 차이는 Device Plugin API가 정한 최소 규격 위에 벤더가 얼마나 더 쌓아 올리느냐의 문제다.
+
 ## 참고
 
 - [Kubernetes Docs - Device Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)
@@ -172,3 +186,7 @@ DRA는 한 번에 지금 모습으로 나온 게 아니다. 설계를 한 번 �
 - [NVIDIA MIG User Guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/)
 - [Intel Device Plugins for Kubernetes](https://github.com/intel/intel-device-plugins-for-kubernetes)
 - [AWS Neuron Device Plugin](https://awsdocs-neuron.readthedocs-hosted.com/en/latest/containers/index.html)
+- [AWS Neuron Documentation](https://awsdocs-neuron.readthedocs-hosted.com/en/latest/)
+- [NVIDIA CDI(Container Device Interface) Support](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/cdi-support.html)
+- [CNCF - GPU-Enabled Platforms on Kubernetes](https://www.vcluster.com/gpu-enabled-platforms-on-kubernetes)
+- [HAMi (Heterogeneous AI Computing Virtualization Middleware)](https://github.com/Project-HAMi/HAMi)

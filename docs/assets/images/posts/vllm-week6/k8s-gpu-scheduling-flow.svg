@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="430" viewBox="0 0 980 430" role="img" aria-label="Device Plugin이 노드 기동 시 GPU 개수를 API 서버에 등록하고, Pod가 생성되면 스케줄러가 해당 노드를 선택해 kubelet이 Device Plugin의 Allocate를 호출, 컨테이너 런타임이 GPU를 마운트하는 전체 흐름">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="a1s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4f46e5"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" font-family="JetBrains Mono, monospace" font-size="12" fill="#7c3aed" font-weight="700">① 사전 등록 (노드 기동 시 1회)</text>
+  <rect x="20" y="45" width="180" height="64" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="110" y="72" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">Device Plugin</text>
+  <text x="110" y="90" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">GPU 목록 감지</text>
+
+  <line x1="200" y1="77" x2="272" y2="77" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="236" y="68" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#6b7280">ListAndWatch()</text>
+
+  <rect x="280" y="45" width="150" height="64" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="355" y="82" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">kubelet</text>
+
+  <line x1="430" y1="77" x2="502" y2="77" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="466" y="68" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#6b7280">Node Update</text>
+
+  <rect x="510" y="45" width="270" height="64" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="645" y="70" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">API Server: Node.status</text>
+  <text x="645" y="88" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#4338ca">allocatable[nvidia.com/gpu] = 4</text>
+
+  <line x1="645" y1="109" x2="645" y2="150" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a1s)"/>
+  <text x="770" y="132" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">스케줄링 시 이 값을 참조</text>
+
+  <text x="20" y="185" font-family="JetBrains Mono, monospace" font-size="12" fill="#7c3aed" font-weight="700">② Pod 생성 → 컨테이너 기동</text>
+
+  <rect x="20" y="200" width="150" height="76" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="95" y="228" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">Pod spec</text>
+  <text x="95" y="246" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#4338ca">resources.limits</text>
+  <text x="95" y="260" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#4338ca">nvidia.com/gpu: 1</text>
+
+  <line x1="170" y1="238" x2="242" y2="238" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <rect x="250" y="200" width="170" height="76" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="335" y="232" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">kube-scheduler</text>
+  <text x="335" y="250" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">Filter: GPU 남은</text>
+  <text x="335" y="265" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">노드만 선택</text>
+
+  <line x1="420" y1="238" x2="492" y2="238" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="456" y="228" text-anchor="middle" font-family="Noto Sans KR" font-size="10.5" fill="#6b7280">Bind</text>
+
+  <rect x="500" y="200" width="150" height="76" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="575" y="232" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">kubelet</text>
+  <text x="575" y="250" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">(선택된 노드)</text>
+
+  <line x1="650" y1="238" x2="722" y2="238" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="686" y="228" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#6b7280">Allocate()</text>
+
+  <rect x="730" y="200" width="150" height="76" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="805" y="232" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">Device Plugin</text>
+  <text x="805" y="250" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#4338ca">디바이스 경로 +</text>
+  <text x="805" y="265" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#4338ca">env/mount 반환</text>
+
+  <line x1="805" y1="276" x2="805" y2="330" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <rect x="640" y="338" width="330" height="66" rx="8" fill="#f3f4f9" stroke="#c9cee0" stroke-width="1.5"/>
+  <text x="805" y="365" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#1e2233" font-weight="500">Container Runtime</text>
+  <text x="805" y="383" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6b7280">/dev/nvidia* 마운트 후 컨테이너 시작</text>
+</svg>

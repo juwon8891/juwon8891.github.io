@@ -39,6 +39,11 @@ plugins:
         - ko
         - en
   - tags
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      zoomable: true
+      draggable: true
 
 markdown_extensions:
   - pymdownx.highlight:

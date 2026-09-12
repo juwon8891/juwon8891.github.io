@@ -144,6 +144,8 @@ Pod 입장에서 보면 벤더가 바뀌어도 패턴은 동일하다. `resource
 
 NVIDIA와 AWS Neuron을 나란히 놓고 보면 **개입 레벨 자체가 다르다**는 점이 드러난다.
 
+![NVIDIA vs AWS Neuron 개입 레벨 비교](/assets/images/posts/vllm-week6/nvidia-vs-neuron-intervention-level.svg)
+
 - **NVIDIA**: Device Plugin은 "몇 개 줄지"만 정하고, 실제 주입은 Container Toolkit이 컨테이너 런타임(OCI prestart 훅 또는 CDI) 레벨까지 내려가서 처리한다. 드라이버 라이브러리(`libcuda.so` 등)가 호스트에만 있고 컨테이너 이미지 안에는 없기 때문에, 런타임이 그걸 컨테이너 파일시스템으로 복사·마운트해 줘야 하기 때문이다.
 
 - **AWS Neuron**: 순수하게 **Kubernetes Device Plugin 레벨에서만** 개입한다. Neuron SDK의 유저스페이스 라이브러리는 애초에 pip로 컨테이너 이미지 안에 들어가 있어서, Device Plugin이 `Allocate()` 응답으로 `NEURON_RT_VISIBLE_CORES` 같은 환경 변수만 넣어 주면 끝난다. 별도 컨테이너 런타임 훅이 필요 없다.

@@ -7,6 +7,8 @@ tags:
   - GPU Operator
   - DRA
   - MIG
+  - CDI
+  - HAMi
   - Accelerator
 ---
 
@@ -40,9 +42,28 @@ Device Plugin과 kubelet은 클러스터 API 서버를 거치지 않고 **노드
 
 ![Device Plugin API 동작](/assets/images/posts/vllm-week6/device-plugin-api-sequence.svg)
 
-`Allocate()` 응답을 실제로 컨테이너 안에 반영하는 건 Device Plugin이 아니라 컨테이너 런타임 쪽 몫이다. 예전에는 벤더마다 제각각인 OCI prestart 훅으로 이 작업을 처리했는데, 최근에는 **CDI(Container Device Interface)**라는 표준 스펙으로 정리되는 추세다. `/etc/cdi/nvidia.yaml` 같은 파일에 "이 디바이스를 쓰려면 어떤 파일을 마운트하고 어떤 환경 변수를 심어야 하는지"를 미리 선언해 두면, `runc`가 그 스펙을 그대로 따라 실행한다. Device Plugin이 "몇 개 줄지"를 정한다면, CDI는 "그걸 실제로 어떻게 주입할지"를 표준화한 것이다.
+`Allocate()` 응답을 실제로 컨테이너 안에 반영하는 건 Device Plugin이 아니라 컨테이너 런타임 쪽 몫이다. 그 구체적인 메커니즘은 뒤에서 **CDI**로 따로 다룬다.
 
 이 API가 다루는 정보는 딱 여기까지다. "GPU가 몇 개 있다"와 "이 컨테이너에 어떤 디바이스를 마운트하라"만 표현할 수 있고, 그 사이에 있는 "어떤 조건의 GPU를 원하는가"는 이 API의 영역이 아니다. 이 한계는 뒤에서 **DRA**로 다시 등장한다.
+
+## CDI: 디바이스를 컨테이너에 실제로 주입하는 방법
+
+Device Plugin의 `Allocate()`는 "이 디바이스 경로를 마운트하고 이 환경 변수를 넣어라"는 응답을 돌려줄 뿐, 그걸 실제로 컨테이너에 반영하는 건 컨테이너 런타임(containerd, CRI-O)의 몫이다. 예전에는 이 반영 로직을 벤더마다 독자적인 OCI prestart 훅으로 구현했다 — NVIDIA는 `nvidia-container-runtime-hook`, 다른 벤더는 각자의 방식으로. 런타임 입장에서는 벤더가 늘어날 때마다 훅을 새로 지원해야 하는 구조였다.
+
+**CDI(Container Device Interface)**는 이 반영 로직 자체를 표준 스펙으로 뽑아낸 CNCF 프로젝트다. 벤더는 `vendor.com/class=name` 형식의 정규화된 이름과, `/etc/cdi/vendor.json` 같은 스펙 파일 하나만 준비하면 된다. 런타임은 벤더가 누구인지 몰라도 이 파일 하나만 읽으면 된다.
+
+![CDI 동작 원리](/assets/images/posts/vllm-week6/cdi-container-device-interface.svg)
+
+CDI 스펙 파일의 `containerEdits`는 네 가지 편집을 표준화한다.
+
+| 필드 | 역할 |
+|------|------|
+| `env` | 컨테이너에 심을 환경 변수 (예: `NVIDIA_VISIBLE_DEVICES=0`) |
+| `deviceNodes` | 마운트할 디바이스 노드 경로 (예: `/dev/nvidia0`) |
+| `mounts` | 호스트의 드라이버 라이브러리(`libcuda.so` 등)를 컨테이너로 복사·마운트 |
+| `hooks` | 컨테이너 생성 단계별로 실행할 스크립트 |
+
+이 네 필드가 그대로 OCI 런타임 스펙에 병합되고, `runc`는 이걸 벤더 구분 없이 동일한 방식으로 처리한다. Device Plugin이 "몇 개 줄지"를 정하는 자리라면, CDI는 그 결정을 "실제로 어떻게 주입할지" 표준화한 자리다. Kubernetes 1.28부터 `AllocateResponse`가 CDI 디바이스 이름을 직접 담을 수 있게 되면서, 최신 NVIDIA Device Plugin은 아예 CDI 경로로만 동작하도록 전환되는 중이다.
 
 ## NVIDIA GPU Operator
 
@@ -75,7 +96,7 @@ GPU 한 장을 여러 Pod가 나눠 쓰는 방법은 격리 경계를 어디에 
 
 - **MIG**: GPU 다이 자체를 물리적으로 분할한다. SM(Streaming Multiprocessor)·메모리·캐시가 인스턴스별로 완전히 독립돼, 한쪽 장애가 다른 쪽으로 전혀 넘어가지 않는다.
 
-네 가지 모두 NVIDIA가 제공하는 방식이라 벤더 종속적이다. **HAMi** 같은 오픈소스 프로젝트는 NVIDIA·AMD·Cambricon 등 여러 벤더의 GPU를 동일한 방식으로 가상 메모리·코어 단위까지 나눠 쓸 수 있게 해주는 벤더 중립적인 레이어를 표방한다. 다만 이 글에서는 NVIDIA 생태계 안의 네 가지 방식에 집중한다.
+네 가지 모두 NVIDIA가 자체적으로 제공하는 방식이다. 벤더 중립적인 대안인 **HAMi**는 뒤에서 따로 다룬다.
 
 네 방식 중 격리 수준이 가장 높은 MIG만 조금 더 들여다볼 가치가 있다.
 
@@ -86,6 +107,24 @@ MIG는 Ampere 세대(A100) 이상에서 지원하는 기능으로, 물리 GPU �
 ![NVIDIA MIG 파티셔닝 구조](/assets/images/posts/vllm-week6/mig-partitioning-structure.svg)
 
 각 인스턴스는 전용 SM·메모리·캐시·메모리 대역폭을 가지며, Kubernetes에는 `nvidia.com/mig-1g.10gb`처럼 **크기별로 서로 다른 리소스 이름**으로 노출된다. Pod는 "GPU 1개"가 아니라 "메모리 10GB짜리 인스턴스 1개"를 정확히 요청할 수 있게 된다. 이 파티셔닝을 수동 CLI 없이 자동화해 주는 것이 앞서 본 GPU Operator의 MIG Manager다.
+
+MIG는 격리 수준이 가장 높지만 조건이 두 가지 있다 — **Ampere 이상**이어야 하고, **NVIDIA GPU**여야 한다. 이 두 조건을 벗어나는 상황(구형 GPU, 여러 벤더 혼합 클러스터)에서는 소프트웨어로 우회하는 다른 접근이 필요한데, 그게 HAMi다.
+
+## HAMi: 벤더 중립 소프트웨어 가상화
+
+**HAMi**(Heterogeneous AI Computing Virtualization Middleware)는 CNCF Incubating 프로젝트로, MIG처럼 GPU 하드웨어를 건드리지 않고도 메모리·컴퓨팅 코어 단위로 GPU를 잘게 나눠 쓸 수 있게 해준다. NVIDIA뿐 아니라 Cambricon·Ascend·Hygon·Iluvatar·MetaX·Moore Threads 등 여러 가속기를 같은 스케줄러·Device Plugin 위에서 관리한다는 점이 MIG와의 가장 큰 차이다.
+
+핵심은 **HAMi-core**(`libvgpu.so`)라는 유저스페이스 라이브러리다. 컨테이너 시작 시 `LD_PRELOAD`로 먼저 로드돼, `cu`나 `nvml`로 시작하는 CUDA/NVML 함수 호출을 `dlsym` 후킹으로 가로챈다.
+
+![HAMi 아키텍처와 소프트웨어 GPU 가상화](/assets/images/posts/vllm-week6/hami-gpu-virtualization-architecture.svg)
+
+가로챈 호출은 두 가지 방식으로 제한된다.
+
+- **메모리 가드**: `cuMemAlloc` 같은 할당 함수 호출 시 현재 사용량과 요청량의 합이 Pod에 배정된 한도(`nvidia.com/gpumem`)를 넘으면 실제 GPU에 요청을 보내지 않고 그 자리에서 `CUDA_ERROR_OUT_OF_MEMORY`를 반환한다. `nvmlDeviceGetMemoryInfo` 같은 조회 함수도 물리 GPU의 전체 용량이 아니라 할당된 한도만 보이도록 값을 바꿔치기한다.
+
+- **코어 레이트리미터**: `cuLaunchKernel` 같은 커널 실행 함수 호출 전에 남은 코어 쿼터(`g_cur_cuda_cores`)를 확인한다. 쿼터가 소진되면 spin-wait 상태로 대기시키고, 별도 스레드가 실제 GPU 사용률을 주기적으로 샘플링해 쿼터를 다시 채워 넣는다.
+
+이 방식은 드라이버나 하드웨어를 전혀 건드리지 않기 때문에 MIG를 지원하지 않는 구형 GPU에도 그대로 적용할 수 있다는 것이 가장 큰 장점이다. 대신 격리가 애플리케이션 레벨의 소프트웨어 후킹으로 이뤄지는 **소프트 격리**라서, MIG의 하드웨어 격리만큼 강하지는 않다. HAMi 스케줄러는 여기에 더해 어떤 노드의 어떤 GPU에 남은 메모리·코어가 있는지를 보고 Pod를 배치하는 토폴로지 인지 스케줄링까지 담당한다.
 
 ## NVIDIA 외 가속기 생태계
 
@@ -164,7 +203,9 @@ DRA는 한 번에 지금 모습으로 나온 게 아니다. 설계를 한 번 �
 
 - **GPU Operator**는 새로운 스케줄링 방식이 아니라, Device Plugin이 동작하는 데 필요한 드라이버·런타임·모니터링을 한 CR로 묶어 배포하는 오퍼레이터다.
 
-- GPU 공유는 격리 경계를 어디에 두느냐의 스펙트럼이다. **Time-Slicing → MPS → MIG** 순으로 격리 수준이 올라가고, MIG만 유일하게 하드웨어 자체를 분할한다.
+- GPU 공유는 격리 경계를 어디에 두느냐의 스펙트럼이다. **Time-Slicing → MPS → MIG** 순으로 격리 수준이 올라가고, MIG만 유일하게 하드웨어 자체를 분할한다. **HAMi**는 하드웨어 대신 CUDA 호출 자체를 가로채는 소프트웨어 방식으로 같은 문제를 벤더 중립적으로 풀어낸다.
+
+- **CDI**는 Device Plugin이 정한 "몇 개 줄지"를 실제로 "어떻게 주입할지"로 옮기는 표준 스펙이다. 벤더별 OCI 훅을 스펙 파일 하나로 대체해, 런타임이 벤더를 몰라도 되게 만든다.
 
 - Device Plugin API는 NVIDIA만의 것이 아니라 **표준 인터페이스**이며, AMD·Intel·AWS·Google이 각자의 방식으로 같은 인터페이스를 구현한다.
 

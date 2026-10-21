@@ -2,3 +2,5 @@ mkdocs>=1.5.0
 mkdocs-material>=9.5.0
 pymdown-extensions>=10.0
 mkdocs-glightbox>=0.4.0
+# selectolax 1.0+에서 mkdocs-glightbox가 이미지를 제거하는 문제로 1.0 미만 고정
+selectolax<1.0

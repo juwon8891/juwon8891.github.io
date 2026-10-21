@@ -12,7 +12,7 @@
 - [Infrastructure](infrastructure/ipmi.md)
 - [Istio](istio/week1-intro.md)
 - [K8s Deploy](k8s-deploy/week1-kubernetes-hard-way.md)
-- [ML Platform Engineering](ml-platform/week1-containerizing-deploying-k8s.md)
+- [ML Platform Engineering](ml-platform/week1-mlops-ml-engineering.md)
 - [Monitoring](monitoring/prometheus.md)
 - [Networking](networking/l2-l3-troubleshooting.md)
 - [vLLM](vllm/week1-llm-basics-model-serving.md)

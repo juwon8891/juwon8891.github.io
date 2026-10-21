@@ -158,6 +158,8 @@ nav:
     - Week 5 - Kubespray HA & Upgrade: k8s-deploy/week5-kubespray-ha-upgrade.md
     - Week 6 - Kubespray Offline: k8s-deploy/week6-kubespray-offline.md
     - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
+  - ML Platform Engineering:
+    - Week 1 - 컨테이너화 & Kubernetes 배포: ml-platform/week1-containerizing-deploying-k8s.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
     - Alertmanager: monitoring/alertmanager.md

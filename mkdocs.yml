@@ -160,6 +160,7 @@ nav:
     - Week 7 - RKE2 & Cluster API: k8s-deploy/week7-rke2-cluster-api.md
   - ML Platform Engineering:
     - Week 1 - MLOps와 ML 엔지니어링: ml-platform/week1-mlops-ml-engineering.md
+    - Week 2 - 실험 추적, 피처 스토어, ML 파이프라인: ml-platform/week2-experiments-features-pipelines.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
     - Alertmanager: monitoring/alertmanager.md

@@ -161,6 +161,7 @@ nav:
   - ML Platform Engineering:
     - Week 1 - MLOps와 ML 엔지니어링: ml-platform/week1-mlops-ml-engineering.md
     - Week 2 - 실험 추적, 피처 스토어, ML 파이프라인: ml-platform/week2-experiments-features-pipelines.md
+    - Week 3 - 모델 서빙, 드리프트 모니터링, 데이터 준비: ml-platform/week3-serving-drift-data-prep.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
     - Alertmanager: monitoring/alertmanager.md

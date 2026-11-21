@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="334" viewBox="0 0 960 334" role="img" font-family="Apple SD Gothic Neo, Malgun Gothic, sans-serif"><title>추천 모델 승격</title><desc>평가 조건을 고정한 다음, 현재 모델과 후보의 품질 차이를 본다.</desc><rect width="960" height="334" rx="20" fill="#f1f5fb"/>
+<text x="32" y="46" fill="#14243d" font-size="29" font-weight="700">추천 모델 승격</text>
+<text x="32" y="77" fill="#40536e" font-size="17" font-weight="500">평가 조건을 고정한 다음, 현재 모델과 후보의 품질 차이를 본다.</text>
+<rect x="32" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="47" y="134" fill="#103b70" font-size="21" font-weight="700">입력 검사</text>
+<text x="47" y="159" fill="#14243d" font-size="16" font-weight="500">Parquet 필수 컬럼 확인</text>
+<text x="318" y="150" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="338" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="353" y="134" fill="#103b70" font-size="21" font-weight="700">모델 훈련</text>
+<text x="353" y="159" fill="#14243d" font-size="16" font-weight="500">실행 ID와 모델 기록</text>
+<text x="624" y="150" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="644" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="659" y="134" fill="#103b70" font-size="21" font-weight="700">같은 검증셋</text>
+<text x="659" y="159" fill="#14243d" font-size="16" font-weight="500">평점 오차 · Precision · Recall</text>
+<rect x="32" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="47" y="239" fill="#103b70" font-size="21" font-weight="700">검증 게이트</text>
+<text x="47" y="264" fill="#14243d" font-size="16" font-weight="500">지표별 허용 범위 확인</text>
+
+<rect x="338" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="353" y="239" fill="#103b70" font-size="21" font-weight="700">통과</text>
+<text x="353" y="264" fill="#14243d" font-size="16" font-weight="500">후보 등록 후 staging 이동</text>
+
+<rect x="644" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="659" y="239" fill="#103b70" font-size="21" font-weight="700">실패</text>
+<text x="659" y="264" fill="#14243d" font-size="16" font-weight="500">기존 모델과 별칭 유지</text>
+<path d="M173 285 V306 H785 M479 306 V285 M785 306 V285 M474 290 L479 285 L484 290 M780 290 L785 285 L790 290" stroke="#315f92" stroke-width="2" fill="none"/>
+</svg>

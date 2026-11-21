@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="316" viewBox="0 0 960 316" role="img" font-family="Apple SD Gothic Neo, Malgun Gothic, sans-serif"><title>BentoML 로컬 실습 요청 카운터</title><desc>정상 요청 한 건을 더 보내자 HTTP 200 카운터만 1에서 2로 증가했다. 400은 1, 500은 0으로 유지됐다.</desc><rect width="960" height="316" rx="20" fill="#f1f5fb"/>
+<text x="32" y="46" fill="#14243d" font-size="29" font-weight="700">추론 요청 한 건이 메트릭에 남는 과정</text>
+<text x="32" y="76" fill="#40536e" font-size="17" font-weight="500">BentoML 로컬 실습 · /predict 누적 요청 수</text>
+<text x="232" y="113" fill="#40536e" font-size="17" font-weight="700">추가 요청 전</text>
+<text x="571" y="113" fill="#40536e" font-size="17" font-weight="700">정상 요청 1건 추가 후</text>
+<text x="34" y="154" fill="#14243d" font-size="18" font-weight="700">HTTP 200</text>
+<rect x="232" y="132" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<rect x="232" y="132" width="94" height="30" rx="6" fill="#58799e"/>
+<text x="463" y="155" fill="#14243d" font-size="19" font-weight="700">1</text>
+<rect x="571" y="132" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<rect x="571" y="132" width="188" height="30" rx="6" fill="#175ea9"/>
+<text x="802" y="155" fill="#14243d" font-size="19" font-weight="700">2</text>
+<text x="34" y="206" fill="#14243d" font-size="18" font-weight="700">HTTP 400</text>
+<rect x="232" y="184" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<rect x="232" y="184" width="94" height="30" rx="6" fill="#58799e"/>
+<text x="463" y="207" fill="#14243d" font-size="19" font-weight="700">1</text>
+<rect x="571" y="184" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<rect x="571" y="184" width="94" height="30" rx="6" fill="#175ea9"/>
+<text x="802" y="207" fill="#14243d" font-size="19" font-weight="700">1</text>
+<text x="34" y="258" fill="#14243d" font-size="18" font-weight="700">HTTP 500</text>
+<rect x="232" y="236" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<text x="463" y="259" fill="#14243d" font-size="19" font-weight="700">0</text>
+<rect x="571" y="236" width="220" height="30" rx="6" fill="#dbe6f2"/>
+<text x="802" y="259" fill="#14243d" font-size="19" font-weight="700">0</text>
+</svg>

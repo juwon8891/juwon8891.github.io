@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="439" viewBox="0 0 960 439" role="img" font-family="Apple SD Gothic Neo, Malgun Gothic, sans-serif"><title>강의에서 비교한 모델 서빙 경로</title><desc>모델 파일이 같아도 입력 계약과 배포 경계가 달라진다.</desc><rect width="960" height="439" rx="20" fill="#f1f5fb"/>
+<text x="32" y="46" fill="#14243d" font-size="29" font-weight="700">강의에서 비교한 모델 서빙 경로</text>
+<text x="32" y="77" fill="#40536e" font-size="17" font-weight="500">모델 파일이 같아도 입력 계약과 배포 경계가 달라진다.</text>
+<rect x="32" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="47" y="134" fill="#103b70" font-size="21" font-weight="700">YOLOv8</text>
+<text x="47" y="159" fill="#14243d" font-size="16" font-weight="500">이미지와 모델 가중치</text>
+<text x="318" y="150" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="338" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="353" y="134" fill="#103b70" font-size="21" font-weight="700">BentoML</text>
+<text x="353" y="159" fill="#14243d" font-size="16" font-weight="500">추론 코드와 의존성을 패키징</text>
+<text x="624" y="150" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="644" y="104" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="659" y="134" fill="#103b70" font-size="21" font-weight="700">검출 API</text>
+<text x="659" y="159" fill="#14243d" font-size="16" font-weight="500">클래스 · 신뢰도 · 상자</text>
+<rect x="32" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="47" y="239" fill="#103b70" font-size="21" font-weight="700">영화 추천</text>
+<text x="47" y="264" fill="#14243d" font-size="16" font-weight="500">사용자 ID와 영화 ID</text>
+<text x="318" y="255" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="338" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="353" y="239" fill="#103b70" font-size="21" font-weight="700">MLflow PyFunc</text>
+<text x="353" y="264" fill="#14243d" font-size="16" font-weight="500">표 형태 입력을 모델에 전달</text>
+<text x="624" y="255" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="644" y="209" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="659" y="239" fill="#103b70" font-size="21" font-weight="700">점수 API</text>
+<text x="659" y="264" fill="#14243d" font-size="16" font-weight="500">입력 행마다 예측 점수</text>
+<rect x="32" y="314" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="47" y="344" fill="#103b70" font-size="21" font-weight="700">Iris 분류</text>
+<text x="47" y="369" fill="#14243d" font-size="16" font-weight="500">꽃 길이·너비 측정값</text>
+<text x="318" y="360" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="338" y="314" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="353" y="344" fill="#103b70" font-size="21" font-weight="700">KServe</text>
+<text x="353" y="369" fill="#14243d" font-size="16" font-weight="500">클러스터에서 런타임 실행</text>
+<text x="624" y="360" fill="#315f92" font-size="20" font-weight="700">→</text>
+<rect x="644" y="314" width="282" height="76" rx="12" fill="#ffffff" stroke="#a7bdd7"/>
+<text x="659" y="344" fill="#103b70" font-size="21" font-weight="700">V1 / V2</text>
+<text x="659" y="369" fill="#14243d" font-size="16" font-weight="500">입력 형식별 분류 결과</text>
+</svg>

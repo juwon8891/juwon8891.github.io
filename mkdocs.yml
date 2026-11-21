@@ -163,6 +163,7 @@ nav:
     - Week 2 - 실험 추적, 피처 스토어, ML 파이프라인: ml-platform/week2-experiments-features-pipelines.md
     - Week 3 - 모델 서빙, 드리프트 모니터링, 데이터 준비: ml-platform/week3-serving-drift-data-prep.md
     - Week 4 - 모델 학습과 검증, PVC 데이터 공유: ml-platform/week4-training-validation-pvc.md
+    - Week 5 - 모델 추론과 서빙, 모니터링과 설명 가능성: ml-platform/week5-inference-serving-monitoring.md
   - Monitoring:
     - Prometheus: monitoring/prometheus.md
     - Alertmanager: monitoring/alertmanager.md
